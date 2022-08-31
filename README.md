@@ -7,6 +7,7 @@ Currently worked on by Oliver
 # Camera Module
 TODO: Make all of the main functions and helper functions
 
+
 ## Main Camera Functions:
 
 ### initCamera()
@@ -20,6 +21,7 @@ sends a image trigger over I2C, waits for response, stores image pixel by pixel 
 
 ### saveImage(folderName, bufferPointer, bufferLength)
 writes buffer to a new file on the SD card in a given folder
+
 
 ## Camera Helper Functions:
 
