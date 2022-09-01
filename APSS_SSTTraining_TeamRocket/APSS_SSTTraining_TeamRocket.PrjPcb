@@ -83,7 +83,7 @@ GenerateClassCluster=0
 DocumentUniqueId=PVSEHHCK
 
 [Document3]
-DocumentPath=..\..\..\Downloads\MSP430FR2355_Altium_Libraries\Passives.PcbLib
+DocumentPath=MSP430FR2355_Altium_Libraries\Passives.PcbLib
 AnnotationEnabled=1
 AnnotateStartValue=1
 AnnotationIndexControlEnabled=0
@@ -97,10 +97,10 @@ ClassGenCCAutoRoomEnabled=1
 ClassGenNCAutoScope=None
 DItemRevisionGUID=
 GenerateClassCluster=0
-DocumentUniqueId=RDIQBAGT
+DocumentUniqueId=
 
 [Document4]
-DocumentPath=..\..\..\Downloads\MSP430FR2355_Altium_Libraries\Passives.SchLib
+DocumentPath=MSP430FR2355_Altium_Libraries\Passives.SchLib
 AnnotationEnabled=1
 AnnotateStartValue=1
 AnnotationIndexControlEnabled=0
@@ -114,10 +114,10 @@ ClassGenCCAutoRoomEnabled=1
 ClassGenNCAutoScope=None
 DItemRevisionGUID=
 GenerateClassCluster=0
-DocumentUniqueId=ALEPWTTD
+DocumentUniqueId=
 
 [Document5]
-DocumentPath=..\..\..\Downloads\MSP430FR2355_Altium_Libraries\Ti MSP430.PcbLib
+DocumentPath=MSP430FR2355_Altium_Libraries\Ti MSP430.PcbLib
 AnnotationEnabled=1
 AnnotateStartValue=1
 AnnotationIndexControlEnabled=0
@@ -134,7 +134,7 @@ GenerateClassCluster=0
 DocumentUniqueId=DEHXSUYO
 
 [Document6]
-DocumentPath=..\..\..\Downloads\MSP430FR2355_Altium_Libraries\Ti MSP430.SchLib
+DocumentPath=MSP430FR2355_Altium_Libraries\Ti MSP430.SchLib
 AnnotationEnabled=1
 AnnotateStartValue=1
 AnnotationIndexControlEnabled=0
