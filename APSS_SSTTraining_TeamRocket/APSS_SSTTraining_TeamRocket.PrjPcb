@@ -165,7 +165,7 @@ ClassGenCCAutoRoomEnabled=1
 ClassGenNCAutoScope=None
 DItemRevisionGUID=
 GenerateClassCluster=0
-DocumentUniqueId=TEJMCCAP
+DocumentUniqueId=DNXQFJMQ
 
 [Document8]
 DocumentPath=MSP430FR2355_Altium_Libraries\JS102011JCQN\JS102011JCQN\SW_JS102011JCQN.PcbLib
@@ -284,7 +284,7 @@ ClassGenCCAutoRoomEnabled=1
 ClassGenNCAutoScope=None
 DItemRevisionGUID=
 GenerateClassCluster=0
-DocumentUniqueId=
+DocumentUniqueId=GMIVLSFD
 
 [Document15]
 DocumentPath=MSP430FR2355_Altium_Libraries\SnapEDAsch.SchLib
@@ -318,7 +318,7 @@ ClassGenCCAutoRoomEnabled=1
 ClassGenNCAutoScope=None
 DItemRevisionGUID=
 GenerateClassCluster=0
-DocumentUniqueId=
+DocumentUniqueId=RNRXRVXK
 
 [Document17]
 DocumentPath=MSP430FR2355_Altium_Libraries\RT9193-33GB.IntLib
@@ -458,6 +458,23 @@ DocumentUniqueId=
 
 [Document25]
 DocumentPath=MSP430FR2355_Altium_Libraries\JS102011JCQN\JS102011JCQN.IntLib
+AnnotationEnabled=1
+AnnotateStartValue=1
+AnnotationIndexControlEnabled=0
+AnnotateSuffix=
+AnnotateScope=All
+AnnotateOrder=-1
+DoLibraryUpdate=1
+DoDatabaseUpdate=1
+ClassGenCCAutoEnabled=1
+ClassGenCCAutoRoomEnabled=1
+ClassGenNCAutoScope=None
+DItemRevisionGUID=
+GenerateClassCluster=0
+DocumentUniqueId=
+
+[Document26]
+DocumentPath=APSS_SSTTraining_TeamRocket.BomDoc
 AnnotationEnabled=1
 AnnotateStartValue=1
 AnnotationIndexControlEnabled=0
@@ -1416,10 +1433,16 @@ NetClassManualEnabled=1
 NetClassSeparateForBusSections=0
 
 [LibraryUpdateOptions]
-SelectedOnly=0
+SelectedOnly=1
 UpdateVariants=1
 UpdateToLatestRevision=1
 PartTypes=0
+ComponentLibIdentifierKind0=Library Name And Type
+ComponentLibraryIdentifier0=Miscellaneous Connectors.SchLib
+ComponentDesignItemID0=Header 12
+ComponentSymbolReference0=Header 12
+ComponentUpdate0=1
+ComponentIsDeviceSheet0=0
 FullReplace=1
 UpdateDesignatorLock=1
 UpdatePartIDLock=1
@@ -1433,6 +1456,30 @@ RemoveParameters=0
 AddModels=1
 RemoveModels=1
 UpdateCurrentModels=1
+ParameterName0=Comment
+ParameterUpdate0=1
+ParameterName1=Component Kind
+ParameterUpdate1=1
+ParameterName2=Description
+ParameterUpdate2=1
+ParameterName3=LatestRevisionDate
+ParameterUpdate3=1
+ParameterName4=LatestRevisionNote
+ParameterUpdate4=1
+ParameterName5=Library Reference
+ParameterUpdate5=1
+ParameterName6=Publisher
+ParameterUpdate6=1
+ModelTypeGroup0=PCBLIB
+ModelTypeUpdate0=1
+ModelType0=PCBLIB
+ModelName0=HDR1X12
+ModelUpdate0=1
+ModelTypeGroup1=SI
+ModelTypeUpdate1=1
+ModelType1=SI
+ModelName1=Connector
+ModelUpdate1=1
 
 [DatabaseUpdateOptions]
 SelectedOnly=0
