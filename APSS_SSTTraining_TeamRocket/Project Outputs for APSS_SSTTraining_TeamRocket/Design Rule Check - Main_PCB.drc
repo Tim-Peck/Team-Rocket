@@ -1,7 +1,7 @@
 Protel Design System Design Rule Check
 PCB File : D:\Users\jwitt\Document\GitHub\Team-Rocket\APSS_SSTTraining_TeamRocket\Main_PCB.PcbDoc
-Date     : 3/09/2022
-Time     : 5:19:50 pm
+Date     : 4/09/2022
+Time     : 2:24:19 pm
 
 Processing Rule : Clearance Constraint (Gap=0.254mm) (All),(All)
 Rule Violations :0
@@ -48,25 +48,30 @@ Processing Rule : Silk To Solder Mask (Clearance=0.1mm) (IsPad),(All)
    Violation between Silk To Solder Mask Clearance Constraint: (0.057mm < 0.1mm) Between Pad P3-4(19.3mm,17.8mm) on Multi-Layer And Track (20.2mm,18.05mm)(38.2mm,18.05mm) on Bottom Overlay [Bottom Overlay] to [Bottom Solder] clearance [0.057mm]
    Violation between Silk To Solder Mask Clearance Constraint: (Collision < 0.1mm) Between Pad T1-1(16.9mm,20.3mm) on Multi-Layer And Track (16.3mm,18mm)(16.3mm,21mm) on Bottom Overlay [Bottom Overlay] to [Bottom Solder] clearance [0mm]
    Violation between Silk To Solder Mask Clearance Constraint: (0.069mm < 0.1mm) Between Pad T2-1(16.9mm,26.5mm) on Multi-Layer And Text "C7" (14.23mm,26.438mm) on Top Overlay [Top Overlay] to [Top Solder] clearance [0.069mm]
-   Violation between Silk To Solder Mask Clearance Constraint: (0.047mm < 0.1mm) Between Pad T2-1(16.9mm,26.5mm) on Multi-Layer And Track (14.4mm,27.2mm)(16.4mm,27.2mm) on Bottom Overlay [Bottom Overlay] to [Bottom Solder] clearance [0.047mm]
-   Violation between Silk To Solder Mask Clearance Constraint: (Collision < 0.1mm) Between Pad T2-1(16.9mm,26.5mm) on Multi-Layer And Track (16.4mm,24.2mm)(16.4mm,27.2mm) on Bottom Overlay [Bottom Overlay] to [Bottom Solder] clearance [0mm]
-   Violation between Silk To Solder Mask Clearance Constraint: (0.047mm < 0.1mm) Between Pad T4-1(17.4mm,32.5mm) on Multi-Layer And Track (14.9mm,33.2mm)(16.9mm,33.2mm) on Bottom Overlay [Bottom Overlay] to [Bottom Solder] clearance [0.047mm]
-   Violation between Silk To Solder Mask Clearance Constraint: (Collision < 0.1mm) Between Pad T4-1(17.4mm,32.5mm) on Multi-Layer And Track (16.9mm,30.2mm)(16.9mm,33.2mm) on Bottom Overlay [Bottom Overlay] to [Bottom Solder] clearance [0mm]
+   Violation between Silk To Solder Mask Clearance Constraint: (Collision < 0.1mm) Between Pad T2-1(16.9mm,26.5mm) on Multi-Layer And Track (16.2mm,24.2mm)(16.2mm,27.2mm) on Bottom Overlay [Bottom Overlay] to [Bottom Solder] clearance [0mm]
+   Violation between Silk To Solder Mask Clearance Constraint: (0.086mm < 0.1mm) Between Pad T4-1(17.4mm,32.5mm) on Multi-Layer And Track (16.5mm,30.15mm)(16.5mm,33.15mm) on Bottom Overlay [Bottom Overlay] to [Bottom Solder] clearance [0.086mm]
    Violation between Silk To Solder Mask Clearance Constraint: (0.047mm < 0.1mm) Between Pad T5-1(17.4mm,38.5mm) on Multi-Layer And Track (14.9mm,39.2mm)(16.9mm,39.2mm) on Bottom Overlay [Bottom Overlay] to [Bottom Solder] clearance [0.047mm]
    Violation between Silk To Solder Mask Clearance Constraint: (Collision < 0.1mm) Between Pad T5-1(17.4mm,38.5mm) on Multi-Layer And Track (16.9mm,36.2mm)(16.9mm,39.2mm) on Bottom Overlay [Bottom Overlay] to [Bottom Solder] clearance [0mm]
-Rule Violations :13
+Rule Violations :11
 
 Processing Rule : Silk to Silk (Clearance=0.1mm) (All),(All)
-   Violation between Silk To Silk Clearance Constraint: (0.028mm < 0.1mm) Between Text "J1" (25.816mm,44.638mm) on Bottom Overlay And Track (21.6mm,44.42mm)(24.2mm,44.42mm) on Bottom Overlay Silk Text to Silk Clearance [0.028mm]
-Rule Violations :1
+Rule Violations :0
 
 Processing Rule : Net Antennae (Tolerance=0mm) (All)
 Rule Violations :0
+
+Processing Rule : Board Clearance Constraint (Gap=0mm) (All)
+   Violation between Board Outline Clearance(Outline Edge): (0.456mm < 0.5mm) Between Board Edge And Text "P2" (19.262mm,2.63mm) on Top Overlay 
+   Violation between Board Outline Clearance(Outline Edge): (0.401mm < 0.5mm) Between Board Edge And Track (19.675mm,1.735mm)(35.725mm,1.735mm) on Top Overlay 
+   Violation between Board Outline Clearance(Outline Edge): (0.401mm < 0.5mm) Between Board Edge And Track (35.725mm,1.735mm)(35.725mm,15.065mm) on Top Overlay 
+   Violation between Board Outline Clearance(Outline Edge): (0.171mm < 0.5mm) Between Board Edge And Track (42.78mm,7.6mm)(46.15mm,7.6mm) on Top Overlay 
+   Violation between Board Outline Clearance(Outline Edge): (0.171mm < 0.5mm) Between Board Edge And Track (46.15mm,7.6mm)(46.15mm,11.2mm) on Top Overlay 
+Rule Violations :5
 
 Processing Rule : Height Constraint (Min=0mm) (Max=25.4mm) (Prefered=12.7mm) (All)
 Rule Violations :0
 
 
-Violations Detected : 24
+Violations Detected : 26
 Waived Violations : 0
-Time Elapsed        : 00:00:02
+Time Elapsed        : 00:00:01
