@@ -1,7 +1,7 @@
 Protel Design System Design Rule Check
 PCB File : D:\Users\jwitt\Document\GitHub\Team-Rocket\APSS_SSTTraining_TeamRocket\Main_PCB.PcbDoc
 Date     : 4/09/2022
-Time     : 4:50:41 pm
+Time     : 9:54:39 pm
 
 Processing Rule : Clearance Constraint (Gap=0.254mm) (All),(All)
 Rule Violations :0
@@ -74,4 +74,4 @@ Rule Violations :0
 
 Violations Detected : 26
 Waived Violations : 0
-Time Elapsed        : 00:00:01
+Time Elapsed        : 00:00:03
