@@ -1,0 +1,11 @@
+Added Pin To Net: NetName=3v0 Pin=S4-3
+Added Member To Class: ClassName=Microcontroller Member=Component C4 C-n-100.000-10-0603
+Added Member To Class: ClassName=GNNS_Module Member=Component C5 C-p-012.000-2-0603
+Added Member To Class: ClassName=GNNS_Module Member=Component C6 C-p-012.000-2-0603
+Added Member To Class: ClassName=GNNS_Module Member=Component C8 C-n-010.000-5-0603
+Added Member To Class: ClassName=GNNS_Module Member=Component C12 C-n-001.000-5-0603
+Added Member To Class: ClassName=Microcontroller Member=Component R1 R-k-010.000-1-0603
+Added Member To Class: ClassName=Microcontroller Member=Component R3 R-k-010.000-1-0603
+Added Member To Class: ClassName=Microcontroller Member=Component R4 R-k-010.000-1-0603
+Added Member To Class: ClassName=GNNS_Module Member=Component T1 Open Pad
+Added Member To Class: ClassName=GNNS_Module Member=Component U3 SE878K3-A
