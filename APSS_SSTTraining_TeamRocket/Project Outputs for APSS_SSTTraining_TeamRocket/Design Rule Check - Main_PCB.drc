@@ -1,7 +1,7 @@
 Protel Design System Design Rule Check
 PCB File : D:\Users\jwitt\Document\GitHub\Team-Rocket\APSS_SSTTraining_TeamRocket\Main_PCB.PcbDoc
-Date     : 4/09/2022
-Time     : 9:54:39 pm
+Date     : 10/09/2022
+Time     : 1:22:07 pm
 
 Processing Rule : Clearance Constraint (Gap=0.254mm) (All),(All)
 Rule Violations :0
@@ -30,29 +30,12 @@ Rule Violations :0
 Processing Rule : Minimum Solder Mask Sliver (Gap=0.1mm) (All),(All)
    Violation between Minimum Solder Mask Sliver Constraint: (0.097mm < 0.1mm) Between Pad J1-1(22.9mm,41.475mm) on Bottom Layer And Pad J1-2(24.225mm,43mm) on Bottom Layer [Bottom Solder] Mask Sliver [0.097mm]
    Violation between Minimum Solder Mask Sliver Constraint: (0.097mm < 0.1mm) Between Pad J1-1(22.9mm,41.475mm) on Bottom Layer And Pad J1-3(21.575mm,43mm) on Bottom Layer [Bottom Solder] Mask Sliver [0.097mm]
-   Violation between Minimum Solder Mask Sliver Constraint: (0.067mm < 0.1mm) Between Pad U3-1(8.28mm,18.56mm) on Bottom Layer And Pad U3-2(8.28mm,19.5mm) on Bottom Layer [Bottom Solder] Mask Sliver [0.067mm]
-   Violation between Minimum Solder Mask Sliver Constraint: (0.067mm < 0.1mm) Between Pad U3-2(8.28mm,19.5mm) on Bottom Layer And Pad U3-3(8.28mm,20.44mm) on Bottom Layer [Bottom Solder] Mask Sliver [0.067mm]
-   Violation between Minimum Solder Mask Sliver Constraint: (0.067mm < 0.1mm) Between Pad U4-1(8.28mm,24.66mm) on Bottom Layer And Pad U4-2(8.28mm,25.6mm) on Bottom Layer [Bottom Solder] Mask Sliver [0.067mm]
-   Violation between Minimum Solder Mask Sliver Constraint: (0.067mm < 0.1mm) Between Pad U4-2(8.28mm,25.6mm) on Bottom Layer And Pad U4-3(8.28mm,26.54mm) on Bottom Layer [Bottom Solder] Mask Sliver [0.067mm]
-   Violation between Minimum Solder Mask Sliver Constraint: (0.067mm < 0.1mm) Between Pad U5-1(8.28mm,30.66mm) on Bottom Layer And Pad U5-2(8.28mm,31.6mm) on Bottom Layer [Bottom Solder] Mask Sliver [0.067mm]
-   Violation between Minimum Solder Mask Sliver Constraint: (0.067mm < 0.1mm) Between Pad U5-2(8.28mm,31.6mm) on Bottom Layer And Pad U5-3(8.28mm,32.54mm) on Bottom Layer [Bottom Solder] Mask Sliver [0.067mm]
-   Violation between Minimum Solder Mask Sliver Constraint: (0.067mm < 0.1mm) Between Pad U8-1(8.38mm,36.56mm) on Bottom Layer And Pad U8-2(8.38mm,37.5mm) on Bottom Layer [Bottom Solder] Mask Sliver [0.067mm]
-   Violation between Minimum Solder Mask Sliver Constraint: (0.067mm < 0.1mm) Between Pad U8-2(8.38mm,37.5mm) on Bottom Layer And Pad U8-3(8.38mm,38.44mm) on Bottom Layer [Bottom Solder] Mask Sliver [0.067mm]
-Rule Violations :10
+   Violation between Minimum Solder Mask Sliver Constraint: (0.067mm < 0.1mm) Between Pad U4-1(8.08mm,18.16mm) on Bottom Layer And Pad U4-2(8.08mm,19.1mm) on Bottom Layer [Bottom Solder] Mask Sliver [0.067mm]
+   Violation between Minimum Solder Mask Sliver Constraint: (0.067mm < 0.1mm) Between Pad U4-2(8.08mm,19.1mm) on Bottom Layer And Pad U4-3(8.08mm,20.04mm) on Bottom Layer [Bottom Solder] Mask Sliver [0.067mm]
+Rule Violations :4
 
 Processing Rule : Silk To Solder Mask (Clearance=0.1mm) (IsPad),(All)
-   Violation between Silk To Solder Mask Clearance Constraint: (0.023mm < 0.1mm) Between Pad P3-1(19.3mm,25.42mm) on Multi-Layer And Track (20.2mm,18.05mm)(20.2mm,36.05mm) on Bottom Overlay [Bottom Overlay] to [Bottom Solder] clearance [0.023mm]
-   Violation between Silk To Solder Mask Clearance Constraint: (0.023mm < 0.1mm) Between Pad P3-2(19.3mm,22.88mm) on Multi-Layer And Track (20.2mm,18.05mm)(20.2mm,36.05mm) on Bottom Overlay [Bottom Overlay] to [Bottom Solder] clearance [0.023mm]
-   Violation between Silk To Solder Mask Clearance Constraint: (0.023mm < 0.1mm) Between Pad P3-3(19.3mm,20.34mm) on Multi-Layer And Track (20.2mm,18.05mm)(20.2mm,36.05mm) on Bottom Overlay [Bottom Overlay] to [Bottom Solder] clearance [0.023mm]
-   Violation between Silk To Solder Mask Clearance Constraint: (0.057mm < 0.1mm) Between Pad P3-4(19.3mm,17.8mm) on Multi-Layer And Track (20.2mm,18.05mm)(20.2mm,36.05mm) on Bottom Overlay [Bottom Overlay] to [Bottom Solder] clearance [0.057mm]
-   Violation between Silk To Solder Mask Clearance Constraint: (0.057mm < 0.1mm) Between Pad P3-4(19.3mm,17.8mm) on Multi-Layer And Track (20.2mm,18.05mm)(38.2mm,18.05mm) on Bottom Overlay [Bottom Overlay] to [Bottom Solder] clearance [0.057mm]
-   Violation between Silk To Solder Mask Clearance Constraint: (Collision < 0.1mm) Between Pad T1-1(16.9mm,20.3mm) on Multi-Layer And Track (16.3mm,18mm)(16.3mm,21mm) on Bottom Overlay [Bottom Overlay] to [Bottom Solder] clearance [0mm]
-   Violation between Silk To Solder Mask Clearance Constraint: (0.069mm < 0.1mm) Between Pad T2-1(16.9mm,26.5mm) on Multi-Layer And Text "C7" (14.23mm,26.438mm) on Top Overlay [Top Overlay] to [Top Solder] clearance [0.069mm]
-   Violation between Silk To Solder Mask Clearance Constraint: (Collision < 0.1mm) Between Pad T2-1(16.9mm,26.5mm) on Multi-Layer And Track (16.2mm,24.2mm)(16.2mm,27.2mm) on Bottom Overlay [Bottom Overlay] to [Bottom Solder] clearance [0mm]
-   Violation between Silk To Solder Mask Clearance Constraint: (0.086mm < 0.1mm) Between Pad T4-1(17.4mm,32.5mm) on Multi-Layer And Track (16.5mm,30.15mm)(16.5mm,33.15mm) on Bottom Overlay [Bottom Overlay] to [Bottom Solder] clearance [0.086mm]
-   Violation between Silk To Solder Mask Clearance Constraint: (0.047mm < 0.1mm) Between Pad T5-1(17.4mm,38.5mm) on Multi-Layer And Track (14.9mm,39.2mm)(16.9mm,39.2mm) on Bottom Overlay [Bottom Overlay] to [Bottom Solder] clearance [0.047mm]
-   Violation between Silk To Solder Mask Clearance Constraint: (Collision < 0.1mm) Between Pad T5-1(17.4mm,38.5mm) on Multi-Layer And Track (16.9mm,36.2mm)(16.9mm,39.2mm) on Bottom Overlay [Bottom Overlay] to [Bottom Solder] clearance [0mm]
-Rule Violations :11
+Rule Violations :0
 
 Processing Rule : Silk to Silk (Clearance=0.1mm) (All),(All)
 Rule Violations :0
@@ -61,17 +44,14 @@ Processing Rule : Net Antennae (Tolerance=0mm) (All)
 Rule Violations :0
 
 Processing Rule : Board Clearance Constraint (Gap=0mm) (All)
-   Violation between Board Outline Clearance(Outline Edge): (0.456mm < 0.5mm) Between Board Edge And Text "P2" (19.262mm,2.63mm) on Top Overlay 
-   Violation between Board Outline Clearance(Outline Edge): (0.401mm < 0.5mm) Between Board Edge And Track (19.675mm,1.735mm)(35.725mm,1.735mm) on Top Overlay 
-   Violation between Board Outline Clearance(Outline Edge): (0.401mm < 0.5mm) Between Board Edge And Track (35.725mm,1.735mm)(35.725mm,15.065mm) on Top Overlay 
-   Violation between Board Outline Clearance(Outline Edge): (0.171mm < 0.5mm) Between Board Edge And Track (42.78mm,7.6mm)(46.15mm,7.6mm) on Top Overlay 
-   Violation between Board Outline Clearance(Outline Edge): (0.171mm < 0.5mm) Between Board Edge And Track (46.15mm,7.6mm)(46.15mm,11.2mm) on Top Overlay 
-Rule Violations :5
+   Violation between Board Outline Clearance(Outline Edge): (Collision < 0.5mm) Between Board Edge And Text "APSS-5 Team Rocket
+Designed by T. Peck & J. Wittgen" (3.155mm,33.435mm) on Top Overlay 
+Rule Violations :1
 
 Processing Rule : Height Constraint (Min=0mm) (Max=25.4mm) (Prefered=12.7mm) (All)
 Rule Violations :0
 
 
-Violations Detected : 26
+Violations Detected : 5
 Waived Violations : 0
-Time Elapsed        : 00:00:03
+Time Elapsed        : 00:00:02
