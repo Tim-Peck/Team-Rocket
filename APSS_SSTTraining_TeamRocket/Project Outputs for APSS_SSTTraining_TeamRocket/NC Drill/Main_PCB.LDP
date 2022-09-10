@@ -1,6 +1,3 @@
 Layer Pairs Export File for PCB: D:\Users\jwitt\Document\GitHub\Team-Rocket\APSS_SSTTraining_TeamRocket\Main_PCB.PcbDoc
-LayersSetName=Top_Bot_Thru_Holes|DrillFile=main_pcb.txt|DrillLayers=gtl,g1,gp1,gbl
-LayersSetName=Top_1_Blind_Vias|DrillFile=main_pcb.tx1|DrillLayers=gtl,g1
-LayersSetName=Top_GND_Blind_Vias|DrillFile=main_pcb.tx3|DrillLayers=gtl,g1,gp1
-LayersSetName=GND_Bot_Blind_Vias|DrillFile=main_pcb.tx4|DrillLayers=gp1,gbl
-LayersSetName=Counterholes_Top|DrillFile=main_pcb.tx14|DrillLayers=gtl,g1,gp1
+LayersSetName=Top_Bot_Thru_Holes|DrillFile=main_pcb.txt|DrillLayers=gtl,gbl
+LayersSetName=Top_Bot_Thru_Holes|DrillFile=main_pcb.tx4|DrillLayers=gtl,gbl

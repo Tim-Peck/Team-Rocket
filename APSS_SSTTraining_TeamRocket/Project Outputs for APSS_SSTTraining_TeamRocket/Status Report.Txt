@@ -1,12 +1,13 @@
-Output: Gerber Files
-Type  : Gerber
-From  : Variant [[No Variations]] of Project [APSS_SSTTraining_TeamRocket.PrjPcb]
-   Generated File[Main_PCB.RUL]
-   Generated File[Main_PCB.EXTREP]
-   Generated File[Main_PCB.REP]
+Output: NC Drill Files
+Type  : NC Drill
+From  : PCB Document [Main_PCB.PcbDoc]
+   Generated File[Main_PCB.TXT]
+   Generated File[Main_PCB.TX4]
+   Generated File[Main_PCB.LDP]
+   Generated File[Main_PCB.DRR]
 
 
-Files Generated   : 3
+Files Generated   : 4
 Documents Printed : 0
 
-Finished Output Generation At 4:59:01 pm On 4/09/2022
+Finished Output Generation At 1:28:18 pm On 10/09/2022
