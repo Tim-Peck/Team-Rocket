@@ -11,11 +11,12 @@ TODO: Make all of the main functions and helper functions
 ## Main Camera Functions:
 
 ### initCamera()
-Initialises the camera, sets registers over I2C, return status.
+Initialises the camera, sets setting registers over I2C, return status.
 
 returns 0 for successful start
 returns 1 if error
 
+<!-- Unsure about buffers, what extent? -->
 ### takeImage(bufferPointer, bufferLength)
 sends a image trigger over I2C, waits for response, stores image pixel by pixel to a buffer
 
@@ -28,15 +29,13 @@ writes buffer to a new file on the SD card in a given folder
 ### requestImage()
 sends the I2C trigger command to the module
 
-### waitForPXClockCycle()
-polls until the pixel clock's downward edge indicating the middle of a pixel cycle
+### waitForPXClockCycle(boolean)
+polls until the given level on the pixel clock
 
 
 ## External Communication Functions:
 
-### sendI2CMessage(address, messageContent, messageLength)
-sends the given message over I2C to the given address
-
+<!-- Unsure how this will work, need OBC advisement -->
 ### writeToSDFile(folderName, fileName, bufferPointer, bufferLength)
 writes the given buffer to the given file in the given folder
 ??? Might need something to do with creating or overwriting existing files
