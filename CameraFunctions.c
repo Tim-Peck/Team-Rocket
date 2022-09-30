@@ -19,6 +19,9 @@
 #define CAM_ERROR_BUFFERTOOSMALL 2
 #define CAM_ERROR_NORESPONSE 3
 
+uint8 imageBuffer[CAM_ROWLENGTH*CAM_COLLENGTH];
+int imageCount = 0;
+
 // initalises the camera pins and changes required registers via I2C.
 int initCamera(){
   // Set up the HSYNC, HSYNC, PIXCLOCK and DATA0 Pins
@@ -43,15 +46,10 @@ int initCamera(){
 // Sends a request to the camera, then waits for and
 // records the image response to the buffer.
 // Returns success if the image was successfully recorded
-int takeImage(uint8 *bufferPointer[], int bufferLength){
+int takeImage(){
   // initalise pixel position counters
   int rowNum = 0;
   int pixNum = 0;
-
-  // Ensure the buffer is large enough
-  if (bufferLength < CAM_ROWLENGTH * CAM_COLLENGTH){
-    return CAM_ERROR_BUFFERTOOSMALL;
-  }
 
   // Send request over I2C
   requestImage();
@@ -80,19 +78,19 @@ int takeImage(uint8 *bufferPointer[], int bufferLength){
         // Read data0 pin and
         // or the value with the correct position in byte
         // TODO: Figure BIT[i]
-        byte = byte | (BIT[i]&CAM_DATA0);
+        byte |=  (uint8)CAM_DATA0 << i;
       }
-      bufferPointer[rowNum*CAM_ROWLENGTH + pixNum] = byte;
+      imageBuffer[rowNum*CAM_ROWLENGTH + pixNum] = byte;
       pixNum ++;
     }
     rowNum ++;
   }
-
+  imageCount ++;
   return CAM_SUCCESS;
 }
 
 // Save the image to the
-void saveImage(int imageID, uint8 *bufferPointer, int bufferLength){
+void saveImage(){
   // gather an image line into a binary string???
 
   // write that binary string into the SD card
