@@ -33,7 +33,7 @@ FSMCodingStyle=eFMSDropDownList_OneProcess
 FSMEncodingStyle=eFMSDropDownList_OneHot
 IsProjectConflictPreventionWarningsEnabled=0
 IsVirtualBomDocumentRemoved=0
-OutputPath=
+OutputPath=Project Outputs for APSS_SSTTraining_TeamRocket
 LogFolderPath=
 ManagedProjectGUID=
 IncludeDesignInRelease=0
@@ -420,7 +420,7 @@ ClassGenCCAutoRoomEnabled=1
 ClassGenNCAutoScope=None
 DItemRevisionGUID=
 GenerateClassCluster=0
-DocumentUniqueId=KMXRQVJA
+DocumentUniqueId=QKMOOWJN
 
 [Document23]
 DocumentPath=MSP430FR2355_Altium_Libraries\Miscellaneous Connectors.IntLib
@@ -571,90 +571,66 @@ DocumentPath=Project Outputs for APSS_SSTTraining_TeamRocket\Gerber\Main_PCB.EXT
 DItemRevisionGUID=
 
 [GeneratedDocument4]
-DocumentPath=Project Outputs for APSS_SSTTraining_TeamRocket\Main_PCB.EXTREP
-DItemRevisionGUID=
-
-[GeneratedDocument5]
-DocumentPath=Project Outputs for APSS_SSTTraining_TeamRocket\Gerber\Main_PCB.G1
-DItemRevisionGUID=
-
-[GeneratedDocument6]
 DocumentPath=Project Outputs for APSS_SSTTraining_TeamRocket\Gerber\Main_PCB.GBL
 DItemRevisionGUID=
 
-[GeneratedDocument7]
+[GeneratedDocument5]
 DocumentPath=Project Outputs for APSS_SSTTraining_TeamRocket\Gerber\Main_PCB.GBO
 DItemRevisionGUID=
 
-[GeneratedDocument8]
+[GeneratedDocument6]
 DocumentPath=Project Outputs for APSS_SSTTraining_TeamRocket\Gerber\Main_PCB.GBP
 DItemRevisionGUID=
 
-[GeneratedDocument9]
+[GeneratedDocument7]
 DocumentPath=Project Outputs for APSS_SSTTraining_TeamRocket\Gerber\Main_PCB.GBS
 DItemRevisionGUID=
 
-[GeneratedDocument10]
+[GeneratedDocument8]
 DocumentPath=Project Outputs for APSS_SSTTraining_TeamRocket\Gerber\Main_PCB.GKO
 DItemRevisionGUID=
 
-[GeneratedDocument11]
-DocumentPath=Project Outputs for APSS_SSTTraining_TeamRocket\Gerber\Main_PCB.GP1
-DItemRevisionGUID=
-
-[GeneratedDocument12]
+[GeneratedDocument9]
 DocumentPath=Project Outputs for APSS_SSTTraining_TeamRocket\Gerber\Main_PCB.GTL
 DItemRevisionGUID=
 
-[GeneratedDocument13]
+[GeneratedDocument10]
 DocumentPath=Project Outputs for APSS_SSTTraining_TeamRocket\Gerber\Main_PCB.GTO
 DItemRevisionGUID=
 
-[GeneratedDocument14]
+[GeneratedDocument11]
 DocumentPath=Project Outputs for APSS_SSTTraining_TeamRocket\Gerber\Main_PCB.GTP
 DItemRevisionGUID=
 
-[GeneratedDocument15]
+[GeneratedDocument12]
 DocumentPath=Project Outputs for APSS_SSTTraining_TeamRocket\Gerber\Main_PCB.GTS
 DItemRevisionGUID=
 
-[GeneratedDocument16]
+[GeneratedDocument13]
 DocumentPath=Project Outputs for APSS_SSTTraining_TeamRocket\NC Drill\Main_PCB.LDP
 DItemRevisionGUID=
 
-[GeneratedDocument17]
+[GeneratedDocument14]
+DocumentPath=Project Outputs for APSS_SSTTraining_TeamRocket\PCB 3D Print\Main_PCB.png
+DItemRevisionGUID=
+
+[GeneratedDocument15]
 DocumentPath=Project Outputs for APSS_SSTTraining_TeamRocket\Gerber\Main_PCB.REP
 DItemRevisionGUID=
 
-[GeneratedDocument18]
-DocumentPath=Project Outputs for APSS_SSTTraining_TeamRocket\Main_PCB.REP
-DItemRevisionGUID=
-
-[GeneratedDocument19]
+[GeneratedDocument16]
 DocumentPath=Project Outputs for APSS_SSTTraining_TeamRocket\Gerber\Main_PCB.RUL
 DItemRevisionGUID=
 
-[GeneratedDocument20]
-DocumentPath=Project Outputs for APSS_SSTTraining_TeamRocket\Main_PCB.RUL
+[GeneratedDocument17]
+DocumentPath=Project Outputs for APSS_SSTTraining_TeamRocket\ExportSTEP\Main_PCB.step
 DItemRevisionGUID=
 
-[GeneratedDocument21]
-DocumentPath=Project Outputs for APSS_SSTTraining_TeamRocket\NC Drill\Main_PCB.TX1
-DItemRevisionGUID=
-
-[GeneratedDocument22]
-DocumentPath=Project Outputs for APSS_SSTTraining_TeamRocket\NC Drill\Main_PCB.TX3
-DItemRevisionGUID=
-
-[GeneratedDocument23]
+[GeneratedDocument18]
 DocumentPath=Project Outputs for APSS_SSTTraining_TeamRocket\NC Drill\Main_PCB.TX4
 DItemRevisionGUID=
 
-[GeneratedDocument24]
-DocumentPath=Project Outputs for APSS_SSTTraining_TeamRocket\NC Drill\Main_PCB.TX14
-DItemRevisionGUID=
-
-[GeneratedDocument25]
+[GeneratedDocument19]
 DocumentPath=Project Outputs for APSS_SSTTraining_TeamRocket\NC Drill\Main_PCB.TXT
 DItemRevisionGUID=
 
@@ -667,6 +643,9 @@ Variant=[No Variations]
 OutputJobsCount=0
 ContentTypeGUID=CB6F2064-E317-11DF-B822-12313F0024A2
 ConfigurationType=Source
+
+[Generic_EDE]
+OutputDir=Project Outputs for APSS_SSTTraining_TeamRocket
 
 [OutputGroup1]
 Name=Netlist Outputs
