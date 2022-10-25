@@ -1,0 +1,30 @@
+Rough pseudocode outline of data compression and decompression functions
+
+Expected strings
+
+See to interperate GNSS GGA string https://receiverhelp.trimble.com/alloy-gnss/en-us/NMEA-0183messages_GGA.html
+
+Required  Data	Bits required	  Sensor Output
+Accl_X	  16	  16 Bits         
+Accl_Y	  16	  16 Bits         
+Accl_Z	  16	  16 Bits         
+Bat_voltage	12	12 Bits         
+Longitude	42	  42 Bits         
+Latidue	  42	  42 Bits         
+Altitude	42	  18 Bits         
+UTC time	18	  18 Bits         
+
+
+string data_compression(string gnss, float bat_volt, float accl_x, float accl_y, float accl_z);
+
+outputString = data_compression(gnss, bat_volt, accl_x, accl_y, accl_z) {
+//output string format = UTC,alt,lat,long,bat,accl_x,accl_y,accl_z
+
+convert gnss string to char array, extract UTC, alt, lat, and long at relavant sizes
+
+convert to format uses least bits
+
+repeat for other data types
+
+combine into 1 output message?
+}
