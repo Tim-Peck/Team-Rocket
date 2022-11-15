@@ -1,31 +1,8 @@
 
-#define CAM_ROWLENGTH 320
-#define CAM_COLLENGTH 320
-#define CAM_PIXBITS 8
-// TODO: Check 0x24 syntax
-#define CAM_I2CADDRESS 0x24
-#define CAM_WAITTIMEOUT 1000000
-#define CAM_IMAGEFOLDER "imageFolder"
+#include "Camera.h"
 
-// Pin number in register
-#define CAM_VSYNC 0x01
-#define CAM_HSYNC 0x02
-#define CAM_PIXCLOCK 0x03
-#define CAM_DATA0 0x04
 
-// ERROR DEFINES
-#define CAM_SUCCESS 0
-#define CAM_ERROR_INVALIDI2CRESPONSE 1
-#define CAM_ERROR_NORESPONSE 2
-
-uint8 imageBuffer[CAM_ROWLENGTH*CAM_COLLENGTH];
-int imageCount = 0;
-
-// i2C_write(slave address data);
-// i2C_recieve(slave address);
-
-// initalises the camera pins and changes required registers via I2C.
-int initCamera(){
+void initCamera(){
   // Set up the HSYNC, HSYNC, PIXCLOCK and DATA0 Pins
   // Clear pintype to 0 = GPIO read
   // Clear pin direction to 0 = input
@@ -49,9 +26,10 @@ int initCamera(){
   // read 0x0000[7:0] should be 0x01 in MODEL_ID_H
   // read 0x0001[7:0] should be 0xB0 in MODEL_ID_L
   // if failed, return CAM_ERROR_INVALIDI2CRESPONSE
-  if (i2C_recieve(CAM_I2CADDRESS, 0x0000) != 0x01){
+  i2C_recieve(CAM_I2CADDRESS, 0x0000, 2);
+  if (received_bytes[0] != 0x01){
     return CAM_ERROR_INVALIDI2CRESPONSE;
-  } else if (i2C_recieve(CAM_I2CADDRESS, 0x0001) != 0xB0) {
+  } else if (received_bytes[1] != 0xB0) {
     return CAM_ERROR_INVALIDI2CRESPONSE;
   }
 
@@ -66,13 +44,9 @@ int initCamera(){
   // 0x3060[4] = 1  msb_en
   i2C_write(CAM_I2CADDRESS, 0x3059, 0x1A);
 
-  return CAM_SUCCESS;
 }
 
-// Sends a request to the camera, then waits for and
-// records the image response to the buffer.
-// Returns success if the image was successfully recorded
-int takeImage(){
+void takeImage(){
   // initalise pixel position counters
   int rowNum = 0;
   int pixNum = 0;
@@ -85,7 +59,7 @@ int takeImage(){
   while (~(P1IN & CAM_VSYNC)) {
     timeOut ++;
     if (CAM_WAITTIMEOUT < timeOut){
-      return CAM_ERROR_NORESPONSE;
+      return;
     }
   }
 
@@ -98,9 +72,7 @@ int takeImage(){
       uint8 byte = 0;
       for (size_t i = 0; i < CAM_PIXBITS; i++) {
         // wait for the centre of the clock cycle
-        if (waitForPXClockChangeTo(0) != CAM_SUCCESS){
-          return CAM_ERROR_NORESPONSE;
-        }
+        waitForPXClockChangeTo(0);
         // Read data0 pin and
         // OR the value with the correct position in byte
         byte |=  (uint8)(P1IN & CAM_DATA0) << i;
@@ -111,10 +83,8 @@ int takeImage(){
     rowNum ++;
   }
   imageCount ++;
-  return CAM_SUCCESS;
 }
 
-// Save the image to the
 void saveImage(){
   // gather an image line into a binary string???
 
@@ -122,7 +92,6 @@ void saveImage(){
   // CAM_IMAGEFOLDER
 }
 
-// Sends an I2C message to the camera to take a photo
 void requestImage(){
   // Address = 0x24
   // Trigger Message
@@ -134,9 +103,7 @@ void requestImage(){
     i2C_write(CAM_I2CADDRESS, 0x0100, 0x03);
 }
 
-// Polls until the PXClock changes to the given level
-// if already at level, waits for it to cycle to level
-int waitForPXClockChangeTo(bool level){
+void waitForPXClockChangeTo(bool level){
   // Check that we are not already at level
   int timeOut = 0;
   if ((P1IN & CAM_PXCLOCK) == level) {
@@ -145,7 +112,7 @@ int waitForPXClockChangeTo(bool level){
       // Wait until timeout cycles
       timeOut ++;
       if (CAM_WAITTIMEOUT < timeOut){
-        return CAM_ERROR_NORESPONSE;
+        return;
       }
     }
   }
@@ -154,8 +121,8 @@ int waitForPXClockChangeTo(bool level){
   while ((P1IN & CAM_PXCLOCK) != level){
     timeOut ++;
     if (CAM_WAITTIMEOUT < timeOut){
-      return CAM_ERROR_NORESPONSE;
+      return;
     }
   }
-  return CAM_SUCCESS;
+  return;
 }
