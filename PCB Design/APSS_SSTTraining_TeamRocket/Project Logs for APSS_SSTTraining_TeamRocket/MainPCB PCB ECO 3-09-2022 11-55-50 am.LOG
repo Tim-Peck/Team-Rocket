@@ -1,0 +1,104 @@
+Change Component Footprint: Designator=C6 Old Footprint=0805 (Capacitor) New Footprint=0603 (Capacitor)
+Change Component Footprint: Designator=C10 Old Footprint=0805 (Capacitor) New Footprint=0603 (Capacitor)
+Change Component Footprint: Designator=C13 Old Footprint=0805 (Capacitor) New Footprint=0603 (Capacitor)
+Change Component Footprint: Designator=C15 Old Footprint=0805 (Capacitor) New Footprint=0603 (Capacitor)
+Change Component Footprint: Designator=C19 Old Footprint=0805 (Capacitor) New Footprint=0603 (Capacitor)
+Change Component Footprint: Designator=C20 Old Footprint=0805 (Capacitor) New Footprint=0603 (Capacitor)
+Change Component Footprint: Designator=L1 Old Footprint=0805 (Inductor) New Footprint=0402 (Inductor)
+Change Component Footprint: Designator=C5 Old Footprint=1210 (Capacitor) New Footprint=0603 (Capacitor)
+Change Component Footprint: Designator=C9 Old Footprint=1210 (Capacitor) New Footprint=0603 (Capacitor)
+Change Component Footprint: Designator=C12 Old Footprint=1210 (Capacitor) New Footprint=0603 (Capacitor)
+Change Component Footprint: Designator=C14 Old Footprint=1210 (Capacitor) New Footprint=0603 (Capacitor)
+Change Component Comment : Designator=C6 Old Comment=C-u-001.000-10-0805 New Comment=C-n-001.000-5-0603
+Change Component Comment : Designator=C10 Old Comment=C-u-001.000-10-0805 New Comment=C-n-001.000-5-0603
+Change Component Comment : Designator=C13 Old Comment=C-u-001.000-10-0805 New Comment=C-n-001.000-5-0603
+Change Component Comment : Designator=C15 Old Comment=C-u-001.000-10-0805 New Comment=C-n-001.000-5-0603
+Change Component Comment : Designator=C19 Old Comment=C-u-002.200-10-0805 New Comment=C-n-001.000-5-0603
+Change Component Comment : Designator=C20 Old Comment=C-u-010.000-10-0805 New Comment=C-n-001.000-5-0603
+Change Component Comment : Designator=C5 Old Comment=C-u-022.000-10-1210 New Comment=C-n-001.000-5-0603
+Change Component Comment : Designator=C9 Old Comment=C-u-022.000-10-1210 New Comment=C-n-001.000-5-0603
+Change Component Comment : Designator=C12 Old Comment=C-u-022.000-10-1210 New Comment=C-n-001.000-5-0603
+Change Component Comment : Designator=C14 Old Comment=C-u-022.000-10-1210 New Comment=C-n-001.000-5-0603
+Change Component Comment : Designator=L1 Old Comment=L-u-006.800-20-0603 New Comment=L-n-027.000-5-0402
+Change component parameters: Designator = "C5" ("C5"); Footprint = "1210 (Capacitor)"; UniqueID = "\AXPJPWIQ" ("\AXPJPWIQ")
+Change component parameters (AddParameter): Name = "Case/Package"; Value = "0603"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Manufacturer"; Value = "Murata"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Manufacturer PartNo"; Value = "GCM1885C2A102JA16D"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Tolerance"; Value = "+/-5%"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Value"; Value = "22nF"; VariantName = "[No Variations]"
+Change component parameters: Designator = "C6" ("C6"); Footprint = "0805 (Capacitor)"; UniqueID = "\DBPYRRAR" ("\DBPYRRAR")
+Change component parameters (AddParameter): Name = "Case/Package"; Value = "0603"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Manufacturer"; Value = "Murata"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Manufacturer PartNo"; Value = "GCM1885C2A102JA16D"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Tolerance"; Value = "+/-5%"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Value"; Value = "1uF"; VariantName = "[No Variations]"
+Change component parameters: Designator = "C9" ("C9"); Footprint = "1210 (Capacitor)"; UniqueID = "\LLBHRMWP" ("\LLBHRMWP")
+Change component parameters (AddParameter): Name = "Case/Package"; Value = "0603"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Manufacturer"; Value = "Murata"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Manufacturer PartNo"; Value = "GCM1885C2A102JA16D"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Tolerance"; Value = "+/-5%"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Value"; Value = "22nF"; VariantName = "[No Variations]"
+Change component parameters: Designator = "C10" ("C10"); Footprint = "0805 (Capacitor)"; UniqueID = "\OAOEQBUT" ("\OAOEQBUT")
+Change component parameters (AddParameter): Name = "Case/Package"; Value = "0603"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Manufacturer"; Value = "Murata"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Manufacturer PartNo"; Value = "GCM1885C2A102JA16D"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Tolerance"; Value = "+/-5%"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Value"; Value = "1uF"; VariantName = "[No Variations]"
+Change component parameters: Designator = "C12" ("C12"); Footprint = "1210 (Capacitor)"; UniqueID = "\OIEYJEJU" ("\OIEYJEJU")
+Change component parameters (AddParameter): Name = "Case/Package"; Value = "0603"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Manufacturer"; Value = "Murata"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Manufacturer PartNo"; Value = "GCM1885C2A102JA16D"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Tolerance"; Value = "+/-5%"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Value"; Value = "22nF"; VariantName = "[No Variations]"
+Change component parameters: Designator = "C13" ("C13"); Footprint = "0805 (Capacitor)"; UniqueID = "\NRUXTMCX" ("\NRUXTMCX")
+Change component parameters (AddParameter): Name = "Case/Package"; Value = "0603"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Manufacturer"; Value = "Murata"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Manufacturer PartNo"; Value = "GCM1885C2A102JA16D"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Tolerance"; Value = "+/-5%"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Value"; Value = "1uF"; VariantName = "[No Variations]"
+Change component parameters: Designator = "C14" ("C14"); Footprint = "1210 (Capacitor)"; UniqueID = "\GLPNQUVI" ("\GLPNQUVI")
+Change component parameters (AddParameter): Name = "Case/Package"; Value = "0603"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Manufacturer"; Value = "Murata"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Manufacturer PartNo"; Value = "GCM1885C2A102JA16D"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Tolerance"; Value = "+/-5%"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Value"; Value = "22nF"; VariantName = "[No Variations]"
+Change component parameters: Designator = "C15" ("C15"); Footprint = "0805 (Capacitor)"; UniqueID = "\XOKCEQPH" ("\XOKCEQPH")
+Change component parameters (AddParameter): Name = "Case/Package"; Value = "0603"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Manufacturer"; Value = "Murata"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Manufacturer PartNo"; Value = "GCM1885C2A102JA16D"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Tolerance"; Value = "+/-5%"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Value"; Value = "1uF"; VariantName = "[No Variations]"
+Change component parameters: Designator = "C19" ("C19"); Footprint = "0805 (Capacitor)"; UniqueID = "\WCBYRDWU" ("\WCBYRDWU")
+Change component parameters (AddParameter): Name = "Case/Package"; Value = "0603"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Manufacturer"; Value = "Murata"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Manufacturer PartNo"; Value = "GCM1885C2A102JA16D"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Tolerance"; Value = "+/-5%"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Value"; Value = "0.1uF"; VariantName = "[No Variations]"
+Change component parameters: Designator = "C20" ("C20"); Footprint = "0805 (Capacitor)"; UniqueID = "\GAQDQKVN" ("\GAQDQKVN")
+Change component parameters (AddParameter): Name = "Case/Package"; Value = "0603"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Manufacturer"; Value = "Murata"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Manufacturer PartNo"; Value = "GCM1885C2A102JA16D"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Tolerance"; Value = "+/-5%"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Value"; Value = "10uF"; VariantName = "[No Variations]"
+Change component parameters: Designator = "L1" ("L1"); Footprint = "0805 (Inductor)"; UniqueID = "\ARSJRNSH" ("\ARSJRNSH")
+Change component parameters (AddParameter): Name = "Case/Package"; Value = "0402"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Manufacturer"; Value = "Murata"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Manufacturer PartNo"; Value = "LQG15HS27NJ02D"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Tolerance"; Value = "+/-5%"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Value"; Value = "35.5nH"; VariantName = "[No Variations]"
+Added Pin To Net: NetName=3v3 Pin=C4-1
+Add Pin To Net: Unknown Pin: Pin P1-1
+Add Pin To Net: Unknown Pin: Pin P1-2
+Add Pin To Net: Unknown Pin: Pin U1-2
+Add Pin To Net: Unknown Pin: Pin U1-4
+Add Pin To Net: Unknown Pin: Pin U1-6
+Add Pin To Net: Unknown Pin: Pin U1-10
+Add Pin To Net: Unknown Pin: Pin U1-11
+Add Pin To Net: Unknown Pin: Pin U1-14
+Add Pin To Net: Unknown Pin: Pin U1-15
+Add Pin To Net: Unknown Pin: Pin U1-16
+Add Pin To Net: Unknown Pin: Pin U1-17
+Add Pin To Net: Unknown Pin: Pin U1-18
+Add Pin To Net: Unknown Pin: Pin U1-21
+Add Pin To Net: Unknown Pin: Pin U1-22
+Added Room: Name=Microcontroller
