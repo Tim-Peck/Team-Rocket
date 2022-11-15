@@ -7,7 +7,7 @@
 
 #define CAM_I2CADDRESS 0x24
 #define CAM_WAITTIMEOUT 1000000
-#define CAM_IMAGEFOLDER "imageFolder"
+#define CAM_IMAGEFOLDER "imagefolder"
 
 // Pin number in register
 #define CAM_VSYNC 0x01
@@ -24,7 +24,7 @@ static volatile uint8 imageBuffer[CAM_ROWLENGTH*CAM_COLLENGTH];
 static volatile int imageCount = 0;
 
 // initalises the camera pins and changes required registers via I2C.
-int initCamera();
+int cameraInit();
 
 // Sends a request to the camera, then waits for and
 // records the image response to the buffer.

@@ -2,7 +2,7 @@
 #include "Camera.h"
 
 
-void initCamera(){
+void cameraInit(){
   // Set up the HSYNC, HSYNC, PIXCLOCK and DATA0 Pins
   // Clear pintype to 0 = GPIO read
   // Clear pin direction to 0 = input
