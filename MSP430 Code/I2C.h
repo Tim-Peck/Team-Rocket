@@ -22,6 +22,9 @@ static volatile int rwStatus; // bool value for ISR: 0 means read, 1 means write
 // eUSCI_B0
 void i2c_init();
 
+
+// -------- private functions -------- //
+
 // write data to an address on I2C 
 // input: slave address, target register address, data (each in 1 byte)
 void i2c_write(uint8_t slave_byte, uint8_t address_byte, uint8_t data_byte);
@@ -31,6 +34,8 @@ void i2c_write(uint8_t slave_byte, uint8_t address_byte, uint8_t data_byte);
 // note: register address is incremented for subsequent bytes to be received
 // output: received bytes stored in "received_bytes" array
 void i2c_receive(uint8_t slave_byte, uint8_t address_byte, int length);
+
+// -------- private functions -------- //
 
 
 // initialise accelerometer to switch to IMU operating mode
@@ -47,9 +52,10 @@ void barInit();
 // input: array to store 2 pressure bytes
 void getBar(uint8_t *data_array);
 
-// get 1 byte from a register with I2C
-// input: 8 byte slave address, 8 byte register address to read, target pointer to store data
-void getByte(uint8_t slaveAddress, uint8_t registerAddress, uint8_t *storeByte) ;
+// get any number of bytes from a register with I2C
+// note: register address is incremented for subsequent bytes to be received
+// input: 8 byte slave address, 8 byte register address to read, target pointer to store data, number of bytes to read
+void getBytes(uint8_t slaveAddress, uint8_t registerAddress, uint8_t *storeByte, int numBytes) ;
 
 // blips led for testing
 void blip();

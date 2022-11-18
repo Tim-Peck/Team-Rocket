@@ -31,18 +31,18 @@ int main(void)
 
 //    getAccel(receiveDataData);
 //    getBar(receiveData);
-    getByte(0x76, 0xD0, receiveData);
-
-    uart_send_byte(receiveData[0]);
+//    getBytes(0x28, 0x3C, receiveData, 2);
+////
+//    uart_send_byte(receiveData[0]);
 //    uart_send_byte(receiveData[1]);
 
     // keep MSP running
     while (1)
     {
-//        __delay_cycles(100000);
-//        getAccel(receiveData);
-//        uart_send_byte(receiveData[0]);
-//        uart_send_byte(receiveData[1]);
+        __delay_cycles(100000);
+        getAccel(receiveData);
+        uart_send_byte(receiveData[0]);
+        uart_send_byte(receiveData[1]);
     }
 
     return 0;
