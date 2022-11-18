@@ -229,10 +229,15 @@ void getBar(uint8_t *data_array)
 
 }
 
-void getByte(uint8_t slaveAddress, uint8_t registerAddress, uint8_t *storeByte) 
+void getBytes(uint8_t slaveAddress, uint8_t registerAddress, uint8_t *storeByte, int numBytes)
 {
-	i2c_receive(slaveAddress, registerAddress, 1);
-	*storeByte = received_bytes[0];
+	i2c_receive(slaveAddress, registerAddress, numBytes);
+
+	// store each byte read
+	int i;
+	for (i = 0; i < numBytes; i++) {
+	    storeByte[i] = received_bytes[i];
+	}
 }
 
 void blip()
