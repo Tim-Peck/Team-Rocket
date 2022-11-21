@@ -17,33 +17,26 @@ static volatile uint8_t received_bytes[BUFFER_SIZE];
 
 static volatile int rwStatus; // bool value for ISR: 0 means read, 1 means write
 
-// initialising I2C once
-// Using P1.2/1.3 for I2C with launchpad (1.3 is SCL, 1.2 is SDA)
-// eUSCI_B0
-void i2c_init();
+// initialising SPI once
+// Using P2.5/2.6/3.1/2.4 for SPI with launchpad (2.5 is SOMI, 2.6 is SIMO, 3.1 is CS, 2.4 is CLK)
+// eUSCI_A1
+void spi_init();
 
 
 // -------- private functions -------- //
 
-// write data to an address on I2C 
+// write data to an address on SPI
 // input: slave address, target register address, data (each in 1 byte)
-void i2c_write(uint8_t slave_byte, uint8_t address_byte, uint8_t data_byte);
+void spi_write(uint8_t slave_byte, uint8_t address_byte, uint8_t data_byte);
 
-// receive byte/s from address on I2C
+// receive byte/s from address on SPI
 // input: slave address, target register address of first byte to be received, number of bytes to be received from data
 // note: register address is incremented for subsequent bytes to be received
 // output: received bytes stored in "received_bytes" array
-void i2c_receive(uint8_t slave_byte, uint8_t address_byte, int length);
+void spi_receive(uint8_t slave_byte, uint8_t address_byte, int length);
 
 // -------- private functions -------- //
 
-
-// initialise accelerometer to switch to IMU operating mode
-void accelInit();
-
-// capture accelerometer values in all 3 directions
-// input: array to store 6 acceleration bytes
-void getAccel(uint8_t *data_array);
 
 // initialise barometer
 void barInit();
@@ -52,7 +45,7 @@ void barInit();
 // input: array to store 2 pressure bytes
 void getBar(uint8_t *data_array);
 
-// get any number of bytes from a register with I2C
+// get any number of bytes from a register with SPI
 // note: register address is incremented for subsequent bytes to be received
 // input: 8 byte slave address, 8 byte register address to read, target pointer to store data, number of bytes to read
 void getBytes(uint8_t slaveAddress, uint8_t registerAddress, uint8_t *storeByte, int numBytes) ;
