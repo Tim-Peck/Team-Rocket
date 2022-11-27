@@ -3,10 +3,10 @@
 
 void spi_init()
 {
-    next_idx_to_send = 0;
-    next_idx_to_store = 0;
-    current_length = 0;
-    receive_idx = 0;
+    next_idx_to_sendSPI = 0;
+    next_idx_to_storeSPI = 0;
+    current_lengthSPI = 0;
+    receive_idxSPI = 0;
 
     // setting pins for SPI
     P2SEL0 |= (BIT4 | BIT5 | BIT6); // primary module function
@@ -22,7 +22,7 @@ void spi_init()
     UCA1CTLW0 |= UCSWRST; // control register set SPI to reset condition (must be in reset for configuration)
 
     // set USCI_A as SPI master mode
-    UCA1CTLW0 |= (UCMODE_2 | UCMST | UCSYNC | UCSTEM); // UCMODE_2 sets eUSCI_A to SPI mode with active low CS, UCMST sets master mode, and UCSYNC sets synchronous mode, UCSTEM sets STE pin to be CS
+    UCA1CTLW0 |= (UCMODE_2 | UCMST | UCSYNC | UCSTEM | UCMSB); // UCMODE_2 sets eUSCI_A to SPI mode with active low CS, UCMST sets master mode, and UCSYNC sets synchronous mode, UCSTEM sets STE pin to be CS
 
     // set clock source of USCI_A
     UCA1CTLW0 |= UCSSEL__SMCLK; // control register UCSSELx field, set clock source to SMCLK (which is same as MCLK at ~1MHz)
@@ -30,127 +30,105 @@ void spi_init()
     // acts as divisor for BRCLK
     UCA1BRW |= 10;
 
-    UCA1CTLW0 &= ~UCSWRST; // bring SPI out of reset
+    UCA1CTLW0 &= ~UCSWRST; // bring SPI out of reset (Testing note: This brings SIMO and CS low for some reason)
 }
 
-void spi_write(uint8_t slave_byte, uint8_t address_byte, uint8_t data_byte)
+void spi_write(uint8_t address_byte, uint8_t data_byte)
 {
-    rwStatus = 1; // set bool for ISR to write
+    rwStatus = 0; // set bool for ISR to write
+
+    // add write bit to MSB (RW = '0')
+    address_byte &= ~0b10000000;
 
     // store address byte in buffer
-    if (current_length < BUFFER_SIZE)
-    {
-        address_buffer[next_idx_to_store++] = address_byte; // next_idx is always incremented and not reset
-        current_length++;
-    }
+    address_bufferSPI[next_idx_to_storeSPI++] = address_byte; // next_idx is always incremented and not reset
+    current_lengthSPI++;
 
     // store data byte in buffer
-    if (current_length < BUFFER_SIZE)
-    {
-        // store byte in buffer
-        address_buffer[next_idx_to_store++] = data_byte; // next_idx is always incremented and not reset
-        current_length++;
-    }
+    address_bufferSPI[next_idx_to_storeSPI++] = data_byte;
+    current_lengthSPI++;
 
-    // generate start by doing the following (See 24.3.5.2.1)
-
-    // set slave address bit size (7 or 10)
-    UCA1CTLW0 &= ~UCSLA10; // 7 bit
-    // set desired slave address (transmits on START)
-    UCA1SPISA = slave_byte;
-    // set SPI for transmitter mode (the r/w bit in slave address byte)
-    UCA1CTLW0 |= UCTR;
-    // generate start condition in master mode
-    UCA1CTLW0 |= UCTXSTT; // THIS SETS TXIFG0 when START generated AND TXBUF is clear
-
-    UCA1IE |= UCTXIE0; // enable transmit interrupt
+    UCA1IE |= UCTXIE; // enable transmit interrupt which generates interrupt request (23.3.8.1)
 }
 
-void spi_receive(uint8_t slave_byte, uint8_t address_byte, int length)
+void spi_receive(uint8_t address_byte, int length)
 {
-    rwStatus = 0; // set bool for ISR to read
-	receiveLength = length;
-    received = 0; // reset received bool
+    rwStatus = 1; // set bool for ISR to read
+    receiveLengthSPI = length;
+    receivedStatus = 0; // reset received bool
 
-    if (current_length < BUFFER_SIZE)
+    // add read bit to MSB (RW = '1')
+    address_byte |= 0b10000000;
+
+    // store byte in buffer
+    address_bufferSPI[next_idx_to_storeSPI++] = address_byte; // next_idx is always incremented and not reset
+    current_lengthSPI++; // so current length alternates between 0 and 1 for each byte
+
+    UCA1IE |= UCTXIE;
+
+    while (!receivedStatus)
     {
-        // store byte in buffer
-        address_buffer[next_idx_to_store++] = address_byte; // next_idx is always incremented and not reset
-        current_length++; // so current length alternates between 0 and 1 for each byte
-    }
+//        blipSPI();
+    } // poll for data received before exiting function
 
-    // generate start by doing the following (see 24.3.5.2.1)
-
-    // set slave address bit size (7 or 10)
-    UCA1CTLW0 &= ~UCSLA10; // 7 bit
-    // set desired slave address (transmits on START)
-    UCA1SPISA = slave_byte;
-    // set SPI for transmitter mode (the r/w bit in slave address byte)
-    UCA1CTLW0 |= UCTR;
-    // generate start condition in master mode
-    UCA1CTLW0 |= UCTXSTT; // THIS SETS TXIFG0 when START generated AND TXBUF is clear
-
-    UCA1IE |= UCTXIE0;
-
-    while (!received); // poll for data received before exiting function
-
-    __delay_cycles(2200); // SPI receive requires delay for some reason
+//    __delay_cycles(2200); // SPI receive requires delay for some reason
 }
-
 
 // ISR for USCI_A1 for SPI
 #pragma vector=USCI_A1_VECTOR
 __interrupt void USCI_A1_ISR(void)
 {
+//    blipSPI();
     switch (UCA1IV)
     {
-    case USCI_SPI_UCTXIFG: // TRANSMIT FIRST
-        if (current_length > 0)
+    case USCI_SPI_UCTXIFG: // transmit flag
+        if (current_lengthSPI > -1)
         {
-            UCA1TXBUF = address_buffer[next_idx_to_send++];
-            current_length--;
-        }
-        else
-        { // transmission end
-            if (rwStatus)
-            { // if writing, generate stop once data is sent
-                UCA1CTLW0 |= UCTXSTP;
-
-                UCA1IE &= ~UCTXIE0;
-                UCA1IFG |= UCTXIFG0;
+            if (next_idx_to_sendSPI == 0) {
+                UCA1TXBUF = address_bufferSPI[next_idx_to_sendSPI++]; // Testing note: sends LSB first so opposite way
             }
             else
             {
-                // if writing, generate repeated start once address is sent
-                // ENABLE REPEATED START FOR RECEIVING
-                // set SPI for receiver mode
-                UCA1CTLW0 &= ~UCTR;
-                // generate restart condition in receiver mode
-                UCA1CTLW0 |= UCTXSTT;
-                UCA1IE |= UCRXIE0;
-
-                UCA1IE &= ~UCTXIE0;
-                UCA1IFG |= UCTXIFG0;
+                UCA1TXBUF = 0x00;
             }
+
+
+            received_bytesSPI[receive_idxSPI] = UCA1RXBUF;
+            receive_idxSPI++;
+            current_lengthSPI--;
+        }
+        else
+        { // transmission end
+            UCA1IE &= ~UCTXIE;
+            UCA1IFG |= UCTXIFG;
+            receivedStatus = 1;
+
+            // if reading, enable receive interrupt
+//            if (rwStatus)
+//            {
+//                UCA1IE |= UCRXIE;
+//            }
         }
         break;
 
-    case USCI_SPI_UCRXIFG: // RECEIVE SECOND
+    case USCI_SPI_UCRXIFG: // receive flag
         // receive the data in global variable
-        received_bytes[receive_idx] = UCA1RXBUF;
-        receive_idx++;
+        if (receive_idxSPI) {
+            received_bytesSPI[receive_idxSPI - 1] = UCA1RXBUF;
+        }
+        receive_idxSPI++;
 
-        // send stop bit if last bit to be read
-        if (receive_idx == receiveLength)
+        if (receive_idxSPI != receiveLengthSPI + 1)
         {
-            received = 1;
-            receive_idx = 0; // reset idx
+            UCA1TXBUF = 0xFF;
+        }
+        else
+        { // stop if end
+            receivedStatus = 1;
+            receive_idxSPI = 0; // reset idx
 
-            // generate stop condition to stop SPI transmission
-            UCA1CTLW0 |= UCTXSTP;
-
-            UCA1IE &= ~UCRXIE0;
-            UCA1IFG |= UCRXIFG0;
+            UCA1IE &= ~UCRXIE; // disable receive interrupt to stop?
+            UCA1IFG |= UCRXIFG;
         }
         break;
     default:
@@ -158,43 +136,40 @@ __interrupt void USCI_A1_ISR(void)
     }
 }
 
-
-void barInit()
+void barInitSPI()
 {
-    const uint8_t barAddress = 0x76; // BMP280
-
     const uint8_t meas = 0xF4;
     const uint8_t measSettings = 0b00000111; // osrs_p & power mode
 
-    spi_write(barAddress, meas, measSettings);
+    spi_write(meas, measSettings);
     __delay_cycles(400);
 }
 
-void getBar(uint8_t *data_array)
+void getBarSPI(uint8_t *data_array)
 {
-    // define addresses of barometer
-    const uint8_t barAddress = 0x76; // BMP280
+    // register address of barometer
     const uint8_t pressReg = 0xF7;
 
     // store pressure data (2 bytes)
-    spi_receive(barAddress, pressReg, 2);
-    data_array[0] = received_bytes[0];
-    data_array[1] = received_bytes[1];
-
+    spi_receive(pressReg, 2);
+    data_array[0] = received_bytesSPI[0];
+    data_array[1] = received_bytesSPI[1];
 }
 
-void getBytes(uint8_t slaveAddress, uint8_t registerAddress, uint8_t *storeByte, int numBytes)
+void getBytesSPI(uint8_t registerAddress, uint8_t *storeByte, int numBytes)
 {
-	spi_receive(slaveAddress, registerAddress, numBytes);
+    spi_receive(registerAddress, numBytes);
 
-	// store each byte read
-	int i;
-	for (i = 0; i < numBytes; i++) {
-	    storeByte[i] = received_bytes[i];
-	}
+    // store each byte read
+    int i;
+    for (i = 0; i < numBytes+3; i++)
+    {
+        storeByte[i] = received_bytesSPI[i];
+    }
+
 }
 
-void blip()
+void blipSPI()
 {
     // toggle on and off for a second
     P1OUT &= ~BIT0;

@@ -130,7 +130,7 @@ __interrupt void USCI_B0_ISR(void)
             }
             else
             {
-                // if writing, generate repeated start once address is sent
+                // if reading, generate repeated start once address is sent
                 // ENABLE REPEATED START FOR RECEIVING
                 // set I2C for receiver mode
                 UCB0CTLW0 &= ~UCTR;
