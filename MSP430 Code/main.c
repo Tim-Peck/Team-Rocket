@@ -46,8 +46,7 @@ int main(void)
 
     uart_send_byte(receiveData[0]);
     uart_send_byte(receiveData[1]);
-    uart_send_byte(receiveData[2]);
-    uart_send_byte(receiveData[3]);
+//    uart_send_byte(receiveData[2]);
 
 
     // keep MSP running

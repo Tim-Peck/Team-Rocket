@@ -78,58 +78,36 @@ void spi_receive(uint8_t address_byte, int length)
 #pragma vector=USCI_A1_VECTOR
 __interrupt void USCI_A1_ISR(void)
 {
-//    blipSPI();
     switch (UCA1IV)
     {
     case USCI_SPI_UCTXIFG: // transmit flag
-        if (current_lengthSPI > -1)
+        if (current_lengthSPI > 0)
         {
-            if (next_idx_to_sendSPI == 0) {
-                UCA1TXBUF = address_bufferSPI[next_idx_to_sendSPI++]; // Testing note: sends LSB first so opposite way
-            }
-            else
-            {
-                UCA1TXBUF = 0x00;
-            }
+            UCA1TXBUF = address_bufferSPI[next_idx_to_sendSPI++];
 
-
+            current_lengthSPI--;
+        }
+        else if (rwStatus && (receive_idxSPI != receiveLengthSPI + 1)) // send if not at the end
+        {
+            UCA1TXBUF = 0xFF;
             received_bytesSPI[receive_idxSPI] = UCA1RXBUF;
             receive_idxSPI++;
-            current_lengthSPI--;
         }
         else
         { // transmission end
             UCA1IE &= ~UCTXIE;
             UCA1IFG |= UCTXIFG;
-            receivedStatus = 1;
 
-            // if reading, enable receive interrupt
-//            if (rwStatus)
-//            {
-//                UCA1IE |= UCRXIE;
-//            }
+            receivedStatus = 1;
+            receive_idxSPI = 0; // reset idx
         }
         break;
 
     case USCI_SPI_UCRXIFG: // receive flag
         // receive the data in global variable
-        if (receive_idxSPI) {
-            received_bytesSPI[receive_idxSPI - 1] = UCA1RXBUF;
-        }
-        receive_idxSPI++;
+//        received_bytesSPI[receive_idxSPI] = UCA1RXBUF; // reading RXBUF resets RXIFG!
+//        receive_idxSPI++;
 
-        if (receive_idxSPI != receiveLengthSPI + 1)
-        {
-            UCA1TXBUF = 0xFF;
-        }
-        else
-        { // stop if end
-            receivedStatus = 1;
-            receive_idxSPI = 0; // reset idx
-
-            UCA1IE &= ~UCRXIE; // disable receive interrupt to stop?
-            UCA1IFG |= UCRXIFG;
-        }
         break;
     default:
         break;
@@ -162,7 +140,7 @@ void getBytesSPI(uint8_t registerAddress, uint8_t *storeByte, int numBytes)
 
     // store each byte read
     int i;
-    for (i = 0; i < numBytes+3; i++)
+    for (i = 0; i < numBytes + 1; i++)
     {
         storeByte[i] = received_bytesSPI[i];
     }
