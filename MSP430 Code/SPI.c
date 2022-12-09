@@ -81,14 +81,18 @@ __interrupt void USCI_A1_ISR(void)
     switch (UCA1IV)
     {
     case USCI_SPI_UCTXIFG: // transmit flag
+//        while (UCA1STATW & UCBUSY); // poll until byte sent
+
         if (current_lengthSPI > 0)
         {
-            UCA1TXBUF = address_bufferSPI[next_idx_to_sendSPI++];
+            UCA1TXBUF = address_bufferSPI[next_idx_to_sendSPI++]; // possibly requires 16 bits before actually shift register sends byte?? (8 for TX->shift, 8 for shift-> sensor)
 
             current_lengthSPI--;
         }
-        else if (rwStatus && (receive_idxSPI != receiveLengthSPI + 1)) // send if not at the end
+        else if (rwStatus && (receive_idxSPI != receiveLengthSPI + 5)) // send if not at the end
         {
+            while (!(UCA1IFG & UCRXIFG)); // poll until byte sent
+
             UCA1TXBUF = 0xFF;
             received_bytesSPI[receive_idxSPI] = UCA1RXBUF;
             receive_idxSPI++;
@@ -140,7 +144,7 @@ void getBytesSPI(uint8_t registerAddress, uint8_t *storeByte, int numBytes)
 
     // store each byte read
     int i;
-    for (i = 0; i < numBytes + 1; i++)
+    for (i = 0; i < numBytes + 5; i++)
     {
         storeByte[i] = received_bytesSPI[i];
     }

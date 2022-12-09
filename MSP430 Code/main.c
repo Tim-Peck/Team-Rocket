@@ -19,7 +19,7 @@ int main(void)
 
     // ------------------------- DO NOT CHANGE ABOVE ---------------------------- //
 
-    uint8_t receiveData[10];
+    uint8_t receiveData[100];
 
     // set direction of pin 1.0 for led
     P1DIR |= BIT0;
@@ -44,9 +44,10 @@ int main(void)
 //    getBytes(0x28, 0x3C, receiveData, 2);
 //
 
-    uart_send_byte(receiveData[0]);
-    uart_send_byte(receiveData[1]);
-//    uart_send_byte(receiveData[2]);
+    int i;
+    for (i = 0; i < 6; i++) {
+        uart_send_byte(receiveData[i]);
+    }
 
 
     // keep MSP running
