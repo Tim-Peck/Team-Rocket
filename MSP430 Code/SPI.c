@@ -22,7 +22,8 @@ void spi_init()
     UCA1CTLW0 |= UCSWRST; // control register set SPI to reset condition (must be in reset for configuration)
 
     // set USCI_A as SPI master mode
-    UCA1CTLW0 |= (UCMODE_2 | UCMST | UCSYNC | UCSTEM | UCMSB); // UCMODE_2 sets eUSCI_A to SPI mode with active low CS, UCMST sets master mode, and UCSYNC sets synchronous mode, UCSTEM sets STE pin to be CS
+    UCA1CTLW0 |= (UCMODE_2 | UCMST | UCSYNC | UCSTEM | UCMSB | UCCKPL);
+    // UCMODE_2 sets eUSCI_A to SPI mode with active low CS, UCMST sets master mode, and UCSYNC sets synchronous mode, UCSTEM sets STE pin to be CS, UCCKPLP sets clock polarity to active low
 
     // set clock source of USCI_A
     UCA1CTLW0 |= UCSSEL__SMCLK; // control register UCSSELx field, set clock source to SMCLK (which is same as MCLK at ~1MHz)
@@ -66,12 +67,9 @@ void spi_receive(uint8_t address_byte, int length)
 
     UCA1IE |= UCTXIE;
 
-    while (!receivedStatus)
-    {
-//        blipSPI();
-    } // poll for data received before exiting function
+    while (!receivedStatus);
 
-//    __delay_cycles(2200); // SPI receive requires delay for some reason
+//    __delay_cycles(5000);
 }
 
 // ISR for USCI_A1 for SPI
@@ -81,17 +79,16 @@ __interrupt void USCI_A1_ISR(void)
     switch (UCA1IV)
     {
     case USCI_SPI_UCTXIFG: // transmit flag
-//        while (UCA1STATW & UCBUSY); // poll until byte sent
 
         if (current_lengthSPI > 0)
         {
-            UCA1TXBUF = address_bufferSPI[next_idx_to_sendSPI++]; // possibly requires 16 bits before actually shift register sends byte?? (8 for TX->shift, 8 for shift-> sensor)
+            UCA1TXBUF = address_bufferSPI[next_idx_to_sendSPI++];
 
             current_lengthSPI--;
         }
-        else if (rwStatus && (receive_idxSPI != receiveLengthSPI + 5)) // send if not at the end
+        else if (rwStatus && (receive_idxSPI != receiveLengthSPI + 1)) // send if not at the end, note: +1 needed as second to last receive byte is read
         {
-            while (!(UCA1IFG & UCRXIFG)); // poll until byte sent
+            while (!(UCA1IFG & UCRXIFG)); // poll until byte received
 
             UCA1TXBUF = 0xFF;
             received_bytesSPI[receive_idxSPI] = UCA1RXBUF;
@@ -108,10 +105,6 @@ __interrupt void USCI_A1_ISR(void)
         break;
 
     case USCI_SPI_UCRXIFG: // receive flag
-        // receive the data in global variable
-//        received_bytesSPI[receive_idxSPI] = UCA1RXBUF; // reading RXBUF resets RXIFG!
-//        receive_idxSPI++;
-
         break;
     default:
         break;
@@ -124,7 +117,6 @@ void barInitSPI()
     const uint8_t measSettings = 0b00000111; // osrs_p & power mode
 
     spi_write(meas, measSettings);
-    __delay_cycles(400);
 }
 
 void getBarSPI(uint8_t *data_array)
@@ -144,9 +136,9 @@ void getBytesSPI(uint8_t registerAddress, uint8_t *storeByte, int numBytes)
 
     // store each byte read
     int i;
-    for (i = 0; i < numBytes + 5; i++)
+    for (i = 1; i < numBytes + 1; i++)
     {
-        storeByte[i] = received_bytesSPI[i];
+        storeByte[i - 1] = received_bytesSPI[i];
     }
 
 }

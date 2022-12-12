@@ -32,31 +32,36 @@ int main(void)
 //    accelInit();
 //    barInit();
 
-//    barInitSPI();
-
-//    getAccel(receiveDataData);
+//    getAccel(receiveData);
 //    getBar(receiveData);
 
-
-//    getBarSPI(receiveData);
-    getBytesSPI(0xD0, receiveData, 1);
-
 //    getBytes(0x28, 0x3C, receiveData, 2);
-//
 
-    int i;
-    for (i = 0; i < 6; i++) {
-        uart_send_byte(receiveData[i]);
-    }
+//    barInitSPI();
+//    getBarSPI(receiveData);
 
+    getBytesSPI(0xD0, receiveData, 1);
+    uart_send_byte(receiveData[0]);
+
+    __delay_cycles(1000000);
+    getBytesSPI(0xD0, receiveData, 1);
+    uart_send_byte(receiveData[0]);
+
+    __delay_cycles(1000000);
+    getBytesSPI(0xD0, receiveData, 1);
+    uart_send_byte(receiveData[0]);
+
+//    int i;
+//    for (i = 0; i < 1; i++) {
+//        uart_send_byte(receiveData[i]);
+//    }
 
     // keep MSP running
     while (1)
     {
-//        __delay_cycles(100000);
-//        getAccel(receiveData);
+//        __delay_cycles(1000000);
+//        getBytesSPI(0xD0, receiveData, 1);
 //        uart_send_byte(receiveData[0]);
-//        uart_send_byte(receiveData[1]);
     }
 
     return 0;
