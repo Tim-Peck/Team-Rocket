@@ -38,12 +38,8 @@ void spi_receive(uint8_t address_byte, int length);
 // -------- private functions -------- //
 
 
-// initialise barometer
-void barInitSPI();
-
-// capture pressure data
-// input: array to store 2 pressure bytes
-void getBarSPI(uint8_t *data_array);
+// initialise SD card
+void SDInit();
 
 // get any number of bytes from a register with SPI
 // note: register address is incremented for subsequent bytes to be received

@@ -12,9 +12,6 @@ void spi_init()
     P2SEL0 |= (BIT4 | BIT5 | BIT6); // primary module function
     P3SEL0 |= BIT1;
 
-//    P1REN |= BIT2 | BIT3; // Enable internal resistors
-//    P1OUT |= BIT2 | BIT3; // Switch resistors to pull-up
-
     // configure SPI
     // see 23.4 for SPI registers
     // eUSCI_A1 so control register UCA"1"CTLW0
@@ -65,11 +62,10 @@ void spi_receive(uint8_t address_byte, int length)
     address_bufferSPI[next_idx_to_storeSPI++] = address_byte; // next_idx is always incremented and not reset
     current_lengthSPI++; // so current length alternates between 0 and 1 for each byte
 
+    UCA1IFG &= ~UCRXIFG; // reset RXIFG before receiving
     UCA1IE |= UCTXIE;
 
     while (!receivedStatus);
-
-//    __delay_cycles(5000);
 }
 
 // ISR for USCI_A1 for SPI
@@ -96,8 +92,11 @@ __interrupt void USCI_A1_ISR(void)
         }
         else
         { // transmission end
+            while (!(UCA1IFG & UCRXIFG)); // poll until byte received
+
             UCA1IE &= ~UCTXIE;
             UCA1IFG |= UCTXIFG;
+            UCA1IFG &= ~UCRXIFG; // note: flags need to be reset for same functionality after
 
             receivedStatus = 1;
             receive_idxSPI = 0; // reset idx
@@ -111,23 +110,12 @@ __interrupt void USCI_A1_ISR(void)
     }
 }
 
-void barInitSPI()
+void SDInit()
 {
     const uint8_t meas = 0xF4;
     const uint8_t measSettings = 0b00000111; // osrs_p & power mode
 
     spi_write(meas, measSettings);
-}
-
-void getBarSPI(uint8_t *data_array)
-{
-    // register address of barometer
-    const uint8_t pressReg = 0xF7;
-
-    // store pressure data (2 bytes)
-    spi_receive(pressReg, 2);
-    data_array[0] = received_bytesSPI[0];
-    data_array[1] = received_bytesSPI[1];
 }
 
 void getBytesSPI(uint8_t registerAddress, uint8_t *storeByte, int numBytes)

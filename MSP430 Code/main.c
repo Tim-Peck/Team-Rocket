@@ -1,4 +1,4 @@
-// 21/11/2022
+// 13/12/2022
 // Last change: Kenny Yu
 // Current function: displays received byte/s on serial monitor with UART from SPI on test microcontroller with test sensors
 
@@ -37,19 +37,9 @@ int main(void)
 
 //    getBytes(0x28, 0x3C, receiveData, 2);
 
-//    barInitSPI();
 //    getBarSPI(receiveData);
 
-    getBytesSPI(0xD0, receiveData, 1);
-    uart_send_byte(receiveData[0]);
-
-    __delay_cycles(1000000);
-    getBytesSPI(0xD0, receiveData, 1);
-    uart_send_byte(receiveData[0]);
-
-    __delay_cycles(1000000);
-    getBytesSPI(0xD0, receiveData, 1);
-    uart_send_byte(receiveData[0]);
+//    getBytesSPI(0xD0, receiveData, 1);
 
 //    int i;
 //    for (i = 0; i < 1; i++) {
@@ -59,9 +49,9 @@ int main(void)
     // keep MSP running
     while (1)
     {
-//        __delay_cycles(1000000);
-//        getBytesSPI(0xD0, receiveData, 1);
-//        uart_send_byte(receiveData[0]);
+        __delay_cycles(500000);
+        getBytesSPI(0xD0, receiveData, 1);
+        uart_send_byte(receiveData[0]);
     }
 
     return 0;
