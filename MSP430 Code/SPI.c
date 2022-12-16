@@ -19,8 +19,15 @@ void spi_init()
     UCA1CTLW0 |= UCSWRST; // control register set SPI to reset condition (must be in reset for configuration)
 
     // set USCI_A as SPI master mode
-    UCA1CTLW0 |= (UCMODE_2 | UCMST | UCSYNC | UCSTEM | UCMSB | UCCKPL);
-    // UCMODE_2 sets eUSCI_A to SPI mode with active low CS, UCMST sets master mode, and UCSYNC sets synchronous mode, UCSTEM sets STE pin to be CS, UCCKPLP sets clock polarity to active low
+    UCA1CTLW0 |= (UCCKPH | UCMODE_2 | UCMST | UCSYNC | UCSTEM | UCMSB);
+    // for SD card
+    // UCCKPL = 0, clock polarity active high
+    // UCCKPH = 1, data is captured on first edge before changing
+    // UCMODE_2 sets eUSCI_A to SPI mode with active low CS
+    // UCMST sets master mode
+    // UCSYNC sets synchronous mode (SPI mode)
+    // UCSTEM sets STE pin to be CS,
+    // UCMSB sets Most Significant Bit first
 
     // set clock source of USCI_A
     UCA1CTLW0 |= UCSSEL__SMCLK; // control register UCSSELx field, set clock source to SMCLK (which is same as MCLK at ~1MHz)
@@ -36,7 +43,7 @@ void spi_write(uint8_t address_byte, uint8_t data_byte)
     rwStatus = 0; // set bool for ISR to write
 
     // add write bit to MSB (RW = '0')
-    address_byte &= ~0b10000000;
+    address_byte &= ~0x40;
 
     // store address byte in buffer
     address_bufferSPI[next_idx_to_storeSPI++] = address_byte; // next_idx is always incremented and not reset
@@ -56,7 +63,7 @@ void spi_receive(uint8_t address_byte, int length)
     receivedStatus = 0; // reset received bool
 
     // add read bit to MSB (RW = '1')
-    address_byte |= 0b10000000;
+    address_byte |= 0x40;
 
     // store byte in buffer
     address_bufferSPI[next_idx_to_storeSPI++] = address_byte; // next_idx is always incremented and not reset
