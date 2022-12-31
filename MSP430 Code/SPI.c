@@ -1,6 +1,10 @@
 #include <msp430.h>
 #include "SPI.h"
 
+// macros
+#define CS_ENABLE() P3OUT &= ~BIT1;
+#define CS_DISABLE() P3OUT |= BIT1;
+
 void spi_init()
 {
     next_idx_to_sendSPI = 0;
@@ -10,7 +14,7 @@ void spi_init()
 
     // setting pins for SPI
     P2SEL0 |= (BIT4 | BIT5 | BIT6); // primary module function
-    P3SEL0 |= BIT1;
+    P3DIR |= BIT1; // Use GPIO for CS
 
     // configure SPI
     // see 23.4 for SPI registers
@@ -21,7 +25,7 @@ void spi_init()
     // set USCI_A as SPI master mode
     UCA1CTLW0 |= (UCCKPH | UCMODE_2 | UCMST | UCSYNC | UCSTEM | UCMSB);
     // for SD card
-    // UCCKPL = 0, clock polarity active high
+    // UCCKPL = 0, clock polarity idle low
     // UCCKPH = 1, data is captured on first edge before changing
     // UCMODE_2 sets eUSCI_A to SPI mode with active low CS
     // UCMST sets master mode
@@ -31,48 +35,99 @@ void spi_init()
 
     // set clock source of USCI_A
     UCA1CTLW0 |= UCSSEL__SMCLK; // control register UCSSELx field, set clock source to SMCLK (which is same as MCLK at ~1MHz)
-    // configuring baud rate registers for 100kHz when sourcing from SMCLK where SMCLK = 1,048,576 Hz
+    // configuring baud rate registers for 100kHz when sourcing from SMCLK where SMCLK = 1048576 Hz
     // acts as divisor for BRCLK
     UCA1BRW |= 10;
 
     UCA1CTLW0 &= ~UCSWRST; // bring SPI out of reset (Testing note: This brings SIMO and CS low for some reason)
 }
 
-void spi_write(uint8_t address_byte, uint8_t data_byte)
+uint8_t spi_transfer(uint8_t byte)
 {
-    rwStatus = 0; // set bool for ISR to write
+    // load data into register
+    UCA1TXBUF = byte;
 
-    // add write bit to MSB (RW = '0')
-    address_byte &= ~0x40;
+    // poll until byte received
+    while (!(UCA1IFG & UCRXIFG))
+        ;
 
-    // store address byte in buffer
-    address_bufferSPI[next_idx_to_storeSPI++] = address_byte; // next_idx is always incremented and not reset
-    current_lengthSPI++;
-
-    // store data byte in buffer
-    address_bufferSPI[next_idx_to_storeSPI++] = data_byte;
-    current_lengthSPI++;
-
-    UCA1IE |= UCTXIE; // enable transmit interrupt which generates interrupt request (23.3.8.1)
+    // return PREVIOUS byte received in receive register
+    return UCA1RXBUF;
 }
 
-void spi_receive(uint8_t address_byte, int length)
+void SD_command(uint8_t cmd, uint32_t arg, uint8_t crc)
 {
-    rwStatus = 1; // set bool for ISR to read
-    receiveLengthSPI = length;
-    receivedStatus = 0; // reset received bool
+    // see command format
 
-    // add read bit to MSB (RW = '1')
-    address_byte |= 0x40;
+    // transmit command to SD card
+    spi_transfer(cmd | 0x40); // bit 6 high but bit 7 always low from cmd argument
 
-    // store byte in buffer
-    address_bufferSPI[next_idx_to_storeSPI++] = address_byte; // next_idx is always incremented and not reset
-    current_lengthSPI++; // so current length alternates between 0 and 1 for each byte
+    // transmit argument
+    spi_transfer((uint8_t) (arg >> 24)); // shift down one byte at a time
+    spi_transfer((uint8_t) (arg >> 16));
+    spi_transfer((uint8_t) (arg >> 8));
+    spi_transfer((uint8_t) (arg));
 
-    UCA1IFG &= ~UCRXIFG; // reset RXIFG before receiving
-    UCA1IE |= UCTXIE;
+    // transmit crc
+    spi_transfer(crc | 0x01);
+}
 
-    while (!receivedStatus);
+uint8_t SD_readResponse1()
+{
+    uint8_t count = 0, response1;
+
+    // poll until response received or 8 bytes passed
+    // note: after sending first 0xFF, receive should have response byte (transmit line must be active for clock and receive to be active)
+    while ((count < 8) & ((response1 = spi_transfer(0xFF)) == 0xFF)) {
+        count++;
+    }
+
+    // return response byte
+    return response1;
+}
+
+void SD_powerUpSeq()
+{
+    // SD card reader must be held high during power up
+    CS_DISABLE();
+
+    // give SD card at least 1ms to power up
+    __delay_cycles(104858);
+
+    // send 80 clock cycles to synchronize where 1 byte is 8 clock cycles
+    uint8_t i;
+    for (i = 0; i < 10; i++)
+    {
+        spi_transfer(0xFF);
+    }
+
+    // deselect SD card
+    CS_DISABLE();
+    spi_transfer(0xFF);
+}
+
+uint8_t SD_goIdleState()
+{
+    // assert chip select
+    spi_transfer(0xFF); // 0xFF send before and after CS for safety (see notes 29/12)
+    CS_ENABLE();
+    spi_transfer(0xFF);
+
+    // send CMD0
+    // index: 0
+    // argument: stuff bits
+    // CRC: 10010100b (page 43 of physical spec)
+    SD_command(0, 0x00000000, 0x94);
+
+    // read response
+    uint8_t res1 = SD_readResponse1();
+
+    // deassert chip select
+    spi_transfer(0xFF);
+    CS_DISABLE();
+    spi_transfer(0xFF);
+
+    return res1;
 }
 
 // ISR for USCI_A1 for SPI
@@ -91,7 +146,8 @@ __interrupt void USCI_A1_ISR(void)
         }
         else if (rwStatus && (receive_idxSPI != receiveLengthSPI + 1)) // send if not at the end, note: +1 needed as second to last receive byte is read
         {
-            while (!(UCA1IFG & UCRXIFG)); // poll until byte received
+            while (!(UCA1IFG & UCRXIFG))
+                ; // poll until byte received
 
             UCA1TXBUF = 0xFF;
             received_bytesSPI[receive_idxSPI] = UCA1RXBUF;
@@ -99,7 +155,8 @@ __interrupt void USCI_A1_ISR(void)
         }
         else
         { // transmission end
-            while (!(UCA1IFG & UCRXIFG)); // poll until byte received
+            while (!(UCA1IFG & UCRXIFG))
+                ; // poll until byte received
 
             UCA1IE &= ~UCTXIE;
             UCA1IFG |= UCTXIFG;

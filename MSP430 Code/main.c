@@ -138,37 +138,24 @@ int main(void)
 
     // ------------------------- DO NOT CHANGE ABOVE ---------------------------- //
 
+
     // SD card testing
-     uint8_t receiveData[100];
 
      uart_init();
      //    i2c_init();
+     spi_init(); // initialise SPI for SD card
 
-     spi_init();
+     // start power up sequence
+     SD_powerUpSeq();
 
-     //    accelInit();
-     //    barInit();
+     // command card to idle
+     SD_goIdleState();
 
-     //    getAccel(receiveData);
-     //    getBar(receiveData);
 
-     //    getBytes(0x28, 0x3C, receiveData, 2);
-
-     //    getBarSPI(receiveData);
-
-     //    getBytesSPI(0xD0, receiveData, 1);
-
-     //    int i;
-     //    for (i = 0; i < 1; i++) {
-     //        uart_send_byte(receiveData[i]);
-     //    }
 
      // keep MSP running
      while (1)
      {
-     __delay_cycles(500000);
-     getBytesSPI(0xD0, receiveData, 1);
-     uart_send_byte(receiveData[0]);
      }
 
 
