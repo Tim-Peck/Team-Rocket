@@ -38,9 +38,19 @@ void SD_command(uint8_t cmd, uint32_t arg, uint8_t crc);
 
 // receive a response byte from address on SPI
 // output: response byte if card responds (less than 8 bytes), otherwise 0xFF
-uint8_t SD_readResponse1();
+uint8_t SD_readRes1();
+
+// receive response R7
+// input: 5 byte uin8_t array to store response R7
+SD_readRes7(uint8_t *res);
 
 // -------- private functions -------- //
+
+// print R1 to serial monitor in ASCII
+void SD_printR1(uint8_t res);
+
+// print R7 to serial monitor in ASCII
+void SD_printR7(uint8_t *res);
 
 // required power up sequence for SD card includes 1ms delay and sending 74 clock cycles
 void SD_powerUpSeq();
@@ -48,6 +58,10 @@ void SD_powerUpSeq();
 // switching to SPI mode and going to idle state
 // output: response R1 from CMD0
 uint8_t SD_goIdleState();
+
+// send interface condition to check generation of card
+// input: 5 byte uint8_t array to store response
+void SD_sendInterfaceCond(uint8_t *res);
 
 // initialise SD card
 void SDInit();

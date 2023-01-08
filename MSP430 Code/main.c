@@ -141,6 +141,8 @@ int main(void)
 
     // SD card testing
 
+    uint8_t res[5];
+
      uart_init();
      //    i2c_init();
      spi_init(); // initialise SPI for SD card
@@ -149,8 +151,16 @@ int main(void)
      SD_powerUpSeq();
 
      // command card to idle
-     SD_goIdleState();
+     uart_send_bytes("Sending CMD0...\r", sizeof("Sending CMD0...\r"));
+     res[0] = SD_goIdleState();
+     uart_send_bytes("Response:\r", sizeof("Response:\r"));
+     SD_printR1(res[0]);
 
+     // send interface conditions
+     uart_send_bytes("Sending CMD8...\r", sizeof("Sending CMD8...\r"));
+     SD_sendInterfaceCond(res);
+     uart_send_bytes("Response:\r", sizeof("Response:\r"));
+     SD_printR7(res);
 
 
      // keep MSP running

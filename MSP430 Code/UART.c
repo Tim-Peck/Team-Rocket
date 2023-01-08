@@ -46,6 +46,25 @@ void uart_send_bytes(uint8_t *bytes, uint8_t number_of_bytes) {
     }
 }
 
+void uart_send_hex8(uint8_t byte)
+{
+    // print most significant hex digit
+    uint8_t MSD = ((byte >> 4) & 0b00001111);
+    if (MSD > 0x09) { // if hex digit is a letter
+        uart_send_byte(MSD + 0x37);
+    } else { // if hex digit is a number
+        uart_send_byte(MSD + 0x30);
+    }
+
+    // print least significant hex digit
+    uint8_t LSD = (byte & 0b00001111);
+    if (LSD > 0x09) { // if hex digit is a letter
+            uart_send_byte(LSD + 0x37);
+        } else { // if hex digit is a number
+            uart_send_byte(LSD + 0x30);
+        }
+}
+
 
 // ISR TO USCI_A0
 #pragma vector=USCI_A0_VECTOR
