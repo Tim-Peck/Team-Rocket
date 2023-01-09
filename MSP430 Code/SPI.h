@@ -24,7 +24,7 @@ void spi_init();
 
 // -------- private functions -------- //
 
-// transfer one byte from microcontroller
+// transfer one byte from microcontroller and receive previous byte
 // input: target register address, data (each in 1 byte)
 // output: previous byte in receive register
 uint8_t spi_transfer(uint8_t byte);
@@ -44,7 +44,7 @@ uint8_t SD_readRes1();
 // input: 5 byte uin8_t array to store response R7
 SD_readRes7(uint8_t *res);
 
-// -------- private functions -------- //
+// -------- print functions -------- //
 
 // print R1 after any CMD to serial monitor in ASCII
 // prints error conditions and idle state
@@ -57,6 +57,8 @@ void SD_printR7(uint8_t *res);
 // print R3 after CMD58 to serial monitor in ASCII
 // checks whether card is powered up, whether it's high capacity and its operating voltages
 void SD_printR3(uint8_t *res);
+
+// -------- startup functions -------- //
 
 // required power up sequence for SD card includes 1ms delay and sending 74 clock cycles
 void SD_powerUpSeq();
@@ -73,14 +75,18 @@ void SD_sendInterfaceCond(uint8_t *res);
 // input: 5 byte uint8_t array to store response R3
 void SD_readOCR(uint8_t *res);
 
-// initialise SD card
-void SDInit();
+// send CMD55 application command (required before any ACMD)
+// output: R1
+uint8_t SD_sendAppCommand();
 
-// get any number of bytes from a register with SPI
-// note: register address is incremented for subsequent bytes to be received
-// input: 8 byte slave address, 8 byte register address to read, target pointer to store data, number of bytes to read
-void getBytesSPI(uint8_t registerAddress, uint8_t *storeByte, int numBytes);
+// send operating conditions register to activate card initialization
+// output: R1
+uint8_t SD_sendOCR();
 
-void blipSPI();
+// -------- complete initialization function -------- //
+
+// complete initialization function for SD card
+// output: 0 for initialization failure, 1 for success
+uint8_t SD_init();
 
 #endif

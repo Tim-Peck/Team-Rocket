@@ -1,7 +1,7 @@
 #include <msp430.h>
 #include "SPI.h"
 
-// NOTE FOR UINT8_T: NON-ZERO NUMBERS ARE TRUE WHILE ZERO IS FALSE (so e.g. 0b10 & 0b11 is TRUE while 0b10 & 0b01 is FALSE)
+// note for uint8_t: NON-ZERO NUMBERS ARE TRUE WHILE ZERO IS FALSE (so e.g. 0b10 & 0b11 is TRUE while 0b10 & 0b01 is FALSE)
 // R1 values
 #define PARAM_ERROR(X)      X & 0b01000000
 #define ADDR_ERROR(X)       X & 0b00100000
@@ -37,7 +37,6 @@
 // chip select macros
 #define CS_ENABLE() P3OUT &= ~BIT1;
 #define CS_DISABLE() P3OUT |= BIT1;
-
 
 void spi_init()
 {
@@ -76,6 +75,7 @@ void spi_init()
     UCA1CTLW0 &= ~UCSWRST; // bring SPI out of reset (Testing note: This brings SIMO and CS low for some reason)
 }
 
+// note: in order to receive for SPI, transmit line must be active so this transmit acts as receiving as well
 uint8_t spi_transfer(uint8_t byte)
 {
     // load data into register
@@ -119,6 +119,8 @@ uint8_t SD_readRes1()
 
     // return response byte
     return res;
+    // send extra 0xFF after response for safety
+    spi_transfer(0xFF);
 }
 
 SD_readRes7(uint8_t *res)
@@ -138,6 +140,9 @@ SD_readRes7(uint8_t *res)
     {
         res[i] = spi_transfer(0xFF);
     }
+
+    // send extra 0xFF after response for safety
+    spi_transfer(0xFF);
 }
 
 void SD_printR1(uint8_t res)
@@ -207,7 +212,8 @@ void SD_printR3(uint8_t *res)
     if (res[0] > 1)
         return;
 
-    uart_send_bytes("\tCard Power Up Status: ", sizeof("\tCard Power Up Status: ") - 1);
+    uart_send_bytes("\tCard Power Up Status: ",
+                    sizeof("\tCard Power Up Status: ") - 1);
     // print card power up status
     if (POWER_UP_STATUS(res[1]))
     {
@@ -255,7 +261,7 @@ void SD_powerUpSeq()
     CS_DISABLE();
 
     // give SD card at least 1ms to power up
-    __delay_cycles(104858);
+    __delay_cycles(1050);
 
     // send 80 clock cycles to synchronize where 1 byte is 8 clock cycles
     uint8_t i;
@@ -282,7 +288,7 @@ uint8_t SD_goIdleState()
     // CRC: 10010100b (page 43 of physical spec)
     SD_command(0, 0x00000000, 0x94);
 
-    // read response
+    // read response R1
     uint8_t res1 = SD_readRes1();
 
     // deassert chip select
@@ -337,82 +343,133 @@ void SD_readOCR(uint8_t *res)
     spi_transfer(0xFF);
 }
 
-// ISR for USCI_A1 for SPI
-#pragma vector=USCI_A1_VECTOR
-__interrupt void USCI_A1_ISR(void)
+uint8_t SD_sendAppCommand()
 {
-    switch (UCA1IV)
-    {
-    case USCI_SPI_UCTXIFG: // transmit flag
+    // assert chip select
+    spi_transfer(0xFF); // 0xFF send before and after CS for safety (see notes 29/12)
+    CS_ENABLE();
+    spi_transfer(0xFF);
 
-        if (current_lengthSPI > 0)
+    // send CMD55
+    // index: 55
+    // 31:0 are stuff bits
+    SD_command(55, 0, 0);
+
+    // read response R1
+    uint8_t res1 = SD_readRes1();
+
+    // deassert chip select
+    spi_transfer(0xFF);
+    CS_DISABLE();
+    spi_transfer(0xFF);
+
+    return res1;
+}
+
+uint8_t SD_sendOCR()
+{
+    // assert chip select
+    spi_transfer(0xFF); // 0xFF send before and after CS for safety (see notes 29/12)
+    CS_ENABLE();
+    spi_transfer(0xFF);
+
+    // send ACMD41
+    // index: 41
+    // bit 30 to indicate high capacity cards supported (0b01000000 << 24 = 0x40000000)
+    // NOTE: high capacity cards appear to not initialize if bit 30 not set
+    SD_command(41, 0x40000000, 0);
+
+    // read response R1
+    uint8_t res1 = SD_readRes1();
+
+    // deassert chip select
+    spi_transfer(0xFF);
+    CS_DISABLE();
+    spi_transfer(0xFF);
+
+    return res1;
+}
+
+uint8_t SD_init()
+{
+    uint8_t res[5], cmdAttempts = 0;
+
+    // start power up sequence
+    SD_powerUpSeq();
+
+    // command card to idle and switch to SPI mode
+    // give 10 attempts
+    do
+    {
+        uart_send_bytes("Sending CMD0...\r", sizeof("Sending CMD0...\r"));
+        res[0] = SD_goIdleState();
+        uart_send_bytes("Response:\r", sizeof("Response:\r"));
+        SD_printR1(res[0]);
+        uart_send_bytes("------------------\r", sizeof("------------------\r"));
+
+        cmdAttempts++;
+        if (cmdAttempts > 9)
         {
-            UCA1TXBUF = address_bufferSPI[next_idx_to_sendSPI++];
-
-            current_lengthSPI--;
+            return 0;
         }
-        else if (rwStatus && (receive_idxSPI != receiveLengthSPI + 1)) // send if not at the end, note: +1 needed as second to last receive byte is read
-        {
-            while (!(UCA1IFG & UCRXIFG))
-                ; // poll until byte received
+    } while(res[0] != 0x01);
 
-            UCA1TXBUF = 0xFF;
-            received_bytesSPI[receive_idxSPI] = UCA1RXBUF;
-            receive_idxSPI++;
-        }
-        else
-        { // transmission end
-            while (!(UCA1IFG & UCRXIFG))
-                ; // poll until byte received
-
-            UCA1IE &= ~UCTXIE;
-            UCA1IFG |= UCTXIFG;
-            UCA1IFG &= ~UCRXIFG; // note: flags need to be reset for same functionality after
-
-            receivedStatus = 1;
-            receive_idxSPI = 0; // reset idx
-        }
-        break;
-
-    case USCI_SPI_UCRXIFG: // receive flag
-        break;
-    default:
-        break;
-    }
-}
-
-void SDInit()
-{
-    const uint8_t meas = 0xF4;
-    const uint8_t measSettings = 0b00000111; // osrs_p & power mode
-
-    spi_write(meas, measSettings);
-}
-
-void getBytesSPI(uint8_t registerAddress, uint8_t *storeByte, int numBytes)
-{
-    spi_receive(registerAddress, numBytes);
-
-    // store each byte read
-    int i;
-    for (i = 1; i < numBytes + 1; i++)
+    // check interface conditions
+    uart_send_bytes("Sending CMD8...\r", sizeof("Sending CMD8...\r"));
+    SD_sendInterfaceCond(res);
+    uart_send_bytes("Response:\r", sizeof("Response:\r"));
+    SD_printR7(res);
+    uart_send_bytes("------------------\r", sizeof("------------------\r"));
+    // check if first gen card
+    if (res[0] != 0x01)
     {
-        storeByte[i - 1] = received_bytesSPI[i];
+        uart_send_bytes("First gen card\r", sizeof("First gen card\r"));
+        return 0;
     }
-
-}
-
-void blipSPI()
-{
-    // toggle on and off for a second
-    P1OUT &= ~BIT0;
-    int i;
-    for (i = 0; i < 5; i++)
+    // check echo pattern
+    if (res[4] != 0xAA)
     {
-        P1OUT ^= BIT0;
-        __delay_cycles(100000);
-        P1OUT ^= BIT0;
-        __delay_cycles(100000);
+        uart_send_bytes("Wrong echo pattern\r", sizeof("Wrong echo pattern\r"));
+        return 0;
     }
-    __delay_cycles(150000);
+
+    // attempt SD initialization
+    cmdAttempts = 0;
+    do
+    {
+        if(cmdAttempts > 100) { // return if not initialized after 100 attempts
+            return 0;
+        }
+
+        // send CMD55
+        uart_send_bytes("Sending CMD55...\r", sizeof("Sending CMD55...\r"));
+        res[0] = SD_sendAppCommand();
+        uart_send_bytes("Response:\r", sizeof("Response:\r"));
+        SD_printR1(res[0]);
+        uart_send_bytes("------------------\r", sizeof("------------------\r"));
+
+        // send ACMD41
+        uart_send_bytes("Sending ACMD41...\r", sizeof("Sending ACMD41...\r"));
+        res[0] = SD_sendOCR();
+        uart_send_bytes("Response:\r", sizeof("Response:\r"));
+        SD_printR1(res[0]);
+        uart_send_bytes("------------------\r", sizeof("------------------\r"));
+        __delay_cycles(11000);
+
+        cmdAttempts++;
+    }
+    while (res[0] != 0); // send initialization sequence 100 times max
+
+    // check operating conditions
+    uart_send_bytes("Sending CMD58...\r", sizeof("Sending CMD58...\r"));
+    SD_readOCR(res);
+    uart_send_bytes("Response:\r", sizeof("Response:\r"));
+    SD_printR3(res);
+    uart_send_bytes("------------------\r", sizeof("------------------\r"));
+    // return if card not ready
+    if(!(POWER_UP_STATUS(res[1]))) {
+        return 0;
+    }
+
+    return 1;
 }

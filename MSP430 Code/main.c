@@ -139,54 +139,15 @@ int main(void)
 
     // SD card testing
 
-    uint8_t res[5];
-
     uart_init();
     //    i2c_init();
     spi_init(); // initialise microcontroller SPI for SD card
 
-    // start power up sequence
-    SD_powerUpSeq();
-
-    // command card to idle and switch to SPI mode
-    uart_send_bytes("Sending CMD0...\r", sizeof("Sending CMD0...\r"));
-    res[0] = SD_goIdleState();
-    uart_send_bytes("Response:\r", sizeof("Response:\r"));
-    SD_printR1(res[0]);
-    uart_send_bytes("------------------\r", sizeof("------------------\r"));
-
-    // check interface conditions
-    uart_send_bytes("Sending CMD8...\r", sizeof("Sending CMD8...\r"));
-    SD_sendInterfaceCond(res);
-    uart_send_bytes("Response:\r", sizeof("Response:\r"));
-    SD_printR7(res);
-    uart_send_bytes("------------------\r", sizeof("------------------\r"));
-
-    // check operating conditions
-    uart_send_bytes("Sending CMD58...\r", sizeof("Sending CMD58...\r"));
-    SD_readOCR(res);
-    uart_send_bytes("Response:\r", sizeof("Response:\r"));
-    SD_printR3(res);
-    uart_send_bytes("------------------\r", sizeof("------------------\r"));
-
-    // check operating conditions
-    uart_send_bytes("Sending CMD58...\r", sizeof("Sending CMD58...\r"));
-    SD_readOCR(res);
-    uart_send_bytes("Response:\r", sizeof("Response:\r"));
-    SD_printR3(res);
-    uart_send_bytes("------------------\r", sizeof("------------------\r"));
-
-    // check operating conditions
-    uart_send_bytes("Sending CMD58...\r", sizeof("Sending CMD58...\r"));
-    SD_readOCR(res);
-    uart_send_bytes("Response:\r", sizeof("Response:\r"));
-    SD_printR3(res);
-    uart_send_bytes("------------------\r", sizeof("------------------\r"));
-
-//    uint8_t i;
-//    for (i = 0; i < 255; i++) {
-//        uart_send_hex8(i);
-//    }
+    if (SD_init()) {
+        uart_send_bytes("SD Initialization Success\r", sizeof("SD Initialization Success\r"));
+    } else {
+        uart_send_bytes("SD Initialization Failure\r", sizeof("SD Initialization Failure\r"));
+    }
 
     // keep MSP running
     while (1)
