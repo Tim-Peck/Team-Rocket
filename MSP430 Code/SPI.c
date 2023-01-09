@@ -1,6 +1,7 @@
 #include <msp430.h>
 #include "SPI.h"
 
+// NOTE FOR UINT8_T: NON-ZERO NUMBERS ARE TRUE WHILE ZERO IS FALSE (so e.g. 0b10 & 0b11 is TRUE while 0b10 & 0b01 is FALSE)
 // R1 values
 #define PARAM_ERROR(X)      X & 0b01000000
 #define ADDR_ERROR(X)       X & 0b00100000
@@ -11,7 +12,7 @@
 #define IN_IDLE(X)          X & 0b00000001
 
 // R7 values
-#define CMD_VER(X)          ((X >> 4) & 0xF0) // input: byte 31:24 (command verison for bits 31:28)
+#define CMD_VER(X)          ((X >> 4) & 0xF0) // input: byte 31:24 (command version for bits 31:28)
 #define VOL_ACC(X)          (X & 0x1F) // input: byte 15:8 (voltage accept for bits 11:8)
 
 #define VOLTAGE_ACC_27_33   0b00000001
@@ -19,9 +20,24 @@
 #define VOLTAGE_ACC_RES1    0b00000100
 #define VOLTAGE_ACC_RES2    0b00001000
 
+// R3 values
+#define POWER_UP_STATUS(X)  X & 0x80 // input: byte 31:24 (card power up status for bit 31)
+#define CCS_VAL(X)          X & 0x40 // input: byte 31:24 (card capacity status for bit 30)
+// voltages supported by card
+#define VDD_2728(X)         X & 0b10000000
+#define VDD_2829(X)         X & 0b00000001
+#define VDD_2930(X)         X & 0b00000010
+#define VDD_3031(X)         X & 0b00000100
+#define VDD_3132(X)         X & 0b00001000
+#define VDD_3233(X)         X & 0b00010000
+#define VDD_3334(X)         X & 0b00100000
+#define VDD_3435(X)         X & 0b01000000
+#define VDD_3536(X)         X & 0b10000000
+
 // chip select macros
 #define CS_ENABLE() P3OUT &= ~BIT1;
 #define CS_DISABLE() P3OUT |= BIT1;
+
 
 void spi_init()
 {
@@ -111,36 +127,48 @@ SD_readRes7(uint8_t *res)
     res[0] = SD_readRes1(); // note: reusing code
 
     // if error reading R1 (version 1 SD card), return
-    if(res[0] > 1) {
+    if (res[0] > 1)
+    {
         return;
     }
 
     // store next 4 bytes
     uint8_t i;
-    for (i = 1; i < 5; i++) {
+    for (i = 1; i < 5; i++)
+    {
         res[i] = spi_transfer(0xFF);
     }
 }
 
 void SD_printR1(uint8_t res)
 {
-    if(res & 0b10000000)
-        { uart_send_bytes("\tError: MSB = 1\r", sizeof("\tError: MSB = 1\r") - 1); return; }
-    if(res == 0)
-        { uart_send_bytes("\tCard Ready\r", sizeof("\tCard Ready\r") - 1); return; }
-    if(PARAM_ERROR(res))
-        uart_send_bytes("\tParameter Error\r", sizeof("\tParameter Error\r") - 1);
-    if(ADDR_ERROR(res))
+    if (res & 0b10000000)
+    {
+        uart_send_bytes("\tError: MSB = 1\r", sizeof("\tError: MSB = 1\r") - 1);
+        return;
+    }
+    if (res == 0)
+    {
+        uart_send_bytes("\tCard Ready\r", sizeof("\tCard Ready\r") - 1);
+        return;
+    }
+    if (PARAM_ERROR(res))
+        uart_send_bytes("\tParameter Error\r",
+                        sizeof("\tParameter Error\r") - 1);
+    if (ADDR_ERROR(res))
         uart_send_bytes("\tAddress Error\r", sizeof("\tAddress Error\r") - 1);
-    if(ERASE_SEQ_ERROR(res))
-        uart_send_bytes("\tErase Sequence Error\r", sizeof("\tErase Sequence Error\r") - 1);
-    if(CRC_ERROR(res))
+    if (ERASE_SEQ_ERROR(res))
+        uart_send_bytes("\tErase Sequence Error\r",
+                        sizeof("\tErase Sequence Error\r") - 1);
+    if (CRC_ERROR(res))
         uart_send_bytes("\tCRC Error\r", sizeof("\tCRC Error\r") - 1);
-    if(ILLEGAL_CMD(res))
-        uart_send_bytes("\tIllegal Command\r", sizeof("\tIllegal Command\r") - 1);
-    if(ERASE_RESET(res))
-        uart_send_bytes("\tErase Reset Error\r", sizeof("\tErase Reset Error\r") - 1);
-    if(IN_IDLE(res))
+    if (ILLEGAL_CMD(res))
+        uart_send_bytes("\tIllegal Command\r",
+                        sizeof("\tIllegal Command\r") - 1);
+    if (ERASE_RESET(res))
+        uart_send_bytes("\tErase Reset Error\r",
+                        sizeof("\tErase Reset Error\r") - 1);
+    if (IN_IDLE(res))
         uart_send_bytes("\tIn Idle State\r", sizeof("\tIn Idle State\r") - 1);
 }
 
@@ -148,20 +176,21 @@ void SD_printR7(uint8_t *res)
 {
     SD_printR1(res[0]);
 
-    if(res[0] > 1) return;
+    if (res[0] > 1)
+        return;
 
     uart_send_bytes("\tCommand Version: ", sizeof("\tCommand Version: ") - 1);
     uart_send_hex8(CMD_VER(res[1]));
     uart_send_bytes("\r", sizeof("\r") - 1);
 
     uart_send_bytes("\tVoltage Accepted: ", sizeof("\tVoltage Accepted: ") - 1);
-    if(VOL_ACC(res[3]) == VOLTAGE_ACC_27_33)
+    if (VOL_ACC(res[3]) == VOLTAGE_ACC_27_33)
         uart_send_bytes("2.7-3.6V\r", sizeof("2.7-3.6V\r") - 1);
-    else if(VOL_ACC(res[3]) == VOLTAGE_ACC_LOW)
+    else if (VOL_ACC(res[3]) == VOLTAGE_ACC_LOW)
         uart_send_bytes("LOW VOLTAGE\r", sizeof("LOW VOLTAGE\r") - 1);
-    else if(VOL_ACC(res[3]) == VOLTAGE_ACC_RES1)
+    else if (VOL_ACC(res[3]) == VOLTAGE_ACC_RES1)
         uart_send_bytes("RESERVED\r", sizeof("RESERVED\r") - 1);
-    else if(VOL_ACC(res[3]) == VOLTAGE_ACC_RES2)
+    else if (VOL_ACC(res[3]) == VOLTAGE_ACC_RES2)
         uart_send_bytes("RESERVED\r", sizeof("RESERVED\r") - 1);
     else
         uart_send_bytes("NOT DEFINED\r", sizeof("NOT DEFINED\r") - 1);
@@ -169,6 +198,55 @@ void SD_printR7(uint8_t *res)
     uart_send_bytes("\tEcho: ", sizeof("\tEcho: ") - 1);
     uart_send_hex8(res[4]);
     uart_send_bytes("\r", sizeof("\r") - 1);
+}
+
+void SD_printR3(uint8_t *res)
+{
+    SD_printR1(res[0]);
+
+    if (res[0] > 1)
+        return;
+
+    uart_send_bytes("\tCard Power Up Status: ", sizeof("\tCard Power Up Status: ") - 1);
+    // print card power up status
+    if (POWER_UP_STATUS(res[1]))
+    {
+        uart_send_bytes("READY\r", sizeof("READY\r") - 1);
+        uart_send_bytes("\tCCS Status: ", sizeof("\tCCS Status: ") - 1);
+        if (CCS_VAL(res[1]))
+        {
+            uart_send_bytes("1\r", sizeof("1\r") - 1);
+        }
+        else
+            uart_send_bytes("0\r", sizeof("0\r") - 1);
+    }
+    else
+    {
+        uart_send_bytes("BUSY\r", sizeof("BUSY\r") - 1);
+    }
+
+    // print voltage ranges of SD card
+    uart_send_bytes("\tVDD Window: ", sizeof("\tVDD Window: ") - 1);
+    if (VDD_2728(res[3]))
+        uart_send_bytes("2.7-2.8, ", sizeof("2.7-2.8, ") - 1);
+    if (VDD_2829(res[2]))
+        uart_send_bytes("2.8-2.9, ", sizeof("2.8-2.9, ") - 1);
+    if (VDD_2930(res[2]))
+        uart_send_bytes("2.9-3.0, ", sizeof("2.9-3.0, ") - 1);
+    if (VDD_3031(res[2]))
+        uart_send_bytes("3.0-3.1, ", sizeof("3.0-3.1, ") - 1);
+    if (VDD_3132(res[2]))
+        uart_send_bytes("3.1-3.2, ", sizeof("3.1-3.2, ") - 1);
+    if (VDD_3233(res[2]))
+        uart_send_bytes("3.2-3.3, ", sizeof("3.2-3.3, ") - 1);
+    if (VDD_3334(res[2]))
+        uart_send_bytes("3.3-3.4, ", sizeof("3.3-3.4, ") - 1);
+    if (VDD_3435(res[2]))
+        uart_send_bytes("3.4-3.5, ", sizeof("3.4-3.5, ") - 1);
+    if (VDD_3536(res[2]))
+        uart_send_bytes("3.5-3.6", sizeof("3.5-3.6") - 1);
+    uart_send_bytes("\r", sizeof("\r") - 1);
+
 }
 
 void SD_powerUpSeq()
@@ -230,6 +308,27 @@ void SD_sendInterfaceCond(uint8_t *res)
     SD_command(8, 0x0000001AA, 0x86); // "1AA" for arg's last 12 bits which includes VHS and check pattern. 0x86 is CRC7 in bits 7:1 (1000011 << 1)
 
     // read response
+    SD_readRes7(res);
+
+    // deassert chip select
+    spi_transfer(0xFF);
+    CS_DISABLE();
+    spi_transfer(0xFF);
+}
+
+void SD_readOCR(uint8_t *res)
+{
+    // assert chip select
+    spi_transfer(0xFF); // 0xFF send before and after CS for safety (see notes 29/12)
+    CS_ENABLE();
+    spi_transfer(0xFF);
+
+    // send CMD58
+    // index: 58
+    // 31:0 are stuff bits
+    SD_command(58, 0, 0);
+
+    // read response R3 (same number of bytes as R7)
     SD_readRes7(res);
 
     // deassert chip select

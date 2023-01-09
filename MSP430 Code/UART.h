@@ -8,6 +8,7 @@ static volatile uint8_t msg_buffer[BUFFER_SIZE]; // Note: uint8_t will overflow 
 static volatile uint16_t current_length_UART;
 static volatile uint8_t next_idx_to_send_UART;
 static uint8_t next_idx_to_store_UART;
+static volatile uint8_t byte_sent;
 
 void uart_init();
 

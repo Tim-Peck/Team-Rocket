@@ -46,22 +46,32 @@ SD_readRes7(uint8_t *res);
 
 // -------- private functions -------- //
 
-// print R1 to serial monitor in ASCII
+// print R1 after any CMD to serial monitor in ASCII
+// prints error conditions and idle state
 void SD_printR1(uint8_t res);
 
-// print R7 to serial monitor in ASCII
+// print R7 after CMD8 to serial monitor in ASCII
+// checks compatability with card; whether supplied voltage is appropriate and SD version
 void SD_printR7(uint8_t *res);
+
+// print R3 after CMD58 to serial monitor in ASCII
+// checks whether card is powered up, whether it's high capacity and its operating voltages
+void SD_printR3(uint8_t *res);
 
 // required power up sequence for SD card includes 1ms delay and sending 74 clock cycles
 void SD_powerUpSeq();
 
-// switching to SPI mode and going to idle state
+// switching to SPI mode by holding CS low and going to idle state
 // output: response R1 from CMD0
 uint8_t SD_goIdleState();
 
 // send interface condition to check generation of card
-// input: 5 byte uint8_t array to store response
+// input: 5 byte uint8_t array to store response R7
 void SD_sendInterfaceCond(uint8_t *res);
+
+// read operating conditions register
+// input: 5 byte uint8_t array to store response R3
+void SD_readOCR(uint8_t *res);
 
 // initialise SD card
 void SDInit();

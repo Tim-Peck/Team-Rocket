@@ -29,6 +29,8 @@ void uart_init() {
 }
 
 void uart_send_byte(byte) {
+    byte_sent = 0;
+
     if (current_length_UART < BUFFER_SIZE) {
         msg_buffer[next_idx_to_store_UART++] = byte; // next_idx is always incremented and not reset
         current_length_UART++; // so current length alternates between 0 and 1 for each byte
@@ -37,6 +39,9 @@ void uart_send_byte(byte) {
     // enable transmit interrupt to start transmitting
     // if we are already transmitting this does nothing
     UCA0IE |= UCTXIE;
+
+    // poll until byte is sent
+    while (!byte_sent);
 }
 
 void uart_send_bytes(uint8_t *bytes, uint8_t number_of_bytes) {
@@ -82,7 +87,7 @@ __interrupt void USCI_A0_ISR(void) {
                 // Entering the interrupt service routine (ISR), will clear
                 // interrupt flags. i.e. we have just cleared UCTXIFG
                 // UCTXIFG is usually set when UCA0TXBUF is emptied. However we
-                // didn't write anything to the buffer this time, so it's empty
+                // didn't write anything to the buffer this time (when ISR reentered), so it's empty
                 // and cannot be "emptied". i.e. UCTXIFG will not get set again
                 // We can however set UCTXIFG manually to re-enter the ISR!
                 // Doing this outside of the ISR is dangerous because we may be
@@ -92,6 +97,8 @@ __interrupt void USCI_A0_ISR(void) {
                 // back here.
                 UCA0IE &= ~UCTXIE;
                 UCA0IFG |= UCTXIFG;
+
+                byte_sent = 1;
             }
             break;
 
