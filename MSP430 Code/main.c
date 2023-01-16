@@ -139,15 +139,34 @@ int main(void)
 
     // SD card testing
 
+    uint8_t R1, buf[512], token;
+
     uart_init();
     //    i2c_init();
     spi_init(); // initialise microcontroller SPI for SD card
 
-    if (SD_init()) {
-        uart_send_bytes("SD Initialization Success\r", sizeof("SD Initialization Success\r"));
-    } else {
-        uart_send_bytes("SD Initialization Failure\r", sizeof("SD Initialization Failure\r"));
+    // initialize SD card
+    if (SD_init())
+    {
+        uart_send_bytes("SD Initialization Success\r",
+                        sizeof("SD Initialization Success\r"));
     }
+    else
+    {
+        uart_send_bytes("SD Initialization Failure\r",
+                        sizeof("SD Initialization Failure\r"));
+    }
+
+    uart_send_bytes("------------------\r", sizeof("------------------\r"));
+
+    // read a block from SD card
+    R1 = SD_readSingleBlock(0, buf, &token);
+
+    // print read SD block
+    print_SDBlock(R1, buf, &token);
+
+    // read a block from SD card
+    SD_readSingleBlock(0xFFFFFFFF, buf, &token);
 
     // keep MSP running
     while (1)

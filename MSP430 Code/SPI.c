@@ -2,7 +2,7 @@
 #include "SPI.h"
 
 // note for uint8_t: NON-ZERO NUMBERS ARE TRUE WHILE ZERO IS FALSE (so e.g. 0b10 & 0b11 is TRUE while 0b10 & 0b01 is FALSE)
-// R1 values
+// R1 macros
 #define PARAM_ERROR(X)      X & 0b01000000
 #define ADDR_ERROR(X)       X & 0b00100000
 #define ERASE_SEQ_ERROR(X)  X & 0b00010000
@@ -11,7 +11,7 @@
 #define ERASE_RESET(X)      X & 0b00000010
 #define IN_IDLE(X)          X & 0b00000001
 
-// R7 values
+// R7 macros
 #define CMD_VER(X)          ((X >> 4) & 0xF0) // input: byte 31:24 (command version for bits 31:28)
 #define VOL_ACC(X)          (X & 0x1F) // input: byte 15:8 (voltage accept for bits 11:8)
 
@@ -20,11 +20,10 @@
 #define VOLTAGE_ACC_RES1    0b00000100
 #define VOLTAGE_ACC_RES2    0b00001000
 
-// R3 values
+// R3 macros
 #define POWER_UP_STATUS(X)  X & 0x80 // input: byte 31:24 (card power up status for bit 31)
 #define CCS_VAL(X)          X & 0x40 // input: byte 31:24 (card capacity status for bit 30)
-// voltages supported by card
-#define VDD_2728(X)         X & 0b10000000
+#define VDD_2728(X)         X & 0b10000000 // voltages supported by card
 #define VDD_2829(X)         X & 0b00000001
 #define VDD_2930(X)         X & 0b00000010
 #define VDD_3031(X)         X & 0b00000100
@@ -33,6 +32,12 @@
 #define VDD_3334(X)         X & 0b00100000
 #define VDD_3435(X)         X & 0b01000000
 #define VDD_3536(X)         X & 0b10000000
+
+// Token macros
+#define TOKEN_ERROR(X)      X & 0b00000001
+#define OUT_OF_RANGE(X)     X & 0b00001000
+#define ECC_FAIL(X)         X & 0b00000100
+#define CC_ERROR(X)         X & 0b00000010
 
 // chip select macros
 #define CS_ENABLE() P3OUT &= ~BIT1;
@@ -85,7 +90,10 @@ uint8_t spi_transfer(uint8_t byte)
     while (!(UCA1IFG & UCRXIFG))
         ;
 
-    // return PREVIOUS byte received in receive register
+    // return PREVIOUS byte received in receive register (i.e. not from this transferred byte)
+    // T: |Y|
+    // R: |X|Z|
+    // (so byte X received with Y transferred with this function)
     return UCA1RXBUF;
 }
 
@@ -119,11 +127,9 @@ uint8_t SD_readRes1()
 
     // return response byte
     return res;
-    // send extra 0xFF after response for safety
-    spi_transfer(0xFF);
 }
 
-SD_readRes7(uint8_t *res)
+void SD_readRes7(uint8_t *res)
 {
     // read response 1 in R7
     res[0] = SD_readRes1(); // note: reusing code
@@ -218,7 +224,9 @@ void SD_printR3(uint8_t *res)
     if (POWER_UP_STATUS(res[1]))
     {
         uart_send_bytes("READY\r", sizeof("READY\r") - 1);
-        uart_send_bytes("\tCCS Status: ", sizeof("\tCCS Status: ") - 1);
+        // print card capacity status if card ready
+        uart_send_bytes("\tCard Capacity Status: ",
+                        sizeof("\tCard Capacity Status: ") - 1);
         if (CCS_VAL(res[1]))
         {
             uart_send_bytes("1\r", sizeof("1\r") - 1);
@@ -254,6 +262,40 @@ void SD_printR3(uint8_t *res)
     uart_send_bytes("\r", sizeof("\r") - 1);
 
 }
+
+void SD_printTokenError(uint8_t token){
+    uart_send_bytes("\tSD read error: ", sizeof("\tSD read error: ") - 1);
+    if (token == 0xFF){
+        uart_send_bytes("Timeout", sizeof("Timeout") - 1);
+    }
+    if (OUT_OF_RANGE(token)){
+        uart_send_bytes("Out of range", sizeof("Out of range") - 1);
+    }
+    if (ECC_FAIL(token)){
+        uart_send_bytes("ECC fail", sizeof("ECC fail") - 1);
+    }
+    if (CC_ERROR(token)){
+        uart_send_bytes("CC error", sizeof("CC error") - 1);
+    }
+    uart_send_bytes("\r", sizeof("\r") - 1);
+}
+
+void print_SDBlock(uint8_t R1, uint8_t *buf, uint8_t *token)
+{
+    // check if R1 and token valid
+    if ((R1 > 1) | (*token != 0xFE)) {
+        return;
+    }
+
+    uint16_t i;
+
+    for (i = 0; i < 512; i++){
+        uart_send_hex8(buf[i]);
+    }
+
+    uart_send_bytes("\r------------------\r", sizeof("\r------------------\r"));
+}
+
 
 void SD_powerUpSeq()
 {
@@ -308,8 +350,8 @@ void SD_sendInterfaceCond(uint8_t *res)
 
     // send CM8
     // index: 8
-    // VHS: 001b (for 3.3V)
-    // check pattern: 10101010b
+    // VHS (argument): 001b (for 3.3V)
+    // check pattern (argument): 10101010b
     // CRC: 1000011b
     SD_command(8, 0x0000001AA, 0x86); // "1AA" for arg's last 12 bits which includes VHS and check pattern. 0x86 is CRC7 in bits 7:1 (1000011 << 1)
 
@@ -331,7 +373,7 @@ void SD_readOCR(uint8_t *res)
 
     // send CMD58
     // index: 58
-    // 31:0 are stuff bits
+    // argument: stuff bits
     SD_command(58, 0, 0);
 
     // read response R3 (same number of bytes as R7)
@@ -352,7 +394,7 @@ uint8_t SD_sendAppCommand()
 
     // send CMD55
     // index: 55
-    // 31:0 are stuff bits
+    // argument: stuff bits
     SD_command(55, 0, 0);
 
     // read response R1
@@ -397,7 +439,7 @@ uint8_t SD_init()
     // start power up sequence
     SD_powerUpSeq();
 
-    // command card to idle and switch to SPI mode
+    // command card to idle and switch to SPI mode (CMD0)
     // give 10 attempts
     do
     {
@@ -412,9 +454,10 @@ uint8_t SD_init()
         {
             return 0;
         }
-    } while(res[0] != 0x01);
+    }
+    while (res[0] != 0x01);
 
-    // check interface conditions
+    // check interface conditions (CMD8)
     uart_send_bytes("Sending CMD8...\r", sizeof("Sending CMD8...\r"));
     SD_sendInterfaceCond(res);
     uart_send_bytes("Response:\r", sizeof("Response:\r"));
@@ -433,11 +476,12 @@ uint8_t SD_init()
         return 0;
     }
 
-    // attempt SD initialization
+    // attempt SD initialization (ACMD41)
     cmdAttempts = 0;
     do
     {
-        if(cmdAttempts > 100) { // return if not initialized after 100 attempts
+        if (cmdAttempts > 100)
+        { // return if not initialized after 100 attempts
             return 0;
         }
 
@@ -460,16 +504,78 @@ uint8_t SD_init()
     }
     while (res[0] != 0); // send initialization sequence 100 times max
 
-    // check operating conditions
+    // check operating conditions (CMD58)
     uart_send_bytes("Sending CMD58...\r", sizeof("Sending CMD58...\r"));
     SD_readOCR(res);
     uart_send_bytes("Response:\r", sizeof("Response:\r"));
     SD_printR3(res);
     uart_send_bytes("------------------\r", sizeof("------------------\r"));
     // return if card not ready
-    if(!(POWER_UP_STATUS(res[1]))) {
+    if (!(POWER_UP_STATUS(res[1])))
+    {
         return 0;
     }
 
     return 1;
+}
+
+uint8_t SD_readSingleBlock(uint32_t addr, uint8_t *buf, uint8_t *token)
+{
+    uart_send_bytes("Reading SD card block\r", sizeof("Reading SD card block\r"));
+    uint8_t cycleCount = 0;
+
+    // assert chip select
+    spi_transfer(0xFF); // 0xFF send before and after CS for safety (see notes 29/12)
+    CS_ENABLE();
+    spi_transfer(0xFF);
+
+    // send CMD17
+    // index: 17
+    // argument: address
+    // CRC: N/A
+    SD_command(17, addr, 0);
+
+    // read response R1
+    uint8_t res1 = SD_readRes1();
+
+    // if SD card ready (R1 value of 0), read data block
+    if (!res1)
+    {
+        // transfer 0xFF and poll for token
+        do
+        {
+            *token = spi_transfer(0xFF);
+            cycleCount++;
+        }
+        while ((*token == 0xFF) & (cycleCount < 10486)); // stop if token received or past timeout (100ms)
+
+        // check token before reading data
+        if (TOKEN_ERROR(*token))
+        {
+            SD_printTokenError(*token);
+        }
+        else
+        {
+            uint16_t i;
+
+            // read 512 bytes
+            for (i = 0; i < 512; i++)
+            {
+                buf[i] = spi_transfer(0xFF);
+            }
+
+            // continue by reading 16 bit CRC
+            spi_transfer(0xFF);
+            spi_transfer(0xFF);
+
+            uart_send_bytes("SD read success\r", sizeof("SD read success\r"));
+        }
+    }
+
+    // deassert chip select
+    spi_transfer(0xFF);
+    CS_DISABLE();
+    spi_transfer(0xFF);
+
+    return res1;
 }

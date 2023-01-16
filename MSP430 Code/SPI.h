@@ -42,7 +42,7 @@ uint8_t SD_readRes1();
 
 // receive response R7
 // input: 5 byte uin8_t array to store response R7
-SD_readRes7(uint8_t *res);
+void SD_readRes7(uint8_t *res);
 
 // -------- print functions -------- //
 
@@ -57,6 +57,12 @@ void SD_printR7(uint8_t *res);
 // print R3 after CMD58 to serial monitor in ASCII
 // checks whether card is powered up, whether it's high capacity and its operating voltages
 void SD_printR3(uint8_t *res);
+
+// print read token error
+void SD_printTokenError(uint8_t token);
+
+// print contents of read block
+void print_SDBlock(uint8_t R1, uint8_t *buf, uint8_t *token);
 
 // -------- startup functions -------- //
 
@@ -88,5 +94,13 @@ uint8_t SD_sendOCR();
 // complete initialization function for SD card
 // output: 0 for initialization failure, 1 for success
 uint8_t SD_init();
+
+// -------- read/write functions -------- //
+
+// read a single data block from a specified address
+// each block consists of 512 bytes (unless standard capacity which can be set)
+// input: 32 bit block address, 512 byte uint8_t data array to read, 1 byte variable to store start token
+// output: SD card status
+uint8_t SD_readSingleBlock(uint32_t addr, uint8_t *buf, uint8_t *token);
 
 #endif
