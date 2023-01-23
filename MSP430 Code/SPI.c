@@ -2,6 +2,7 @@
 #include "SPI.h"
 
 // note for uint8_t: NON-ZERO NUMBERS ARE TRUE WHILE ZERO IS FALSE (so e.g. 0b10 & 0b11 is TRUE while 0b10 & 0b01 is FALSE)
+// these check if a bit is positive
 // R1 macros
 #define PARAM_ERROR(X)      X & 0b01000000
 #define ADDR_ERROR(X)       X & 0b00100000
@@ -33,11 +34,14 @@
 #define VDD_3435(X)         X & 0b01000000
 #define VDD_3536(X)         X & 0b10000000
 
-// Token macros
+// Read error token macros
 #define TOKEN_ERROR(X)      X & 0b00000001
 #define OUT_OF_RANGE(X)     X & 0b00001000
 #define ECC_FAIL(X)         X & 0b00000100
 #define CC_ERROR(X)         X & 0b00000010
+// Write error token macros
+#define WRITE_ERROR(X)         X & 0b00000100
+#define WRITE_CRC_ERROR(X)     X & 0b00000010
 
 // chip select macros
 #define CS_ENABLE() P3OUT &= ~BIT1;
@@ -51,7 +55,7 @@ void spi_init()
     receive_idxSPI = 0;
 
     // setting pins for SPI
-    P2SEL0 |= (BIT4 | BIT5 | BIT6); // primary module function
+    P2SEL0 |= (BIT4 | BIT5 | BIT6); // primary module function (SPI)
     P3DIR |= BIT1; // Use GPIO for CS
 
     // configure SPI
@@ -64,11 +68,11 @@ void spi_init()
     UCA1CTLW0 |= (UCCKPH | UCMODE_2 | UCMST | UCSYNC | UCSTEM | UCMSB);
     // for SD card
     // UCCKPL = 0, clock polarity idle low
-    // UCCKPH = 1, data is captured on first edge before changing
+    // UCCKPH sets data to be captured on first edge before changing
     // UCMODE_2 sets eUSCI_A to SPI mode with active low CS
     // UCMST sets master mode
     // UCSYNC sets synchronous mode (SPI mode)
-    // UCSTEM sets STE pin to be CS,
+    // UCSTEM = 1, sets STE pin to be CS mode (needs to be set even though pin is in GPIO function)
     // UCMSB sets Most Significant Bit first
 
     // set clock source of USCI_A
@@ -97,10 +101,9 @@ uint8_t spi_transfer(uint8_t byte)
     return UCA1RXBUF;
 }
 
+// see command format in notes
 void SD_command(uint8_t cmd, uint32_t arg, uint8_t crc)
 {
-    // see command format
-
     // transmit command to SD card
     spi_transfer(cmd | 0x40); // bit 6 high (transmission bit) but bit 7 always low from cmd argument
 
@@ -263,18 +266,23 @@ void SD_printR3(uint8_t *res)
 
 }
 
-void SD_printTokenError(uint8_t token){
+void SD_printReadTokenError(uint8_t token)
+{
     uart_send_bytes("\tSD read error: ", sizeof("\tSD read error: ") - 1);
-    if (token == 0xFF){
+    if (token == 0xFF)
+    {
         uart_send_bytes("Timeout", sizeof("Timeout") - 1);
     }
-    if (OUT_OF_RANGE(token)){
+    if (OUT_OF_RANGE(token))
+    {
         uart_send_bytes("Out of range", sizeof("Out of range") - 1);
     }
-    if (ECC_FAIL(token)){
+    if (ECC_FAIL(token))
+    {
         uart_send_bytes("ECC fail", sizeof("ECC fail") - 1);
     }
-    if (CC_ERROR(token)){
+    if (CC_ERROR(token))
+    {
         uart_send_bytes("CC error", sizeof("CC error") - 1);
     }
     uart_send_bytes("\r", sizeof("\r") - 1);
@@ -283,19 +291,38 @@ void SD_printTokenError(uint8_t token){
 void print_SDBlock(uint8_t R1, uint8_t *buf, uint8_t *token)
 {
     // check if R1 and token valid
-    if ((R1 > 1) | (*token != 0xFE)) {
+    if ((R1 > 1) | (*token != 0xFE))
+    {
         return;
     }
 
     uint16_t i;
 
-    for (i = 0; i < 512; i++){
+    for (i = 0; i < 512; i++)
+    {
         uart_send_hex8(buf[i]);
     }
 
     uart_send_bytes("\r------------------\r", sizeof("\r------------------\r"));
 }
 
+void SD_printWriteTokenError(uint8_t token)
+{
+    uart_send_bytes("\tSD write error: ", sizeof("\tSD write error: ") - 1);
+    if (token == 0)
+    {
+        uart_send_bytes("Timeout", sizeof("Timeout") - 1);
+    }
+    if (WRITE_CRC_ERROR(token))
+    {
+        uart_send_bytes("CRC error", sizeof("CRC error") - 1);
+    }
+    if (WRITE_ERROR(token))
+    {
+        uart_send_bytes("write error", sizeof("write error") - 1);
+    }
+    uart_send_bytes("\r", sizeof("\r") - 1);
+}
 
 void SD_powerUpSeq()
 {
@@ -521,7 +548,8 @@ uint8_t SD_init()
 
 uint8_t SD_readSingleBlock(uint32_t addr, uint8_t *buf, uint8_t *token)
 {
-    uart_send_bytes("Reading SD card block\r", sizeof("Reading SD card block\r"));
+    uart_send_bytes("Reading SD card block\r",
+                    sizeof("Reading SD card block\r"));
     uint8_t cycleCount = 0;
 
     // assert chip select
@@ -552,7 +580,7 @@ uint8_t SD_readSingleBlock(uint32_t addr, uint8_t *buf, uint8_t *token)
         // check token before reading data
         if (TOKEN_ERROR(*token))
         {
-            SD_printTokenError(*token);
+            SD_printReadTokenError(*token);
         }
         else
         {
@@ -568,7 +596,8 @@ uint8_t SD_readSingleBlock(uint32_t addr, uint8_t *buf, uint8_t *token)
             spi_transfer(0xFF);
             spi_transfer(0xFF);
 
-            uart_send_bytes("SD read success\r", sizeof("SD read success\r"));
+            uart_send_bytes("\tSD read success\r",
+                            sizeof("\tSD read success\r"));
         }
     }
 
@@ -576,6 +605,96 @@ uint8_t SD_readSingleBlock(uint32_t addr, uint8_t *buf, uint8_t *token)
     spi_transfer(0xFF);
     CS_DISABLE();
     spi_transfer(0xFF);
+
+    uart_send_bytes("------------------\r", sizeof("------------------\r"));
+
+    return res1;
+}
+
+uint8_t SD_writeSingleBlock(uint32_t addr, uint8_t *writeBuf, uint8_t *token)
+{
+    uart_send_bytes("Writing SD card block\r",
+                    sizeof("Writing SD card block\r"));
+    uint8_t cycleCount = 0;
+
+    // assert chip select
+    spi_transfer(0xFF); // 0xFF send before and after CS for safety (see notes 29/12)
+    CS_ENABLE();
+    spi_transfer(0xFF);
+
+    // send CMD24
+    // index: 24
+    // argument: address
+    // CRC: N/A
+    SD_command(24, addr, 0);
+
+    // read response R1
+    uint8_t res1 = SD_readRes1();
+
+    // if SD card ready (R1 value of 0), write data block
+    if (!res1)
+    {
+        uint16_t i;
+
+        // send start block token
+        spi_transfer(0xFE);
+
+        // send data block
+        for (i = 0; i < 512; i++)
+        {
+            spi_transfer(writeBuf[i]);
+        }
+
+        // wait for data response token
+        // transfer 0xFF and poll for token
+        do
+        {
+            *token = spi_transfer(0xFF);
+            cycleCount++;
+        }
+        while ((*token == 0xFF) & (cycleCount < 26215)); // stop if token received or past timeout (250ms)
+
+        // check token, if error send stop command (CMD 12)
+        // note: must use compare to check for pattern and not just & like macros for one bit
+        if (!((*token & 0b00001111) == 0b00000101))
+        {
+            // send CMD12
+            // index: 12
+            // argument: N/A
+            // CRC: N/A
+            SD_command(12, 0, 0);
+
+            res1 = SD_readRes1();
+
+            SD_printWriteTokenError(*token);
+        }
+        else
+        {
+            cycleCount = 0;
+
+            // wait until card finishes writing by reading till no busy tokens
+            while ((spi_transfer(0xFF) == 0) & (cycleCount++ < 26215))
+                ;
+            if (cycleCount == 26215)
+            {
+                uart_send_bytes("\tBusy signal timeout\r",
+                                sizeof("\tBusy signal timeout\r") - 1);
+            }
+            else
+            {
+                uart_send_bytes("\tSD write success\r",
+                                sizeof("\tSD write success\r") - 1);
+            }
+        }
+
+    }
+
+    // deassert chip select
+    spi_transfer(0xFF);
+    CS_DISABLE();
+    spi_transfer(0xFF);
+
+    uart_send_bytes("------------------\r", sizeof("------------------\r"));
 
     return res1;
 }
