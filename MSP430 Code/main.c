@@ -42,13 +42,16 @@ int main(void)
 
     uart_init();
 
-    timerA0_init();
+    timerB0_init();
+    timerB1_init();
 
-    P1DIR |= BIT0;
+    P1DIR |= BIT0 | BIT1;
 
-    beginRecord();
+    //beginRecord();
 
-    /*
+    rgbLED(1, 50, 0);
+
+
      // SD card testing
 
      uint8_t R1, buf[512], token;
@@ -98,7 +101,7 @@ int main(void)
      // print read SD block
      print_SDBlock(R1, buf, &token);
 
-     */
+
 
     /*
      // ------------------------------ //
