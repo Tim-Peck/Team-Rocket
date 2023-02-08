@@ -1,0 +1,16 @@
+Change Component Footprint: Designator=P3 Old Footprint=Battery Connector- 620102131822 New Footprint=HDR1X2H
+Change Component Comment : Designator=P3 Old Comment=Switch New Comment=Header 2H
+Added Component: Designator=DS1(AVAG-HLMP-4740)
+Added Component: Designator=DS2(AVAG-HLMP-4740)
+Added Component: Designator=U1(NDE0003A)
+Add Pin To Net: Unknown Pin: Pin DS1-1
+Add Pin To Net: Unknown Pin: Pin DS1-2
+Add Pin To Net: Unknown Pin: Pin DS2-1
+Add Pin To Net: Unknown Pin: Pin DS2-2
+Add Pin To Net: Unknown Pin: Pin U1-1
+Add Pin To Net: Unknown Pin: Pin U1-2
+Add Pin To Net: Unknown Pin: Pin U1-3
+Add Class Member: Failed to add class member : Component DS1 HLMP-4740
+Add Class Member: Failed to add class member : Component DS2 HLMP-4740
+Add Class Member: Failed to add class member : Component U1 LM2937ET-3.3
+Added Room: Name=Microcontroller

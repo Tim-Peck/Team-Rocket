@@ -1,0 +1,10 @@
+Added Component: Designator=C5(0603 (Capacitor))
+Add component (AddParameter): Name = "Case/Package"; Value = "0603"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Manufacturer"; Value = "Murata"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Manufacturer PartNo"; Value = "GRM188R72A104KA35D"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Tolerance"; Value = "+/-10%"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Value"; Value = "10uF"; VariantName = "[No Variations]"
+Added Pin To Net: NetName=3v3 Pin=C5-1
+Added Pin To Net: NetName=GND Pin=C5-2
+Added Member To Class: ClassName=Microcontroller Member=Component C5 C-n-100.000-10-0603
+Added Room: Name=Microcontroller

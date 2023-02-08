@@ -1,0 +1,5 @@
+Removed Pin From Net: NetName=NetR3_1 Pin=U9-24
+Removed Pin From Net: NetName=NetR1_1 Pin=U9-26
+Added Pin To Net: NetName=NetR1_1 Pin=U9-24
+Added Pin To Net: NetName=NetR3_1 Pin=U9-26
+Added Room: Name=Microcontroller

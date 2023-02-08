@@ -1,0 +1,22 @@
+Change Component Comment : Designator=U1 Old Comment=Comment New Comment=LM2937ET-3.3
+Change Managed Component Library Link : Designator=U1 Old VaultGUID= New VaultGUID=B7D15EC3-160A-466F-A46C-7801FE6295A7 Old ItemGUID= New ItemGUID=447FBB3B-6EED-4752-9355-C76DDC82ABDF Old RevisionGUID= New RevisionGUID=D66D4372-87FC-4F8B-9FDC-1849808317F9
+Change component parameters: Designator = "U1" ("U1"); Footprint = "NDE0003A"; UniqueID = "\SBGWFFUJ" ("\SBGWFFUJ")
+Change component parameters (AddParameter): Name = "Code_IPC"; Value = ""; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Code_JEDEC"; Value = ""; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Code_JEITA"; Value = ""; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "ComponentLink1Description"; Value = "Datasheet URL"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "ComponentLink1URL"; Value = "http://www.ti.com/general/docs/lit/getliterature.tsp?genericPartNumber=LM2937-3.3&fileType=pdf"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "CompType"; Value = "LDO IC"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "High-Reliability"; Value = ""; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Manufacturer"; Value = "Texas Instruments"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "PackageDescription"; Value = "TO-220, Molded, 3 Lead, Straight"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "PackageReference"; Value = "NDE0003A"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "PackageTopMarking"; Value = "NSUZXYTTE#*LM2937ET*-3.3"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "PartNumber"; Value = ""; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "PinCount"; Value = "3"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "PowerWise"; Value = "N"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "RoHS"; Value = "N"; VariantName = "[No Variations]"
+Added Pin To Net: NetName=NetC4_1 Pin=U1-1
+Added Pin To Net: NetName=GND Pin=U1-2
+Added Pin To Net: NetName=3v3 Pin=U1-3
+Added Room: Name=Microcontroller

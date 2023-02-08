@@ -1,0 +1,8 @@
+Change Component Comment : Designator=P5 Old Comment=FIX Pin  New Comment=FIX Pin
+Change Component Designator: OldDesignator=DS? NewDesignator=DS1
+Added Component: Designator=U1(NDE0003A)
+Add Pin To Net: Unknown Pin: Pin U1-1
+Add Pin To Net: Unknown Pin: Pin U1-2
+Add Pin To Net: Unknown Pin: Pin U1-3
+Change Net Name : Old Net Name=NetDS?_2 New Net Name=NetDS1_2
+Add Class Member: Failed to add class member : Component U1 LM2937ET-3.3

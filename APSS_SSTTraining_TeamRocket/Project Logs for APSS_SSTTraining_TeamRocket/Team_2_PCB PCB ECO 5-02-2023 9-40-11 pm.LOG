@@ -1,0 +1,68 @@
+Removed Pin From Net: NetName=3v0 Pin=R10-2
+Removed Pin From Net: NetName=3v0 Pin=R11-2
+Change Component Footprint: Designator=DS2 Old Footprint=AVAG-HLMP-4740 New Footprint=AVAG-HLMP-4740
+Change Component Comment : Designator=DS2 Old Comment=Comment New Comment=HLMP-4740
+Change component parameters: Designator = "DS2" ("DS2"); Footprint = "AVAG-HLMP-4740"; UniqueID = "\EUCPQXIP" ("\EUCPQXIP")
+Change component parameters (AddParameter): Name = "Category"; Value = "LEDs"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Color"; Value = "Green"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Datasheet URL"; Value = "http://docs.avagotech.com/docs/AV02-1557EN"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Datasheet Version"; Value = "07/2014"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Dominant Wavelength/Color Temperature"; Value = "569nm"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Intensity"; Value = "2.3mcd"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Lens Appearance"; Value = "ColoredDiffused"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Lens Shape Type"; Value = "Circular"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Manufacturer"; Value = "AvagoTechnologies"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Manufacturer URL"; Value = "http://www.avagotech.com/"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Mounting"; Value = "ThroughHole"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Mounting Orientation"; Value = "TopMount"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Mounting Technology"; Value = "ThroughHole"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Number of LEDs"; Value = "1"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Package"; Value = "2T-13/4"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Package Description"; Value = "2-Pin Through Hole Device, Dia 5.845 mm, Pitch 2.54 mm"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Package Reference"; Value = "HLMP-4740"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Packaging"; Value = "Bulk"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Peak Wavelength"; Value = "565nm"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Pin Count"; Value = "2"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Rad Hard"; Value = "No"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Type"; Value = "Uni-Color"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Viewing Angle"; Value = "50°"; VariantName = "[No Variations]"
+Added Component: Designator=DS?(AVAG-HLMP-4740)
+Add component (AddParameter): Name = "Category"; Value = "LEDs"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Color"; Value = "Green"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Datasheet URL"; Value = "http://docs.avagotech.com/docs/AV02-1557EN"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Datasheet Version"; Value = "07/2014"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Dominant Wavelength/Color Temperature"; Value = "569nm"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Intensity"; Value = "2.3mcd"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Lens Appearance"; Value = "ColoredDiffused"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Lens Shape Type"; Value = "Circular"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Manufacturer"; Value = "AvagoTechnologies"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Manufacturer URL"; Value = "http://www.avagotech.com/"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Mounting"; Value = "ThroughHole"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Mounting Orientation"; Value = "TopMount"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Mounting Technology"; Value = "ThroughHole"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Number of LEDs"; Value = "1"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Package"; Value = "2T-13/4"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Package Description"; Value = "2-Pin Through Hole Device, Dia 5.845 mm, Pitch 2.54 mm"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Package Reference"; Value = "HLMP-4740"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Packaging"; Value = "Bulk"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Peak Wavelength"; Value = "565nm"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Pin Count"; Value = "2"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Rad Hard"; Value = "No"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Type"; Value = "Uni-Color"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Viewing Angle"; Value = "50°"; VariantName = "[No Variations]"
+Added Component: Designator=U1(NDE0003A)
+Added Pin To Net: NetName=LED Pin=DS2-1
+Added Pin To Net: NetName=NetDS2_2 Pin=DS2-2
+Added Pin To Net: NetName=3v3 Pin=DS?-1
+Added Pin To Net: NetName=3v3 Pin=R10-2
+Added Pin To Net: NetName=3v3 Pin=R11-2
+Add Pin To Net: Unknown Pin: Pin U1-1
+Add Pin To Net: Unknown Pin: Pin U1-2
+Add Pin To Net: Unknown Pin: Pin U1-3
+Added Pin To Net: NetName=NetDS?_2 Pin=DS?-2
+Added Pin To Net: NetName=NetDS?_2 Pin=R6-2
+Added Net: Name=NetDS?_2
+Added Member To Class: ClassName=Microcontroller Member=Component D2 EAST1616RGBB4
+Added Member To Class: ClassName=Microcontroller Member=Component DS? HLMP-4740
+Add Class Member: Failed to add class member : Component U1 LM2937ET-3.3
+Added Room: Name=Microcontroller

@@ -1,0 +1,4 @@
+Added Pin To Net: NetName=3v3 Pin=C11-1
+Added Pin To Net: NetName=3v3 Pin=U6-1
+Added Member To Class: ClassName=Microcontroller Member=Component C5 C-n-100.000-10-0603
+Added Room: Name=Microcontroller

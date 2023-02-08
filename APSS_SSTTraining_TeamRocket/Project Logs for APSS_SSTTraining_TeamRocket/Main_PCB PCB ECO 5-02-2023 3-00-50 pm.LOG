@@ -1,0 +1,228 @@
+Removed Pin From Net: NetName=GND Pin=C4-1
+Removed Pin From Net: NetName=3v0 Pin=C5-1
+Removed Pin From Net: NetName=GND Pin=C5-2
+Removed Pin From Net: NetName=GND Pin=C8-2
+Removed Pin From Net: NetName=GND Pin=C9-2
+Removed Pin From Net: NetName=3v0 Pin=C10-1
+Removed Pin From Net: NetName=GND Pin=C12-2
+Removed Pin From Net: NetName=3v0 Pin=D2-4
+Removed Pin From Net: NetName=GND Pin=J1-2
+Removed Pin From Net: NetName=GND Pin=J1-3
+Removed Pin From Net: NetName=3v0 Pin=L1-1
+Removed Pin From Net: NetName=3v0 Pin=PROG1-4
+Removed Pin From Net: NetName=GND Pin=R5-2
+Removed Pin From Net: NetName=GND Pin=R6-1
+Removed Pin From Net: NetName=3v0 Pin=R7-1
+Removed Pin From Net: NetName=GND Pin=S1-1
+Removed Pin From Net: NetName=3v0 Pin=S1-3
+Removed Pin From Net: NetName=GND Pin=S2-1
+Removed Pin From Net: NetName=3v0 Pin=S2-3
+Removed Pin From Net: NetName=GND Pin=S3-1
+Removed Pin From Net: NetName=3v0 Pin=S3-3
+Removed Pin From Net: NetName=GND Pin=S4-1
+Removed Pin From Net: NetName=3v0 Pin=S4-3
+Removed Pin From Net: NetName=GND Pin=S5-1
+Removed Pin From Net: NetName=NetC20_1 Pin=S5-2
+Removed Pin From Net: NetName=3v0 Pin=S5-3
+Removed Pin From Net: NetName=3v0 Pin=T2-1
+Removed Pin From Net: NetName=GND Pin=U1-2
+Removed Pin From Net: NetName=GND Pin=U1-15
+Removed Pin From Net: NetName=NetR10_1 Pin=U1-21
+Removed Pin From Net: NetName=NetR11_1 Pin=U1-22
+Removed Pin From Net: NetName=NetR11_1 Pin=U2-3
+Removed Pin From Net: NetName=3v0 Pin=U2-5
+Removed Pin From Net: NetName=GND Pin=U3-7
+Removed Pin From Net: NetName=GND Pin=U3-14
+Removed Pin From Net: NetName=GND Pin=U3-18
+Removed Pin From Net: NetName=GND Pin=U3-22
+Removed Pin From Net: NetName=GND Pin=U3-24
+Removed Pin From Net: NetName=GND Pin=U3-25
+Removed Pin From Net: NetName=GND Pin=U4-2
+Removed Pin From Net: NetName=3v0 Pin=U4-5
+Removed Pin From Net: NetName=NetR11_1 Pin=U6-2
+Removed Member From Class: ClassName=Microcontroller Member=C16
+Removed Member From Class: ClassName=Microcontroller Member=R6
+Removed Member From Class: ClassName=Microcontroller Member=S1
+Removed Member From Class: ClassName=Microcontroller Member=S2
+Removed Member From Class: ClassName=Microcontroller Member=S5
+Removed Member From Class: ClassName=Microcontroller Member=U4
+Change Component Footprint: Designator=C8 Old Footprint=0603 (Capacitor) New Footprint=0603 (Resistor)
+Change Component Footprint: Designator=C9 Old Footprint=0603 (Capacitor) New Footprint=0603 (Resistor)
+Change Component Footprint: Designator=C10 Old Footprint=0603 (Capacitor) New Footprint=1206 (Capacitor)
+Change Footprint: Cannot match pads with new footprint in component :C12 Footprint:AVAG-HLMP-4740
+Change Component Footprint: Designator=C5 Old Footprint=0603 (Capacitor) New Footprint=Battery Connector- 620102131822
+Change Component Footprint: Designator=C4 Old Footprint=0603 (Capacitor) New Footprint=HDR1X8
+Change Component Footprint: Designator=C6 Old Footprint=0603 (Capacitor) New Footprint=HDR2X16_CEN
+Change Component Footprint: Designator=D1 Old Footprint=0603 New Footprint=0603 (Resistor)
+Change Footprint: Cannot match pads with new footprint in component :L1 Footprint:NDE0003A
+Change Component Footprint: Designator=J1 Old Footprint=ANTENNA- CONUFL001-SMD-T New Footprint=1.0k through hole
+Change Component Comment : Designator=C16 Old Comment=C-n-001.000-5-0603 New Comment=C-n-100.000-10-0603
+Change Component Comment : Designator=C10 Old Comment=C-n-001.000-5-0603 New Comment=C-u-010.000-10-1206
+Change Component Comment : Designator=C12 Old Comment=C-n-001.000-5-0603 New Comment=HLMP-4740
+Change Component Comment : Designator=C9 Old Comment=C-n-001.000-5-0603 New Comment=R-k-100.000-1-0603
+Change Component Comment : Designator=C8 Old Comment=C-n-010.000-5-0603 New Comment=R-k-100.000-1-0603
+Change Component Comment : Designator=C4 Old Comment=C-n-100.000-10-0603 New Comment=Header 8
+Change Component Comment : Designator=C6 Old Comment=C-p-012.000-2-0603 New Comment=Header 16X2A
+Change Component Comment : Designator=C5 Old Comment=C-p-012.000-2-0603 New Comment=Switch
+Change Component Comment : Designator=J1 Old Comment=CONUFL001-SMD-T New Comment=1.0k
+Change Component Comment : Designator=L1 Old Comment=L-n-027.000-5-0402 New Comment=LM2937ET-3.3
+Change Component Comment : Designator=D1 Old Comment=LTST-C194TBKT New Comment=R-k-001.500-1-0603
+Change Component Designator: OldDesignator=C4 NewDesignator=P2
+Change Component Designator: OldDesignator=C5 NewDesignator=P3
+Change Component Designator: OldDesignator=C6 NewDesignator=P4
+Change Component Designator: OldDesignator=C8 NewDesignator=R2
+Change Component Designator: OldDesignator=C9 NewDesignator=R5
+Change Component Designator: OldDesignator=C10 NewDesignator=C5
+Change Component Designator: OldDesignator=C12 NewDesignator=DS1
+Change Component Designator: OldDesignator=C16 NewDesignator=C4
+Change Component Designator: OldDesignator=D1 NewDesignator=R6
+Change Component Designator: OldDesignator=J1 NewDesignator=R12
+Change Component Designator: OldDesignator=L1 NewDesignator=U1
+Change Managed Component Library Link : Designator=DS1 Old VaultGUID= New VaultGUID=B7D15EC3-160A-466F-A46C-7801FE6295A7 Old ItemGUID= New ItemGUID=C328F067-EB90-49C4-92DE-CBD7494E7E7C Old RevisionGUID= New RevisionGUID=CEB1BC85-4B62-458F-A9E0-4E4ECFACF0DC
+Change Managed Component Library Link : Designator=U1 Old VaultGUID= New VaultGUID=B7D15EC3-160A-466F-A46C-7801FE6295A7 Old ItemGUID= New ItemGUID=447FBB3B-6EED-4752-9355-C76DDC82ABDF Old RevisionGUID= New RevisionGUID=D66D4372-87FC-4F8B-9FDC-1849808317F9
+Change component parameters: Designator = "C4" ("P2"); Footprint = "0603 (Capacitor)"; UniqueID = "\KCJIZOTH" ("\KCJIZOTH")
+Change component parameters (AddParameter): Name = "LatestRevisionDate"; Value = "17-Jul-2002"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "LatestRevisionNote"; Value = "Re-released for DXP Platform."; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Publisher"; Value = "Altium Limited"; VariantName = "[No Variations]"
+Change component parameters: Designator = "C5" ("P3"); Footprint = "0603 (Capacitor)"; UniqueID = "\RRKVGULV" ("\RRKVGULV")
+Change component parameters (AddParameter): Name = "LatestRevisionDate"; Value = "17-Jul-2002"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "LatestRevisionNote"; Value = "Re-released for DXP Platform."; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Publisher"; Value = "Altium Limited"; VariantName = "[No Variations]"
+Change component parameters: Designator = "C6" ("P4"); Footprint = "0603 (Capacitor)"; UniqueID = "\LSYUTUYQ" ("\LSYUTUYQ")
+Change component parameters (AddParameter): Name = "LatestRevisionDate"; Value = "17-Jul-2002"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "LatestRevisionNote"; Value = "Re-released for DXP Platform."; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Publisher"; Value = "Altium Limited"; VariantName = "[No Variations]"
+Change component parameters: Designator = "C8" ("R2"); Footprint = "0603 (Capacitor)"; UniqueID = "\KMZMPTLT" ("\KMZMPTLT")
+Change component parameters (AddParameter): Name = "Case/Package"; Value = "0603"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Manufacturer"; Value = "Vishay Dale"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Manufacturer PartNo"; Value = "CRCW0603100KFKEAHP"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Tolerance"; Value = "+/-1%"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Value"; Value = "100k"; VariantName = "[No Variations]"
+Change component parameters: Designator = "C9" ("R5"); Footprint = "0603 (Capacitor)"; UniqueID = "\HDSGFJPK" ("\HDSGFJPK")
+Change component parameters (AddParameter): Name = "Case/Package"; Value = "0603"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Manufacturer"; Value = "Vishay Dale"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Manufacturer PartNo"; Value = "CRCW0603100KFKEAHP"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Tolerance"; Value = "+/-1%"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Value"; Value = "100k"; VariantName = "[No Variations]"
+Change component parameters: Designator = "C10" ("C5"); Footprint = "0603 (Capacitor)"; UniqueID = "\WCVDZLFV" ("\WCVDZLFV")
+Change component parameters (AddParameter): Name = "Case/Package"; Value = "1206"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Manufacturer"; Value = "TDK"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Manufacturer PartNo"; Value = "CGA5L1X7R1H106K160AC"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Tolerance"; Value = "+/-10%"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Value"; Value = "10uF"; VariantName = "[No Variations]"
+Change component parameters: Designator = "C12" ("DS1"); Footprint = "0603 (Capacitor)"; UniqueID = "\XTGUGCDQ" ("\XTGUGCDQ")
+Change component parameters (AddParameter): Name = "Category"; Value = "LEDs"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Color"; Value = "Green"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Datasheet URL"; Value = "http://docs.avagotech.com/docs/AV02-1557EN"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Datasheet Version"; Value = "07/2014"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Dominant Wavelength/Color Temperature"; Value = "569nm"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Intensity"; Value = "2.3mcd"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Lens Appearance"; Value = "ColoredDiffused"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Lens Shape Type"; Value = "Circular"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Manufacturer"; Value = "AvagoTechnologies"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Manufacturer URL"; Value = "http://www.avagotech.com/"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Mounting"; Value = "ThroughHole"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Mounting Orientation"; Value = "TopMount"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Mounting Technology"; Value = "ThroughHole"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Number of LEDs"; Value = "1"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Package"; Value = "2T-13/4"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Package Description"; Value = "2-Pin Through Hole Device, Dia 5.845 mm, Pitch 2.54 mm"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Package Reference"; Value = "HLMP-4740"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Packaging"; Value = "Bulk"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Peak Wavelength"; Value = "565nm"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Pin Count"; Value = "2"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Rad Hard"; Value = "No"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Type"; Value = "Uni-Color"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Viewing Angle"; Value = "50°"; VariantName = "[No Variations]"
+Change component parameters: Designator = "C16" ("C4"); Footprint = "0603 (Capacitor)"; UniqueID = "\JSTTVQHB" ("\JSTTVQHB")
+Change component parameters (AddParameter): Name = "Case/Package"; Value = "0603"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Manufacturer"; Value = "Murata"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Manufacturer PartNo"; Value = "GRM188R72A104KA35D"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Tolerance"; Value = "+/-10%"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Value"; Value = "100nF"; VariantName = "[No Variations]"
+Change component parameters: Designator = "D1" ("R6"); Footprint = "0603"; UniqueID = "\NGUUTJLJ" ("\NGUUTJLJ")
+Change component parameters (AddParameter): Name = "Case/Package"; Value = "0603"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Manufacturer"; Value = "Vishay Dale"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Manufacturer PartNo"; Value = "CRCW06031K50FKEAHP"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Tolerance"; Value = "+/-1%"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Value"; Value = "470"; VariantName = "[No Variations]"
+Change component parameters: Designator = "J1" ("R12"); Footprint = "ANTENNA- CONUFL001-SMD-T"; UniqueID = "\MJHAOSEH" ("\MJHAOSEH")
+Change component parameters: Designator = "L1" ("U1"); Footprint = "4426R-9"; UniqueID = "\QIHTAHAI" ("\QIHTAHAI")
+Change component parameters (AddParameter): Name = "Code_IPC"; Value = ""; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Code_JEDEC"; Value = ""; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Code_JEITA"; Value = ""; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "ComponentLink1Description"; Value = "Datasheet URL"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "ComponentLink1URL"; Value = "http://www.ti.com/general/docs/lit/getliterature.tsp?genericPartNumber=LM2937-3.3&fileType=pdf"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "CompType"; Value = "LDO IC"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "High-Reliability"; Value = ""; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Manufacturer"; Value = "Texas Instruments"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "PackageDescription"; Value = "TO-220, Molded, 3 Lead, Straight"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "PackageReference"; Value = "NDE0003A"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "PackageTopMarking"; Value = "NSUZXYTTE#*LM2937ET*-3.3"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "PartNumber"; Value = ""; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "PinCount"; Value = "3"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "PowerWise"; Value = "N"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "RoHS"; Value = "N"; VariantName = "[No Variations]"
+Added Pin To Net: NetName=NetC20_1 Pin=C2-1
+Added Pin To Net: NetName=NetC20_1 Pin=C3-1
+Added Pin To Net: NetName=NetC20_1 Pin=C5-1
+Added Pin To Net: NetName=NetC20_1 Pin=D2-4
+Added Pin To Net: NetName=NetC20_1 Pin=DS1-1
+Added Pin To Net: NetName=GND Pin=P2-6
+Added Pin To Net: NetName=NetC20_1 Pin=P2-8
+Added Pin To Net: NetName=NetC20_1 Pin=P4-2
+Added Pin To Net: NetName=GND Pin=P4-4
+Added Pin To Net: NetName=NetC20_1 Pin=PROG1-4
+Added Pin To Net: NetName=GND Pin=R2-1
+Added Pin To Net: NetName=GND Pin=R6-1
+Added Pin To Net: NetName=NetC20_1 Pin=R7-1
+Added Pin To Net: NetName=GND Pin=R12-1
+Added Pin To Net: NetName=NetLS1_1 Pin=R12-2
+Added Pin To Net: NetName=NetC20_1 Pin=T2-1
+Added Pin To Net: NetName=GND Pin=U1-2
+Add Pin To Net: Unknown Pin: Pin U1-3
+Added Pin To Net: NetName=NetC20_1 Pin=U2-5
+Added Pin To Net: NetName=NetC20_1 Pin=U2-16
+Change Net Name : Old Net Name=NetC20_1 New Net Name=3v3
+Added Pin To Net: NetName=CLK Pin=P2-5
+Added Pin To Net: NetName=CLK Pin=U9-6
+Added Net: Name=CLK
+Added Pin To Net: NetName=CS Pin=P2-2
+Added Pin To Net: NetName=CS Pin=U9-7
+Added Net: Name=CS
+Added Pin To Net: NetName=MISO Pin=P2-4
+Added Pin To Net: NetName=MISO Pin=U9-4
+Added Net: Name=MISO
+Added Pin To Net: NetName=MOSI Pin=P2-3
+Added Pin To Net: NetName=MOSI Pin=U9-5
+Added Net: Name=MOSI
+Added Pin To Net: NetName=NetC4_1 Pin=C4-1
+Added Pin To Net: NetName=NetC4_1 Pin=P3-1
+Added Pin To Net: NetName=NetC4_1 Pin=U1-1
+Added Net: Name=NetC4_1
+Added Pin To Net: NetName=NetDS1_2 Pin=DS1-2
+Added Pin To Net: NetName=NetDS1_2 Pin=R6-2
+Added Net: Name=NetDS1_2
+Added Pin To Net: NetName=NetP1_2 Pin=P1-2
+Added Pin To Net: NetName=NetP1_2 Pin=P3-2
+Added Pin To Net: NetName=NetP1_2 Pin=R5-2
+Added Net: Name=NetP1_2
+Added Pin To Net: NetName=NetU2_3 Pin=U2-3
+Added Pin To Net: NetName=NetU2_3 Pin=U6-2
+Added Net: Name=NetU2_3
+Added Pin To Net: NetName=RX Pin=P4-15
+Added Pin To Net: NetName=RX Pin=U9-20
+Added Net: Name=RX
+Added Pin To Net: NetName=TX Pin=P4-14
+Added Pin To Net: NetName=TX Pin=U9-21
+Added Net: Name=TX
+Added Pin To Net: NetName=Vdiv Pin=R2-2
+Added Pin To Net: NetName=Vdiv Pin=R5-1
+Added Pin To Net: NetName=Vdiv Pin=U9-36
+Added Net: Name=Vdiv
+Added Member To Class: ClassName=Microcontroller Member=Component D2 EAST1616RGBB4
+Added Member To Class: ClassName=Microcontroller Member=Component DS1 HLMP-4740
+Added Member To Class: ClassName=Microcontroller Member=Component P2 Header 8
+Added Member To Class: ClassName=Microcontroller Member=Component P4 Header 16X2A
+Added Member To Class: ClassName=Microcontroller Member=Component R12 1.0k
+Added Room: Name=Microcontroller
