@@ -8,6 +8,7 @@
 #include "UART.h"
 #include "SPI.h"
 #include "timer.h"
+#include "GNSS.h"
 
 const uint8_t redLEDPin = BIT1;
 const uint8_t greenLEDPin = BIT2;
@@ -41,17 +42,26 @@ int main(void)
     // ------------------------- DO NOT CHANGE ABOVE ---------------------------- //
 
     uart_init();
+    uart_GNSS_init();
 
-    timerB0_init();
-    timerB1_init();
+//    timerB0_init();
+//    timerB1_init();
 
     P1DIR |= BIT0 | BIT1;
 
-    //beginRecord();
+    beginRecord();
 
-    rgbLED(1, 50, 0);
+//    rgbLED(1, 255, 0);
 
 
+    // GNSS testing
+
+//    GNSS_receive();
+
+    uart_send_byte('X');
+
+
+/*
      // SD card testing
 
      uint8_t R1, buf[512], token;
@@ -100,7 +110,7 @@ int main(void)
 
      // print read SD block
      print_SDBlock(R1, buf, &token);
-
+*/
 
 
     /*

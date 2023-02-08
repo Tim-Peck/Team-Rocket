@@ -1,6 +1,8 @@
 #include <msp430.h>
 #include <inttypes.h>
 #include "timer.h"
+#include "GNSS.h"
+#include "UART.h"
 
 #define CCR0VALUE 20000
 
@@ -33,6 +35,16 @@ __interrupt void TIMER0_A1_ISR(void)
     {
     case TA0IV_TAIFG:
         P1OUT ^= BIT0;
+
+//        __bis_SR_register(GIE);
+//        if (checkFix())
+//        {
+//            uart_send_bytes("NO FIX", 6);
+//        }
+//        else
+//        {
+//            uart_send_bytes("FIX", 6);
+//        }
         break;
     default:
         break;
@@ -113,7 +125,7 @@ void rgbLED(uint8_t redVal, uint8_t greenVal, uint8_t blueVal)
 __interrupt void TIMER1_A0_ISR(void)
 {
     P1OUT |= BIT0 | BIT1;
-} /ti3neoiunfdewio
+}
 
 // CCR1/2/3 IFG: reset respective LED
 #pragma vector=TIMER1_A1_VECTOR // CHANGE FOR FR2355
