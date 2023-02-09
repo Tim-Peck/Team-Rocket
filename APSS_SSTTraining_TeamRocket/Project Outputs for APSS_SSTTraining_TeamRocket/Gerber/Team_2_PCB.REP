@@ -1,20 +1,21 @@
 *************************************************************
-FileName = Main_PCB.GBR
+FileName = Team_2_PCB.GBR
 AutoAperture = True
 *************************************************************
 Generating : Keep-Out Layer
-      File : Main_PCB.GKO
+      File : Team_2_PCB.GKO
 
     Adding Layer      : Keep-Out Layer
 
 
 Used DCodes :
-    D79
+    D44
+    D59
 *************************************************************
 
 *************************************************************
 Generating : Bottom Overlay
-      File : Main_PCB.GBO
+      File : Team_2_PCB.GBO
 
     Adding Layer      : Bottom Overlay
 
@@ -24,12 +25,13 @@ Used DCodes :
     D11
     D13
     D14
-    D16
+    D44
+    D58
 *************************************************************
 
 *************************************************************
 Generating : Bottom Paste
-      File : Main_PCB.GBP
+      File : Team_2_PCB.GBP
 
     Adding Layer      : Bottom Paste
 
@@ -39,25 +41,15 @@ Generating : Bottom Paste
 
 
 Used DCodes :
-    D22
-    D23
-    D29
-    D56
-    D57
-    D58
-    D59
-    D60
-    D61
-    D62
-    D63
-    D64
-    D65
-    D66
+    D18
+    D19
+    D54
+    D55
 *************************************************************
 
 *************************************************************
 Generating : Bottom Solder
-      File : Main_PCB.GBS
+      File : Team_2_PCB.GBS
 
     Adding Layer      : Bottom Solder
 
@@ -67,32 +59,26 @@ Generating : Bottom Solder
 
 
 Used DCodes :
-    D25
+    D15
+    D27
+    D28
+    D33
+    D34
     D35
     D36
+    D37
+    D38
+    D39
+    D40
+    D41
     D42
-    D43
-    D44
-    D45
-    D46
-    D47
-    D48
-    D68
-    D69
-    D70
-    D71
-    D72
-    D73
-    D74
-    D75
-    D76
-    D77
-    D78
+    D56
+    D57
 *************************************************************
 
 *************************************************************
 Generating : Top Solder
-      File : Main_PCB.GTS
+      File : Team_2_PCB.GTS
 
     Adding Layer      : Top Solder
 
@@ -102,7 +88,13 @@ Generating : Top Solder
 
 
 Used DCodes :
+    D15
+    D24
     D25
+    D26
+    D27
+    D28
+    D29
     D30
     D31
     D32
@@ -116,17 +108,11 @@ Used DCodes :
     D40
     D41
     D42
-    D43
-    D44
-    D45
-    D46
-    D47
-    D48
 *************************************************************
 
 *************************************************************
 Generating : Top Paste
-      File : Main_PCB.GTP
+      File : Team_2_PCB.GTP
 
     Adding Layer      : Top Paste
 
@@ -136,6 +122,8 @@ Generating : Top Paste
 
 
 Used DCodes :
+    D15
+    D16
     D17
     D18
     D19
@@ -143,17 +131,11 @@ Used DCodes :
     D21
     D22
     D23
-    D24
-    D25
-    D26
-    D27
-    D28
-    D29
 *************************************************************
 
 *************************************************************
 Generating : Top Overlay
-      File : Main_PCB.GTO
+      File : Team_2_PCB.GTO
 
     Adding Layer      : Top Overlay
 
@@ -164,13 +146,11 @@ Used DCodes :
     D12
     D13
     D14
-    D15
-    D16
 *************************************************************
 
 *************************************************************
 Generating : Bottom Layer
-      File : Main_PCB.GBL
+      File : Team_2_PCB.GBL
 
     Adding Layer      : Bottom Layer
 
@@ -178,52 +158,13 @@ Generating : Bottom Layer
 
 
 Used DCodes :
-    D16
-    D22
-    D23
-    D29
-    D52
-    D53
-    D54
-    D55
-    D56
-    D57
-    D58
-    D59
-    D60
-    D61
-    D62
-    D63
-    D64
-    D65
-    D66
-    D67
-*************************************************************
-
-*************************************************************
-Generating : Top Layer
-      File : Main_PCB.GTL
-
-    Adding Layer      : Top Layer
-
-    Adding Layer      : Multi-Layer
-
-
-Used DCodes :
-    D13
-    D16
-    D17
     D18
     D19
-    D20
-    D21
-    D22
-    D23
-    D24
-    D25
-    D26
-    D28
-    D29
+    D44
+    D45
+    D46
+    D47
+    D48
     D49
     D50
     D51
@@ -231,5 +172,36 @@ Used DCodes :
     D53
     D54
     D55
+*************************************************************
+
+*************************************************************
+Generating : Top Layer
+      File : Team_2_PCB.GTL
+
+    Adding Layer      : Top Layer
+
+    Adding Layer      : Multi-Layer
+
+
+Used DCodes :
+    D15
+    D16
+    D17
+    D18
+    D19
+    D21
+    D22
+    D23
+    D43
+    D44
+    D45
+    D46
+    D47
+    D48
+    D49
+    D50
+    D51
+    D52
+    D53
 *************************************************************
 
