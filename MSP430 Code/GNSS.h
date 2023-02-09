@@ -51,4 +51,13 @@ void parse_GGA_UTC(uint8_t *UTC);
 // input: ASCII array for GGA sentence, 2 float array to store geographic coordinates in decimal format
 void parse_GGA_GCS(float *GCS);
 
+// convert a sequence of ASCII characters representing a decimal number (with noninteger part) to a float
+// input: ASCII sequence beginning at first digit
+// output: float conversion of ASCII sequence
+float ASCII_to_float(uint8_t *firstDigitPtr);
+
+// copy float's raw value to array of 4 individual bytes
+// input: float value to convert, 4 byte array to store with endianness dependent on system
+void float_to_uint8_t(float floatVal, uint8_t *rawFloatPtr);
+
 #endif
