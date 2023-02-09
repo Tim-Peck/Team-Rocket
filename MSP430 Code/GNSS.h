@@ -37,7 +37,7 @@ void GNSS_receive();
 // check if fix acquired by GNSS module from GGA sentence
 // input: ASCII array for GGA sentence
 // output: 1 for fix acquired, 0 for fix not acquired
-uint8_t checkFix();
+uint8_t fixAcquired();
 
 // store altitude from GGA sentence
 // input: ASCII array for GGA sentence, float to store altitude

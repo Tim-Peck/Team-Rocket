@@ -74,9 +74,11 @@ void GNSS_receive() {
     UCA1IE |= UCRXIE;
 }
 
-uint8_t checkFix(){
+uint8_t fixAcquired(){
     uint8_t i = 0;
     uint8_t commaCount = 0;
+
+//    uart_send_bytes(NMEA_sentence, 40);
 
     // check if NMEA sentence received first
     if (!NMEA_sentence[0]) {
@@ -89,6 +91,8 @@ uint8_t checkFix(){
             commaCount++; // increment commaCount when comma delimiter encountered
         }
     }
+
+    uart_send_byte(NMEA_sentence[i]);
 
     // check if fix acquired
     if (NMEA_sentence[i] == '1') {
@@ -122,7 +126,7 @@ void parse_GGA_GCS(float *GCS){
 // ISR TO USCI_A1
 #pragma vector=USCI_A1_VECTOR
 __interrupt void USCI_A1_ISR(void) {
-//    __bis_SR_register(GIE); // enable interrupt nesting
+    __bis_SR_register(GIE); // enable interrupt nesting
 
     switch(UCA1IV) {
         case USCI_NONE: break;
@@ -130,13 +134,15 @@ __interrupt void USCI_A1_ISR(void) {
         case USCI_UART_UCRXIFG:
             received_byte = UCA1RXBUF;
 
+//            uart_send_byte(received_byte); // print all GNSS bytes
+
             // check receive sequence for GGA
             if (received_byte == NMEA_ID[check_idx]) {
                 check_idx++;
             } else if (check_idx == 3) {
                 // GGA sequence found
                 // store new NMEA sentence
-                if (received_byte != '\r') {
+                if (received_byte != '\n') {
                     NMEA_sentence[receive_idx2++] = received_byte;
                 } else {
                     // reset indexes when whole NMEA sentence read
@@ -154,17 +160,6 @@ __interrupt void USCI_A1_ISR(void) {
                 current_length_GNSS--;
             }
             else {
-                // Entering the interrupt service routine (ISR), will clear
-                // interrupt flags. i.e. we have just cleared UCTXIFG
-                // UCTXIFG is usually set when UCA0TXBUF is emptied. However we
-                // didn't write anything to the buffer this time (when ISR reentered), so it's empty
-                // and cannot be "emptied". i.e. UCTXIFG will not get set again
-                // We can however set UCTXIFG manually to re-enter the ISR!
-                // Doing this outside of the ISR is dangerous because we may be
-                // in the middle of a UART transmission. Instead, we can set it
-                // here and disable TX interrupts. When interrupts are enabled
-                // again, UCTXIFG will still be set so we will immediately come
-                // back here.
                 UCA1IE &= ~UCTXIE;
                 UCA1IFG |= UCTXIFG;
 

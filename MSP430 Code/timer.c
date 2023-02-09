@@ -1,8 +1,7 @@
 #include <msp430.h>
 #include <inttypes.h>
 #include "timer.h"
-#include "GNSS.h"
-#include "UART.h"
+#include "GNSS.h" // need to include .h in .c file if you want to use
 
 #define CCR0VALUE 20000
 
@@ -36,15 +35,15 @@ __interrupt void TIMER0_A1_ISR(void)
     case TA0IV_TAIFG:
         P1OUT ^= BIT0;
 
-//        __bis_SR_register(GIE);
-//        if (checkFix())
-//        {
-//            uart_send_bytes("NO FIX", 6);
-//        }
-//        else
-//        {
-//            uart_send_bytes("FIX", 6);
-//        }
+        __bis_SR_register(GIE);
+        if (fixAcquired())
+        {
+            uart_send_bytes("FIX ACQUIRED\r", 13);
+        }
+        else
+        {
+            uart_send_bytes("NO FIX\r", 7);
+        }
         break;
     default:
         break;

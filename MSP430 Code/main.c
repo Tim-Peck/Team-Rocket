@@ -44,7 +44,7 @@ int main(void)
     uart_init();
     uart_GNSS_init();
 
-//    timerB0_init();
+    timerB0_init();
 //    timerB1_init();
 
     P1DIR |= BIT0 | BIT1;
@@ -56,7 +56,7 @@ int main(void)
 
     // GNSS testing
 
-//    GNSS_receive();
+    GNSS_receive();
 
     uart_send_byte('X');
 
