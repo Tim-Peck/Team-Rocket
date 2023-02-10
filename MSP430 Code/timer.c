@@ -35,10 +35,15 @@ __interrupt void TIMER0_A1_ISR(void)
     case TA0IV_TAIFG:
         P1OUT ^= BIT0;
 
+        // testing
         __bis_SR_register(GIE);
         if (fixAcquired())
         {
-            uart_send_bytes("FIX ACQUIRED\r", 13);
+            // print altitude
+            float f = parse_GGA_alt();
+            uint8_t array[4];
+            float_to_uint8_t(f, array);
+            uart_send_bytes(array, 4);
         }
         else
         {

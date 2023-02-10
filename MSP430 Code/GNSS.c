@@ -86,10 +86,10 @@ void GNSS_receive()
 
 uint8_t fixAcquired()
 {
-    uint8_t i = 0;
+    uint8_t idx = 0;
     uint8_t commaCount = 0;
 
-//    uart_send_bytes(NMEA_sentence, 40);
+//    uart_send_bytes(NMEA_sentence, 40); // print NMEA_sentence for testing
 
     // check if NMEA sentence received first
     if (!NMEA_sentence[0])
@@ -97,19 +97,18 @@ uint8_t fixAcquired()
         return 0;
     }
 
-    // walk the sentence till in fix field
+    // walk the sentence till fix field
     while (commaCount != 6)
     {
-        if (NMEA_sentence[i++] == ',')
+        // note: idx will be incremented to after the target comma
+        if (NMEA_sentence[idx++] == ',')
         {
             commaCount++; // increment commaCount when comma delimiter encountered
         }
     }
 
-    uart_send_byte(NMEA_sentence[i]);
-
     // check if fix acquired
-    if (NMEA_sentence[i] == '1')
+    if (NMEA_sentence[idx] == '1')
     {
         return 1;
     }
@@ -119,13 +118,28 @@ uint8_t fixAcquired()
     }
 }
 
-void parse_GGA_alt(float *altitude)
+float parse_GGA_alt()
 {
+    uint8_t idx = 0;
+    uint8_t commaCount = 0;
+
     // check if fix acquired first
     if (!fixAcquired())
     {
         return;
     }
+
+    // walk the GGA sentence till altitude field reached
+        while (commaCount != 9)
+        {
+            if (NMEA_sentence[idx++] == ',')
+            {
+                commaCount++; // increment commaCount when comma delimiter encountered
+            }
+        }
+
+    // return float value of altitude
+    return ASCII_to_float(NMEA_sentence+idx);
 
 }
 

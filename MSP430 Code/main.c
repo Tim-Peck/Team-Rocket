@@ -49,30 +49,17 @@ int main(void)
 
     P1DIR |= BIT0 | BIT1;
 
-//    beginRecord();
+    beginRecord();
 
 //    rgbLED(1, 255, 0);
 
-
     // GNSS testing
 
-//    GNSS_receive();
+    GNSS_receive();
 
 //    uart_send_byte('X');
 
-    uint8_t testArray[] = "155.582,";
-    float f;
-    f = ASCII_to_float(testArray);
-    uint8_t floatValsPtr[4];
-    float_to_uint8_t(f, floatValsPtr);
-
-//     print the float
-    uart_send_bytes(floatValsPtr, 4);
-
-//    uart_send_byte('X');
-
-
-/*
+    /*
      // SD card testing
 
      uint8_t R1, buf[512], token;
@@ -121,8 +108,7 @@ int main(void)
 
      // print read SD block
      print_SDBlock(R1, buf, &token);
-*/
-
+     */
 
     /*
      // ------------------------------ //

@@ -34,20 +34,21 @@ void GNSS_cmd(int ID);
 // begin storing GNSS data to NMEA_sentence array(currently GGA sentence)
 void GNSS_receive();
 
-// check if fix acquired by GNSS module from GGA sentence
+// check if fix acquired by GNSS module from latest GGA sentence
 // input: ASCII array for GGA sentence
 // output: 1 for fix acquired, 0 for fix not acquired
 uint8_t fixAcquired();
 
-// store altitude from GGA sentence
-// input: ASCII array for GGA sentence, float to store altitude
-void parse_GGA_alt(float *altitude);
+// store altitude from latest GGA sentence
+// input: ASCII array for GGA sentence
+// output: float of altitude
+float parse_GGA_alt();
 
-// store UTC from GGA sentence
+// store UTC from latest GGA sentence
 // input: ASCII array for GGA sentence, 3 byte array to store UTC values (hh, mm, ss)
 void parse_GGA_UTC(uint8_t *UTC);
 
-// store latitude and longitude from GGA sentence
+// store latitude and longitude from latest GGA sentence
 // input: ASCII array for GGA sentence, 2 float array to store geographic coordinates in decimal format
 void parse_GGA_GCS(float *GCS);
 
