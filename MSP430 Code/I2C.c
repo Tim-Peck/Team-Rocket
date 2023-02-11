@@ -229,7 +229,7 @@ void getBar(uint8_t *data_array)
 
 }
 
-void getByte(uint8_t slaveAddress, uint8_t registerAddress, uint8_t *storeByte) 
+void getByte(uint8_t slaveAddress, uint8_t registerAddress, uint8_t *storeByte)
 {
 	i2c_receive(slaveAddress, registerAddress, 1);
 	*storeByte = received_bytes[0];

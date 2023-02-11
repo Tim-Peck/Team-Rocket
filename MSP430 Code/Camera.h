@@ -1,35 +1,35 @@
-#ifndef I2C_H
-#define I2C_H
+#ifndef CAM_H
+#define CAM_H
 
-#define CAM_ROWLENGTH 320
-#define CAM_COLLENGTH 320
-#define CAM_PIXBITS 8
+#include <inttypes.h>
+#include "Camera.c"
 
-#define CAM_I2CADDRESS 0x24
-#define CAM_WAITTIMEOUT 1000000
-#define CAM_IMAGEFOLDER "imagefolder"
+// #define CAM_ROWLENGTH 320
+// #define CAM_COLLENGTH 320
+// #define CAM_PIXBITS 8
 
-// Pin number in register
-#define CAM_VSYNC 0x01
-#define CAM_HSYNC 0x02
-#define CAM_PIXCLOCK 0x03
-#define CAM_DATA0 0x04
+// #define CAM_I2CADDRESS 0x24
+// #define CAM_WAITTIMEOUT 1000000
+// #define CAM_IMAGEFOLDER "imageFolder"
 
-// ERROR DEFINES
-#define CAM_SUCCESS 0
-#define CAM_ERROR_INVALIDI2CRESPONSE 1
-#define CAM_ERROR_NORESPONSE 2
+const uint8_t cam_I2CAddress = 0x24;
+const int cam_waitTimeout = 1000000;
+const char imageFolder[] = "imageFolder";
 
-static volatile uint8 imageBuffer[CAM_ROWLENGTH*CAM_COLLENGTH];
+const int cam_rowLength = 320;
+const int cam_colLength = 320;
+const int cam_pixBits = 8;
+
+static volatile uint8_t imageBuffer[cam_rowLength*cam_colLength];
 static volatile int imageCount = 0;
 
 // initalises the camera pins and changes required registers via I2C.
-int cameraInit();
+void initCamera();
 
 // Sends a request to the camera, then waits for and
 // records the image response to the buffer.
 // Returns success if the image was successfully recorded
-int takeImage();
+void takeImage();
 
 // Save the image to the SD card
 void saveImage();
@@ -39,6 +39,6 @@ void requestImage();
 
 // Polls until the PXClock changes to the given level
 // if already at level, waits for it to cycle to level
-int waitForPXClockChangeTo(bool level);
+void waitForPXClockChangeTo(int level);
 
 #endif

@@ -1,48 +1,50 @@
+#include <msp430.h>
 
 #include "Camera.h"
 
-
-void cameraInit(){
-  // Set up the HSYNC, HSYNC, PIXCLOCK and DATA0 Pins
+void initCamera(){
+  // Set upcam_rowLengthSYNC, PIXCLOCK and DATA0 Pins
   // Clear pintype to 0 = GPIO read
   // Clear pin direction to 0 = input
-  P1SEL &= ~CAM_VSYNC;
-  P1SEL2 &= ~CAM_VSYNC;
-  P1DIR &= ~CAM_VSYNC;
 
-  P1SEL &= ~CAM_HSYNC;
-  P1SEL2 &= ~CAM_HSYNC;
-  P1DIR &= ~CAM_HSYNC;
-
-  P1SEL &= ~CAM_PIXCLOCK;
-  P1SEL2 &= ~CAM_PIXCLOCK;
-  P1DIR &= ~CAM_PIXCLOCK;
-
-  P1SEL &= ~CAM_DATA0;
-  P1SEL2 &= ~CAM_DATA0;
-  P1DIR &= ~CAM_DATA0;
+  // TODO: Check this is correct
+  // TODO: Figure which pin corresponds to which camera pin
+  // Pin 4 (Assuming VSYNC)
+  P4DIR = 0; // Set direction to input
+  P4REN = 0; // disable resistors
+  P4SEL0 = 0; // ensure GPIO use
+  P4SEL1 = 0; // ensure GPIO use
+  // Pin 5 (Assuming HSYNC)
+  P5DIR = 0;
+  P5REN = 0;
+  P5SEL0 = 0;
+  P5SEL1 = 0;
+  // Pin 6 (Assuming PXCLK)
+  P6DIR = 0;
+  P6REN = 0;
+  P6SEL0 = 0;
+  P6SEL1 = 0;
+  // Pin 7 (Assuming D0)
+  P7DIR = 0;
+  P7REN = 0;
+  P7SEL0 = 0;
+  P7SEL1 = 0;
 
   // check enabled by reading the sensor part number
   // read 0x0000[7:0] should be 0x01 in MODEL_ID_H
   // read 0x0001[7:0] should be 0xB0 in MODEL_ID_L
-  // if failed, return CAM_ERROR_INVALIDI2CRESPONSE
-  i2C_recieve(CAM_I2CADDRESS, 0x0000, 2);
-  if (received_bytes[0] != 0x01){
-    return CAM_ERROR_INVALIDI2CRESPONSE;
-  } else if (received_bytes[1] != 0xB0) {
-    return CAM_ERROR_INVALIDI2CRESPONSE;
-  }
+  i2C_recieve(cam_I2CAddress, 0x0000, 2);
+  // if (received_bytes[0] != 0x01){
+  //   return;
+  // } else if (received_bytes[1] != 0xB0) {
+  //   return;
+  // }
 
   // change setting registers \
   // set the data mode to serial
   // default 0x02
-  // 0x3059[6] = 0  4bit_en
   // 0x3059[5] = 1  serial_en
-  i2C_write(CAM_I2CADDRESS, 0x3059, 0x22);
-  // default 0x0A
-  // 0x3060[5] = 0  gated_en
-  // 0x3060[4] = 1  msb_en
-  i2C_write(CAM_I2CADDRESS, 0x3059, 0x1A);
+  i2C_write(cam_I2CAddress, 0x3059, 0x22);
 
 }
 
@@ -56,28 +58,29 @@ void takeImage(){
 
   // Poll until the VSYNC pin goes high
   int timeOut = 0;
-  while (~(P1IN & CAM_VSYNC)) {
+  while (~(P4IN)) {
     timeOut ++;
-    if (CAM_WAITTIMEOUT < timeOut){
+    if (cam_waitTimeout < timeOut){
       return;
     }
   }
 
   // while frame is being transfered (VSYNC high)
-  while (P1IN & CAM_VSYNC) {
+  while (P4IN) {
   // while transfering a line of pixels (HSYNC high)
     pixNum = 0;
-    while (P1IN & CAM_HSYNC) {
+    while (P5IN) {
       // gather a single pixel, 8 cycles
-      uint8 byte = 0;
-      for (size_t i = 0; i < CAM_PIXBITS; i++) {
+      volatile uint8_t byte = 0;
+      int i = 0;
+      for (i = 0; i < cam_pixBits; i++) {
         // wait for the centre of the clock cycle
         waitForPXClockChangeTo(0);
         // Read data0 pin and
         // OR the value with the correct position in byte
-        byte |=  (uint8)(P1IN & CAM_DATA0) << i;
+        byte |=  (P7IN) << i;
       }
-      imageBuffer[rowNum*CAM_ROWLENGTH + pixNum] = byte;
+      imageBuffer[rowNum*cam_rowLength + pixNum] = byte;
       pixNum ++;
     }
     rowNum ++;
@@ -97,30 +100,30 @@ void requestImage(){
   // Trigger Message
     // set PMU_PROGRAMMAB LE_FRAMECNT to 1
     // 0x3020[7:0] = 1
-    i2C_write(CAM_I2CADDRESS, 0x3020, 0x01);
+    i2C_write(cam_I2CAddress, 0x3020, 0x01);
     // Set to I2C trigger in mode select register
     // 0x0100[2:0] = 011
-    i2C_write(CAM_I2CADDRESS, 0x0100, 0x03);
+    i2C_write(cam_I2CAddress, 0x0100, 0x03);
 }
 
-void waitForPXClockChangeTo(bool level){
+void waitForPXClockChangeTo(int level){
   // Check that we are not already at level
-  int timeOut = 0;
-  if ((P1IN & CAM_PXCLOCK) == level) {
+  volatile int timeOut = 0;
+  if (P6IN == level) {
     // If we are, wait until the pin is different to level
-    while ((P1IN & CAM_PXCLOCK) == level){
+    while (P6IN & cam_pixBits == level){
       // Wait until timeout cycles
       timeOut ++;
-      if (CAM_WAITTIMEOUT < timeOut){
+      if (500000 < timeOut){
         return;
       }
     }
   }
   timeOut = 0;
   // Wait until the pin is the same as level
-  while ((P1IN & CAM_PXCLOCK) != level){
+  while (P6IN != level){
     timeOut ++;
-    if (CAM_WAITTIMEOUT < timeOut){
+    if (500000 < timeOut){
       return;
     }
   }
