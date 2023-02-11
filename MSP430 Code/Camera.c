@@ -33,14 +33,15 @@ void initCamera(){
   // check enabled by reading the sensor part number
   // read 0x0000[7:0] should be 0x01 in MODEL_ID_H
   // read 0x0001[7:0] should be 0xB0 in MODEL_ID_L
-  i2C_recieve(cam_I2CAddress, 0x0000, 2);
-  // if (received_bytes[0] != 0x01){
+  // uint8_t checkByte[2];
+  // getBytes(cam_I2CAddress, 0x0000, checkByte, 2);
+  // if (checkByte[0] != 0x01){
   //   return;
-  // } else if (received_bytes[1] != 0xB0) {
+  // } else if (checkByte[1] != 0xB0) {
   //   return;
   // }
 
-  // change setting registers \
+  // change setting registers
   // set the data mode to serial
   // default 0x02
   // 0x3059[5] = 1  serial_en
