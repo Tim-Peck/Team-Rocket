@@ -11,27 +11,32 @@ void uart_GNSS_init()
     next_idx_to_store_GNSS = 0;
     current_length_GNSS = 0;
 
-    NMEA_sentence[0] = 0;
+    NMEA_sentence[0] = 0; //set default value for when GGA sentence not received yet
     receive_idx2 = 0;
     check_idx = 0;
 
+    //TESTING - REMOVE THIS
+//    uint8_t NMEA_sentence1[] =
+//            ",112037.000,3654.4991,S,17444.8546,E,1,04,1.47,110.7,";
+//    memcpy(NMEA_sentence, NMEA_sentence1, 53);
+
     // Configure pins
-    P2SEL0 |= BIT5 | BIT6; // P2.5=RXD, P2.6=TXD (is default high)
+    P1SEL0 |= BIT5 | BIT4; // P1.5=RXD, P1.4=TXD (is default high)
 
     // Configure UART
-    UCA1CTLW0 |= UCSWRST;       // Put UART state machine in reset
-    UCA1CTLW0 |= UCSSEL__SMCLK; // Choose SMCLK as clock source
+    UCA0CTLW0 |= UCSWRST;       // Put UART state machine in reset
+    UCA0CTLW0 |= UCSSEL__SMCLK; // Choose SMCLK as clock source
 
     // Baud Rate calculation - we want 9600 baud (below are fields of registers)
     // N = clock / baud = 1,048,576 Hz / 9600 = 109.227
     // N > 16 so UCOS16 = 1
-    // UCA1BR0 = int(N / 16) = int(109.227 / 16) = int(6.827) = 6
+    // UCA0BR0 = int(N / 16) = int(109.227 / 16) = int(6.827) = 6
     // UCBRSx  = 0x22 as per users guide table "UCBRSx settings"
     // UCBRFx  = int([(N / 16) - int(N / 16)] * 16) = int(13.227) = 8
-    UCA1BRW = 6;
-    UCA1MCTLW = (0x22 << 8) | UCBRF_13 | UCOS16;
+    UCA0BRW = 6;
+    UCA0MCTLW = (0x22 << 8) | UCBRF_13 | UCOS16;
 
-    UCA1CTLW0 &= ~UCSWRST;      // Initialize GNSS state machine
+    UCA0CTLW0 &= ~UCSWRST;      // Initialize GNSS state machine
 }
 
 void GNSS_send_byte( byte)
@@ -46,7 +51,7 @@ void GNSS_send_byte( byte)
 
     // enable transmit interrupt to start transmitting
     // if we are already transmitting this does nothing
-    UCA1IE |= UCTXIE;
+    UCA0IE |= UCTXIE;
 
     // poll until byte is sent
     while (!byte_sent_GNSS)
@@ -81,7 +86,7 @@ void GNSS_cmd(int ID)
 void GNSS_receive()
 {
     // enable receive interrupt to begin receiving ASCII characters
-    UCA1IE |= UCRXIE;
+    UCA0IE |= UCRXIE;
 }
 
 uint8_t fixAcquired()
@@ -92,6 +97,7 @@ uint8_t fixAcquired()
 //    uart_send_bytes(NMEA_sentence, 40); // print NMEA_sentence for testing
 
     // check if NMEA sentence received first
+    // GGA sentence may have not been reached yet
     if (!NMEA_sentence[0])
     {
         return 0;
@@ -130,16 +136,16 @@ float parse_GGA_alt()
     }
 
     // walk the GGA sentence till altitude field reached
-        while (commaCount != 9)
+    while (commaCount != 9)
+    {
+        if (NMEA_sentence[idx++] == ',')
         {
-            if (NMEA_sentence[idx++] == ',')
-            {
-                commaCount++; // increment commaCount when comma delimiter encountered
-            }
+            commaCount++; // increment commaCount when comma delimiter encountered
         }
+    }
 
     // return float value of altitude
-    return ASCII_to_float(NMEA_sentence+idx);
+    return ASCII_to_float(NMEA_sentence + idx);
 
 }
 
@@ -151,66 +157,154 @@ void parse_GGA_UTC(uint8_t *UTC)
         return;
     }
 
+    // extract ASCII values for UTC
+    uint8_t h1 = NMEA_sentence[1];
+    uint8_t h0 = NMEA_sentence[2];
+    uint8_t m1 = NMEA_sentence[3];
+    uint8_t m0 = NMEA_sentence[4];
+    uint8_t s1 = NMEA_sentence[5];
+    uint8_t s0 = NMEA_sentence[6];
 
+    // store hour, minute, and second values
+    UTC[0] = ASCII_to_uint8(h1, h0);
+    UTC[1] = ASCII_to_uint8(m1, m0);
+    UTC[2] = ASCII_to_uint8(s1, s0);
 }
 
 void parse_GGA_GCS(float *GCS)
 {
+    uint8_t idx = 0;
+    uint8_t commaCount = 0;
+    float latitude = 0;
+    float longitude = 0;
+
     // check if fix acquired first
     if (!fixAcquired())
     {
         return;
     }
 
+    // retrieving latitude
+    // walk the GGA sentence till latitude field reached
+    while (commaCount != 2)
+    {
+        if (NMEA_sentence[idx++] == ',')
+        {
+            commaCount++; // increment commaCount when comma delimiter encountered
+        }
+    }
+    // note: latitude format is ddmm.mmmm,N (or S)
+    // calculate integer part from degrees
+    latitude += (float) (NMEA_sentence[idx] - 48) * 10; // tens
+    latitude += (float) (NMEA_sentence[idx + 1] - 48); // ones
+    // calculate fractional part from arcminutes
+    latitude += (float) 1 / 60 * ASCII_to_float(NMEA_sentence + idx + 2);
+    // check direction if south for negative angle
+    // walk the GGA sentence till N/S field reached
+    while (commaCount != 3)
+    {
+        if (NMEA_sentence[idx++] == ',')
+        {
+            commaCount++; // increment commaCount when comma delimiter encountered
+        }
+    }
+    if (NMEA_sentence[idx] == 'S')
+    {
+        latitude *= -1;
+    }
 
+    // retrieving longitude
+    idx += 2;
+    // note: longitude format is dddmm.mmmm,W (or E)
+    // calculate integer part from degrees
+    longitude += (float) (NMEA_sentence[idx] - 48) * 100; // hundreds, note: casts have higher precedence than *
+    longitude += (float) (NMEA_sentence[idx + 1] - 48) * 10; // tens
+    longitude += (float) (NMEA_sentence[idx + 2] - 48); // ones
+    // calculate fractional part from arcminutes
+    longitude += (float) 1 / 60 * ASCII_to_float(NMEA_sentence + idx + 3);
+    // check direction if west to convert to east
+    // walk the GGA sentence till W/E field reached
+    while (commaCount != 4)
+    {
+        if (NMEA_sentence[idx++] == ',')
+        {
+            commaCount++; // increment commaCount when comma delimiter encountered
+        }
+    }
+    if (NMEA_sentence[idx] == 'W') // should never happen because we'd have to take a flight LOL
+    {
+        longitude = 360 - longitude;
+    }
+
+    // store values
+    GCS[0] = latitude;
+    GCS[1] = longitude;
 }
 
-float ASCII_to_float(uint8_t *firstDigitPtr) {
+float ASCII_to_float(uint8_t *firstDigitPtr)
+{
     uint8_t intCount = 0;
     uint8_t nonIntCount = 0;
     uint8_t i;
     float value = 0;
 
     // count number of integers
-    while (firstDigitPtr[intCount] != '.') {
+    while (firstDigitPtr[intCount] != '.')
+    {
         intCount++;
     }
 
     // count number of nonintegers
-    while (*(firstDigitPtr+intCount+1+nonIntCount) != ',') {
+    while (*(firstDigitPtr + intCount + 1 + nonIntCount) != ',')
+    {
         nonIntCount++;
     }
 
     // calculate integer part of float
-    for (i = 0; i < intCount; i++) {
-        value += (float)(firstDigitPtr[i]-48)*powf(10, (float)(intCount-1-i));
+    for (i = 0; i < intCount; i++)
+    {
+        value += (float) (firstDigitPtr[i] - 48)
+                * powf(10, (float) (intCount - 1 - i));
     }
 
     // calculate noninteger part of float
-    for (i = 0; i < nonIntCount; i++) {
-        value += (float)(*(firstDigitPtr+intCount+1+i)-48)*powf(10, (float)(-1-i));
+    for (i = 0; i < nonIntCount; i++)
+    {
+        value += (float) (*(firstDigitPtr + intCount + 1 + i) - 48)
+                * powf(10, (float) (-1 - i));
     }
 
     return value;
 }
 
-void float_to_uint8_t(float floatVal, uint8_t *rawFloatPtr) {
+void float_to_uint8(float floatVal, uint8_t *rawFloatPtr)
+{
     memcpy(rawFloatPtr, &floatVal, sizeof(floatVal));
 }
 
-// ISR TO USCI_A1
-#pragma vector=USCI_A1_VECTOR
-__interrupt void USCI_A1_ISR(void)
+uint8_t ASCII_to_uint8(uint8_t MSD, uint8_t LSD)
+{
+    // convert from ASCII to binary value of digit
+    MSD -= 48;
+    LSD -= 48;
+
+    return (MSD * 10) + LSD;
+}
+
+// ISR TO USCI_A0
+// stores GGA sentence to NMEA_sentence every second (independent of micro timer)
+#pragma vector=USCI_A0_VECTOR
+__interrupt void USCI_A0_ISR(void)
 {
     __bis_SR_register(GIE); // enable interrupt nesting
 
-    switch (UCA1IV)
+    switch (UCA0IV)
     {
     case USCI_NONE:
         break;
 
     case USCI_UART_UCRXIFG:
-        received_byte = UCA1RXBUF;
+        received_byte = UCA0RXBUF;
 
 //            uart_send_byte(received_byte); // print all GNSS bytes
 
@@ -243,13 +337,13 @@ __interrupt void USCI_A1_ISR(void)
     case USCI_UART_UCTXIFG:
         if (current_length_GNSS > 0)
         {
-            UCA1TXBUF = cmd_buffer[next_idx_to_send_GNSS++];
+            UCA0TXBUF = cmd_buffer[next_idx_to_send_GNSS++];
             current_length_GNSS--;
         }
         else
         {
-            UCA1IE &= ~UCTXIE;
-            UCA1IFG |= UCTXIFG;
+            UCA0IE &= ~UCTXIE;
+            UCA0IFG |= UCTXIFG;
 
             byte_sent_GNSS = 1;
         }

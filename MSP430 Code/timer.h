@@ -7,7 +7,8 @@
 void timerB0_init();
 
 // begin timerB0 and functions in TBIFG
-void beginRecord();
+// this will execute the main functions of reading the sensors and writing to the SD card every second
+void begin1HzTimer();
 
 // initialise timerB0 for RGB LED
 void timerB1_init();

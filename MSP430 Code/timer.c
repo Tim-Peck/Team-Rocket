@@ -21,7 +21,7 @@ void timerB0_init() // CHANGE FOR FR2355
     TA0CTL &= ~TAIFG;
 }
 
-void beginRecord() // CHANGE FOR FR2355
+void begin1HzTimer() // CHANGE FOR FR2355
 {
     // start timer in continuous mode
     TA0CTL |= MC1;
@@ -33,21 +33,36 @@ __interrupt void TIMER0_A1_ISR(void)
     switch (TA0IV)
     {
     case TA0IV_TAIFG:
-        P1OUT ^= BIT0;
+        // ------- FLIGHT READY STAGE ------- //
 
-        // testing
+        // check fix acquired before parsing NMEA_sentence
         __bis_SR_register(GIE);
         if (fixAcquired())
         {
             // print altitude
             float f = parse_GGA_alt();
             uint8_t array[4];
-            float_to_uint8_t(f, array);
+            float_to_uint8(f, array);
             uart_send_bytes(array, 4);
+
+            // print UTC time
+            uint8_t UTC[3];
+            parse_GGA_UTC(UTC);
+            uart_send_bytes(UTC, 3);
+            uart_send_byte(100); // FOR TESTING - REMOVE
+
+            // print latitude/longitude
+            float GCS[2];
+            parse_GGA_GCS(GCS);
+            uint8_t latitude[4], longitude[4];
+            float_to_uint8(GCS[0], latitude);
+            float_to_uint8(GCS[1], longitude);
+            uart_send_bytes(latitude, 4);
+            uart_send_bytes(longitude, 4);
         }
         else
         {
-            uart_send_bytes("NO FIX\r", 7);
+//            uart_send_bytes("NO FIX\r", 7);
         }
         break;
     default:

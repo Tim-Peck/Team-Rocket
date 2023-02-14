@@ -71,14 +71,17 @@ void SD_printReadTokenError(uint8_t token);
 void SD_powerUpSeq();
 
 // switching to SPI mode by holding CS low and going to idle state
-// output: response R1 from CMD0
+// CMD0
+// output: response R1
 uint8_t SD_goIdleState();
 
 // send interface condition to check generation of card
+// CMD8
 // input: 5 byte uint8_t array to store response R7
 void SD_sendInterfaceCond(uint8_t *res);
 
 // read operating conditions register
+// CMD58
 // input: 5 byte uint8_t array to store response R3
 void SD_readOCR(uint8_t *res);
 
@@ -87,6 +90,7 @@ void SD_readOCR(uint8_t *res);
 uint8_t SD_sendAppCommand();
 
 // send operating conditions register to activate card initialization
+// ACMD41
 // output: R1
 uint8_t SD_sendOCR();
 
@@ -96,7 +100,9 @@ uint8_t SD_sendOCR();
 // output: 0 for initialization failure, 1 for success
 uint8_t SD_init();
 
-// -------- read/write functions -------- //
+// -------- block read/write functions -------- //
+// NOTE: R1 is returned and token is written to for user to actually check if read/write was successful in SD card (e.g. address out of range)
+// although, checking for R1 here is kind of useless
 
 // read a single data block from a specified sector address
 // each block consists of 512 bytes (unless standard capacity which can be set)
@@ -109,5 +115,11 @@ uint8_t SD_readSingleBlock(uint32_t addr, uint8_t *buf, uint8_t *token);
 // input: 32 bit block address, 512 byte uint8_t data array to write from, 1 byte variable to store data-response token
 // output: SD card status
 uint8_t SD_writeSingleBlock(uint32_t addr, uint8_t *writeBuf, uint8_t *token);
+
+// -------- user operation functions -------- //
+
+// check if flight is finished to stop flight mode
+// used if power is disconnected and reconnected after flight is finished to stop flight mode process from restarting and prevent overriding data
+uint8_t checkFinishStatus();
 
 #endif

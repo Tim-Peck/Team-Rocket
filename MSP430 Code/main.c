@@ -1,6 +1,4 @@
-// 13/12/2022
-// Last change: Kenny Yu
-// Current function: displays received byte/s on serial monitor with UART from SPI on test microcontroller with test sensors
+// Note: Maximum amount of time available for writing data is 24 hours
 
 #include <msp430.h>
 #include <inttypes.h>
@@ -30,6 +28,21 @@ void digital_write(uint8_t pin, int value)
     }
 }
 
+void blip()
+{
+    // toggle on and off for a second
+    P1OUT &= ~BIT0;
+    int i;
+    for (i = 0; i < 5; i++)
+    {
+        P1OUT ^= BIT0;
+        __delay_cycles(100000);
+        P1OUT ^= BIT0;
+        __delay_cycles(100000);
+    }
+    __delay_cycles(150000);
+}
+
 int main(void)
 {
     WDTCTL = WDTPW | WDTHOLD;   // stop watchdog timer
@@ -41,21 +54,134 @@ int main(void)
 
     // ------------------------- DO NOT CHANGE ABOVE ---------------------------- //
 
-    uart_init();
-    uart_GNSS_init();
+    P1DIR |= BIT0 | BIT1; // <- MOVE INSIDE APPROPRIATE FUNCTION
 
-    timerB0_init();
-//    timerB1_init();
 
-    P1DIR |= BIT0 | BIT1;
+    // SET MODE HERE
+    uint8_t mode = 0; // probably better way than elif statements
 
-    beginRecord();
+
+    // Initialising MSP430 pins and timers
+
+//    uart_init(); // Serial Monitor UART // FOR FR2433 SERIAL UART HAS TO OCCUPY SAME PINS SO COMMENT THIS OUT WHEN IN FLIGHT MODE MODE
+    uart_GNSS_init(); // GNSS module UART // FOR FR2433 GNSS UART HAS TO OCCUPY SAME PINS SO COMMENT THIS OUT WHEN IN DATA ANALYSIS MODE
+    i2c_init(); // IMU I2C
+    spi_init(); // SD Card SPI
+
+    timerB0_init(); // 1Hz timer
+    timerB1_init(); // RGB LED PWM timer
+
+    // Initialise SD card
+    if (!SD_init())
+    {
+        mode = 3;
+    }
+
+    // Mode list
+    // 0 - FLIGHT MODE (Flight logic - see flow chart)
+    // 1 - RESET MODE (Erase all content by setting all bytes to 0)
+    // 2 - DATA ANALYSIS MODE (View complete flight data)
+
+    if (mode == 0)
+    { // FLIGHT MODE
+
+        while (1)
+        {
+            // ------- INITIALISATION STAGE ------- //
+
+            // Check if flight/recording is complete
+            if (checkFinishStatus())
+            {
+                // set LED to green
+                rgbLED(0, 255, 0);
+                break; // exit
+            }
+
+            // Verify IMU connection
+//            if (!checkIMUConnection()){
+//                // set LED to pink
+////                rgbLED(255,0,255);
+//                rgbLED(255,0,0); //temporary for testing
+//                break; // exit
+//            }
+
+            // set LED to orange
+//            rgbLED(255,165,0);
+            rgbLED(255, 0, 0); //temporary for testing
+
+            // begin receiving GNSS signals
+            GNSS_receive();
+
+            // wait for fix acquired
+            while (!fixAcquired())
+                ;
+
+            // set LED to yellow
+            rgbLED(255, 255, 0);
+
+            // ------- FLIGHT READY STAGE ------- //
+
+            // begin 1Hz timer
+            begin1HzTimer();
+            break;
+            // check timer.c ISR for continued code
+        }
+
+    }
+    else if (mode == 1)
+    { // RESET MODE
+      // note: write speed limited by microcontroller and SD process
+      // at 1MHz, this is quite slow
+      // EVEN assuming writing a single block takes 512 cycles (more processes are involved)
+      // 1048576Hz / 512cycles per block = 2048 blocks per second
+      // 24 hours of data is required = 86400 blocks (at 1 block per second)
+      // Therefore, 86400/2048 = 42.1875 seconds BEST CASE to reset 24 hours worth of data
+
+      // MAX ADDRESS: 86399 (takes at least 90 minutes)
+        const uint32_t blocks = 1;
+
+        uint8_t R1, buf[512], token;
+        uint32_t i;
+
+        // set LED to off
+        rgbLED(0, 0, 0);
+
+        // fill buffer with 0x00
+        for (i = 0; i < 512; i++)
+        {
+            buf[i] = 0x00;
+        }
+
+        // reset first x blocks in SD card
+        // MAKE RESET MODE CHECK FOR FINAL ADDRESS WRITTEN TO SO DON'T HAVE TO RESET ALL 86400 BLOCKS
+        // actual time required for 1000 blocks is 1 minute and 2 seconds.
+        // time required for 5000 blocks is 5 minute and 13 seconds
+        // Therefore, about 1 minute and 2.75 seconds per 1000 blocks
+        for (i = 0; i < blocks; i++)
+        {
+            SD_writeSingleBlock(i, buf, &token);
+        }
+
+        // set LED to white
+        rgbLED(255, 255, 255);
+
+    }
+    else if (mode == 2)
+    { // DATA ANALYSIS MODE
+
+    }
+    else
+    { // error initialising SD card, set LED to red
+        rgbLED(255, 255, 0);
+    }
+
+//    begin1HzTimer();
 
 //    rgbLED(1, 255, 0);
 
     // GNSS testing
 
-    GNSS_receive();
+//    GNSS_receive();
 
 //    uart_send_byte('X');
 
@@ -64,9 +190,6 @@ int main(void)
 
      uint8_t R1, buf[512], token;
      uint16_t i;
-
-     //    i2c_init();
-     spi_init(); // initialise microcontroller SPI for SD card
 
      // initialize SD card
      if (SD_init())

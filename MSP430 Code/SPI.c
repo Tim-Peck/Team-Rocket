@@ -482,7 +482,7 @@ uint8_t SD_init()
             return 0;
         }
     }
-    while (res[0] != 0x01);
+    while (res[0] != 0x01); // R1's first bit should be 1 for idle state
 
     // check interface conditions (CMD8)
     uart_send_bytes("Sending CMD8...\r", sizeof("Sending CMD8...\r"));
@@ -697,4 +697,18 @@ uint8_t SD_writeSingleBlock(uint32_t addr, uint8_t *writeBuf, uint8_t *token)
     uart_send_bytes("------------------\r", sizeof("------------------\r"));
 
     return res1;
+}
+
+uint8_t checkFinishStatus() {
+    uint8_t R1, buf[512], token;
+
+    // read block 0
+    R1 = SD_readSingleBlock(0, buf, &token);
+
+    // check first byte
+    if (buf[0]) {
+        return 1; // flight finished
+    } else {
+        return 0; // flight not finished
+    }
 }

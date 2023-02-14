@@ -11,6 +11,7 @@ void i2c_init()
     // setting P1.2 and P1.3 for I2C
     P1SEL0 |= (BIT2 | BIT3); // primary module function
 
+    // I2C line is pulled high
     P1REN |= BIT2 | BIT3; // Enable internal resistors
     P1OUT |= BIT2 | BIT3; // Switch resistors to pull-up
 
@@ -42,7 +43,7 @@ void i2c_write(uint8_t slave_byte, uint8_t address_byte, uint8_t data_byte)
     // store address byte in buffer
     if (current_length < BUFFER_SIZE)
     {
-        address_buffer[next_idx_to_store++] = address_byte; // next_idx is always incremented and not reset
+        write_buffer[next_idx_to_store++] = address_byte; // next_idx is always incremented and not reset
         current_length++;
     }
 
@@ -50,7 +51,7 @@ void i2c_write(uint8_t slave_byte, uint8_t address_byte, uint8_t data_byte)
     if (current_length < BUFFER_SIZE)
     {
         // store byte in buffer
-        address_buffer[next_idx_to_store++] = data_byte; // next_idx is always incremented and not reset
+        write_buffer[next_idx_to_store++] = data_byte; // next_idx is always incremented and not reset
         current_length++;
     }
 
@@ -68,7 +69,7 @@ void i2c_write(uint8_t slave_byte, uint8_t address_byte, uint8_t data_byte)
     UCB0IE |= UCTXIE0; // enable transmit interrupt
 }
 
-void i2c_receive(uint8_t slave_byte, uint8_t address_byte, int length)
+uint8_t i2c_receive(uint8_t slave_byte, uint8_t address_byte, int length)
 {
     rwStatus = 0; // set bool for ISR to read
 	receiveLength = length;
@@ -77,7 +78,7 @@ void i2c_receive(uint8_t slave_byte, uint8_t address_byte, int length)
     if (current_length < BUFFER_SIZE)
     {
         // store byte in buffer
-        address_buffer[next_idx_to_store++] = address_byte; // next_idx is always incremented and not reset
+        write_buffer[next_idx_to_store++] = address_byte; // next_idx is always incremented and not reset
         current_length++; // so current length alternates between 0 and 1 for each byte
     }
 
@@ -94,9 +95,16 @@ void i2c_receive(uint8_t slave_byte, uint8_t address_byte, int length)
 
     UCB0IE |= UCTXIE0;
 
-    while (!received); // poll for data received before exiting function
+    // poll for data received before exiting function
+    while (!received) {
+        // check if NACK
+        if (UCNACKIFG & UCB0IFG) {
+            return 0;
+        }
+    }
 
     __delay_cycles(2200); // I2C receive requires delay for some reason
+    return 1;
 }
 
 
@@ -116,7 +124,7 @@ __interrupt void USCI_B0_ISR(void)
     case USCI_I2C_UCTXIFG0: // TRANSMIT FIRST
         if (current_length > 0)
         {
-            UCB0TXBUF = address_buffer[next_idx_to_send++];
+            UCB0TXBUF = write_buffer[next_idx_to_send++];
             current_length--;
         }
         else
@@ -139,7 +147,7 @@ __interrupt void USCI_B0_ISR(void)
                 UCB0IE |= UCRXIE0;
 
                 UCB0IE &= ~UCTXIE0;
-                UCB0IFG |= UCTXIFG0;
+                UCB0IFG |= UCTXIFG0; // note: flag is enabled manually so receive vector is entered
             }
         }
         break;
@@ -172,35 +180,47 @@ __interrupt void USCI_B0_ISR(void)
     }
 }
 
+uint8_t checkIMUConnection() {
+    const uint8_t chipIDRegister = 0;
+
+    if (!i2c_receive(IMUAddress, chipIDRegister, 1)) {
+        return 0; // if NACK
+    }
+
+    // BNO055 chip ID is 0xA0 as seen in register table
+    if (received_bytes[0] == 0xA0){
+        return 1;
+    } else {
+        return 0;
+    }
+}
 
 void accelInit()
 {
-    const uint8_t accelAddress = 0x28; // BNO055
     const uint8_t oprMode = 0x3D; // operating mode register to write to
     const uint8_t mode = 0b00001000; // IMU operating mode
 
-    i2c_write(accelAddress, oprMode, mode);
+    i2c_write(IMUAddress, oprMode, mode);
     __delay_cycles(400); // OPR_MODE register takes 7ms to change mode
 }
 
 void getAccel(uint8_t *data_array)
 {
     // define addresses of accelerometer
-    const uint8_t accelAddress = 0x28; // BNO055
     const uint8_t xAddress = 0x28;
     const uint8_t yAddress = 0x2A;
     const uint8_t zAddress = 0x2C;
 
     // store acceleration values (2 bytes in each direction)
-    i2c_receive(accelAddress, xAddress, 2);
+    i2c_receive(IMUAddress, xAddress, 2);
     data_array[0] = received_bytes[0];
     data_array[1] = received_bytes[1];
 
-    i2c_receive(accelAddress, yAddress, 2);
+    i2c_receive(IMUAddress, yAddress, 2);
     data_array[2] = received_bytes[0];
 	data_array[3] = received_bytes[1];
 
-    i2c_receive(accelAddress, zAddress, 2);
+    i2c_receive(IMUAddress, zAddress, 2);
     data_array[4] = received_bytes[0];
  	data_array[5] = received_bytes[1];
 }
@@ -238,19 +258,4 @@ void getBytes(uint8_t slaveAddress, uint8_t registerAddress, uint8_t *storeByte,
 	for (i = 0; i < numBytes; i++) {
 	    storeByte[i] = received_bytes[i];
 	}
-}
-
-void blip()
-{
-    // toggle on and off for a second
-    P1OUT &= ~BIT0;
-    int i;
-    for (i = 0; i < 5; i++)
-    {
-        P1OUT ^= BIT0;
-        __delay_cycles(100000);
-        P1OUT ^= BIT0;
-        __delay_cycles(100000);
-    }
-    __delay_cycles(150000);
 }

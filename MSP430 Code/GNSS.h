@@ -49,16 +49,22 @@ float parse_GGA_alt();
 void parse_GGA_UTC(uint8_t *UTC);
 
 // store latitude and longitude from latest GGA sentence
-// input: ASCII array for GGA sentence, 2 float array to store geographic coordinates in decimal format
+// input: ASCII array for GGA sentence, 2 float array to store geographic coordinates in decimal degrees
+// note: GCS array will store in index 0: signed latitude with positive NORTH, and in index 1: longitude EAST
 void parse_GGA_GCS(float *GCS);
 
 // convert a sequence of ASCII characters representing a decimal number (with noninteger part) to a float
-// input: ASCII sequence beginning at first digit
+// input: pointer to first digit of ASCII sequence
 // output: float conversion of ASCII sequence
 float ASCII_to_float(uint8_t *firstDigitPtr);
 
 // copy float's raw value to array of 4 individual bytes
 // input: float value to convert, 4 byte array to store with endianness dependent on system
-void float_to_uint8_t(float floatVal, uint8_t *rawFloatPtr);
+void float_to_uint8(float floatVal, uint8_t *rawFloatPtr);
+
+// convert a two digit ASCII number to uint8_t
+// input: ASCII value of tens digit, ASCII value of ones digit
+// output: binary value of digit in uint8_t
+uint8_t ASCII_to_uint8(uint8_t MSD, uint8_t LSD);
 
 #endif
