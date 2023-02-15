@@ -3,6 +3,11 @@
 
 #include <inttypes.h>
 
+// data variables
+static volatile uint8_t UTC[3];
+// variable to determine which stage currently in each time timer ISR is entered
+static volatile uint8_t currentStage; // 0 = flight ready, 1 = recording stage A, 2 = recording stage B, 3 = in flight stage, 4 = landing stage
+
 // initialise timerA0 to have period of 1 second using TAIFG
 void timerB0_init();
 

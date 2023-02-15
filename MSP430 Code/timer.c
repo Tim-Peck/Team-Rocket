@@ -5,8 +5,36 @@
 
 #define CCR0VALUE 20000
 
+// -- USER ENTRY -- //
+// enter valid launch time in NZDT
+static uint8_t launchHour = 20; // 0 to 23
+static uint8_t launchMinute = 25; // 0 to 60
+// -- USER ENTRY -- //
+
 void timerB0_init() // CHANGE FOR FR2355
 {
+    // set first stage as flight ready
+    currentStage = 0;
+
+    // change time to 1 minute before launch for comparing
+    if (launchMinute == 0)
+    {
+        if (launchHour == 0)
+        {
+            launchHour = 23;
+            launchMinute = 59;
+        }
+        else
+        {
+            launchHour -= 1;
+            launchMinute = 59;
+        }
+    }
+    else
+    {
+        launchMinute -= 1;
+    }
+
     // stop timer
     TA0CTL &= ~(MC0 | MC1);
 
@@ -34,8 +62,31 @@ void begin1HzTimer() // CHANGE FOR FR2355
 #pragma vector=TIMER0_A0_VECTOR // CHANGE FOR FR2355
 __interrupt void TIMER0_A0_ISR(void)
 {
-    P1OUT ^= BIT0;
+    // ------- FLIGHT READY STAGE ------- //
 
+    // check if time is T-1 minute to launch time to go to recording stage
+    if (currentStage == 0)
+    {
+        // get current UTC time
+        parse_GGA_UTC(UTC);
+
+        // convert current UTC time to NZDT (NZDT is 13 hours ahead of UTC)
+        UTC[0] = (UTC[0] + 13) % 24;
+
+        // check if T-1 minute reached
+        if ((UTC[0] == launchHour) & (UTC[1] == launchMinute))
+        {
+            // set current stage to recording stage
+            currentStage = 1;
+        }
+    }
+
+    if (currentStage == 1)
+    {
+        // set LED to rainbow
+        rgbLED(255, 255, 0);
+        currentStage = 2;
+    }
     //        // check fix acquired before parsing NMEA_sentence
     //        __bis_SR_register(GIE);
     //        if (fixAcquired())
