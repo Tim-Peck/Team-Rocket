@@ -11,63 +11,60 @@ void timerB0_init() // CHANGE FOR FR2355
     TA0CTL &= ~(MC0 | MC1);
 
     // note: TASSEL1 is control bit for second TASSEL bit (so select SMCLK)
-    // note: TAR has max 2^16 - 1 = 65535 so to count to 1 second with 1MHz clock, we can divide by 16 (ID divide by 8, TAIDEX divide by 2) to get 65536Hz so ID and TAIDEX bits used
-    TA0CTL |= TASSEL1 | ID1 | ID0 | TAIE;
-    TA0EX0 |= TAIDEX0;
+    // note: TAR has max 2^16 - 1 = 65535 so to count to 1 second with 1MHz clock, we can divide by 32 (ID divide by 8, TAIDEX divide by 4) to get 32768Hz which we set as our CCR0 for 1Hz
+    TA0CCR0 = 33040;
+    TA0CTL |= TASSEL1 | ID1 | ID0;
+    TA0EX0 |= TAIDEX0 | TAIDEX1;
+    // enable CCR0 interrupt
+    TA0CCTL0 |= CCIE;
 
     // clear timer
     TA0CTL |= TACLR;
     // clear flag
-    TA0CTL &= ~TAIFG;
+    TA0CCTL0 &= ~CCIFG;
 }
 
 void begin1HzTimer() // CHANGE FOR FR2355
 {
-    // start timer in continuous mode
-    TA0CTL |= MC1;
+    // start timer in up mode
+    TA0CTL |= MC0;
 }
 
-#pragma vector=TIMER0_A1_VECTOR // CHANGE FOR FR2355
-__interrupt void TIMER0_A1_ISR(void)
+// TA0CC0IFG: 1Hz timer for flight logic
+#pragma vector=TIMER0_A0_VECTOR // CHANGE FOR FR2355
+__interrupt void TIMER0_A0_ISR(void)
 {
-    switch (TA0IV)
-    {
-    case TA0IV_TAIFG:
-        // ------- FLIGHT READY STAGE ------- //
+    P1OUT ^= BIT0;
 
-        // check fix acquired before parsing NMEA_sentence
-        __bis_SR_register(GIE);
-        if (fixAcquired())
-        {
-            // print altitude
-            float f = parse_GGA_alt();
-            uint8_t array[4];
-            float_to_uint8(f, array);
-            uart_send_bytes(array, 4);
-
-            // print UTC time
-            uint8_t UTC[3];
-            parse_GGA_UTC(UTC);
-            uart_send_bytes(UTC, 3);
-            uart_send_byte(100); // FOR TESTING - REMOVE
-
-            // print latitude/longitude
-            float GCS[2];
-            parse_GGA_GCS(GCS);
-            uint8_t latitude[4], longitude[4];
-            float_to_uint8(GCS[0], latitude);
-            float_to_uint8(GCS[1], longitude);
-            uart_send_bytes(latitude, 4);
-            uart_send_bytes(longitude, 4);
-        }
-        else
-        {
-//            uart_send_bytes("NO FIX\r", 7);
-        }
-        break;
-    default:
-        break;
-    }
+    //        // check fix acquired before parsing NMEA_sentence
+    //        __bis_SR_register(GIE);
+    //        if (fixAcquired())
+    //        {
+    //            // print altitude
+    //            float f = parse_GGA_alt();
+    //            uint8_t array[4];
+    //            float_to_uint8(f, array);
+    //            uart_send_bytes(array, 4);
+    //
+    //            // print UTC time
+    //            uint8_t UTC[3];
+    //            parse_GGA_UTC(UTC);
+    //            uart_send_bytes(UTC, 3);
+    //            uart_send_byte(100); // FOR TESTING - REMOVE
+    //
+    //            // print latitude/longitude
+    //            float GCS[2];
+    //            parse_GGA_GCS(GCS);
+    //            uint8_t latitude[4], longitude[4];
+    //            float_to_uint8(GCS[0], latitude);
+    //            float_to_uint8(GCS[1], longitude);
+    //            uart_send_bytes(latitude, 4);
+    //            uart_send_bytes(longitude, 4);
+    //        }
+    //        else
+    //        {
+    ////            uart_send_bytes("NO FIX\r", 7);
+    //        }
 }
 
 void timerB1_init() // CHANGE FOR FR2355
@@ -79,7 +76,8 @@ void timerB1_init() // CHANGE FOR FR2355
     TA1CTL |= TASSEL1;
 
     // enable CC interrupts
-    TA1CCTL0 |= CCIE;
+    TA1CCTL0 |= CCIE; // counts to CCR0
+    // enable compare registers for duty cycle/width of pulse
     TA1CCTL1 |= CCIE;
     TA1CCTL2 |= CCIE;
     // TA1CCTL3 |= CCIE; // uncomment for actual
@@ -139,7 +137,7 @@ void rgbLED(uint8_t redVal, uint8_t greenVal, uint8_t blueVal)
     TA1CTL |= MC0;
 }
 
-// CC0IFG: set all LED
+// TA1CC0IFG: set all LED
 #pragma vector=TIMER1_A0_VECTOR // CHANGE FOR FR2355
 __interrupt void TIMER1_A0_ISR(void)
 {
