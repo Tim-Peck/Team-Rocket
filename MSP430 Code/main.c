@@ -7,6 +7,7 @@
 #include "SPI.h"
 #include "timer.h"
 #include "GNSS.h"
+#include "Camera.h"
 
 // -- USER ENTRY -- //
 // Set configuration mode
@@ -71,6 +72,7 @@ int main(void)
     uart_GNSS_init(); // GNSS module UART // FOR FR2433 GNSS UART HAS TO OCCUPY SAME PINS SO COMMENT THIS OUT WHEN IN DATA ANALYSIS MODE
     i2c_init(); // IMU I2C
     spi_init(); // SD Card SPI
+    camera_init(); // Init the camera
 
     timerB0_init(); // 1Hz timer
     timerB1_init(); // RGB LED PWM timer

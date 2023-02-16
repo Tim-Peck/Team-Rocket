@@ -111,6 +111,10 @@ __interrupt void TIMER0_A0_ISR(void)
     //            float_to_uint8(GCS[1], longitude);
     //            uart_send_bytes(latitude, 4);
     //            uart_send_bytes(longitude, 4);
+    //
+    //            // take photo
+    //            takeImage();
+    //
     //        }
     //        else
     //        {
