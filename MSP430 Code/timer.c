@@ -86,6 +86,23 @@ __interrupt void TIMER0_A0_ISR(void)
         // set LED to rainbow
         rgbLED(255, 255, 0);
         currentStage = 2;
+
+        // O Additions
+        // // take photo
+        // takeImage();
+        //
+        // // print IMU acceleration
+        // uint8_t rawAccels[6];
+        // float linearAccels[3];
+        // getAccel(rawAccels);
+        // parseAccelBytes(rawAccels,linearAccels);
+        // uint8_t accelx[4], accely[4], accelz[4];
+        // float_to_uint8(linearAccels[0], accelx);
+        // float_to_uint8(linearAccels[1], accely);
+        // float_to_uint8(linearAccels[1], accelz);
+        // uart_send_bytes(accelx, 4);
+        // uart_send_bytes(accely, 4);
+        // uart_send_bytes(accelz, 4);
     }
     //        // check fix acquired before parsing NMEA_sentence
     //        __bis_SR_register(GIE);
@@ -111,22 +128,6 @@ __interrupt void TIMER0_A0_ISR(void)
     //            float_to_uint8(GCS[1], longitude);
     //            uart_send_bytes(latitude, 4);
     //            uart_send_bytes(longitude, 4);
-    //
-    //            // take photo
-    //            takeImage();
-    //
-    //            // print IMU acceleration
-    //            uint8_t rawAccels[6];
-    //            float linearAccels[3];
-    //            getAccel(rawAccels);
-    //            parseAccelBytes(rawAccels,linearAccels);
-    //            uint8_t accelx[4], accely[4], accelz[4];
-    //            float_to_uint8(linearAccels[0], accelx);
-    //            float_to_uint8(linearAccels[1], accely);
-    //            float_to_uint8(linearAccels[1], accelz);
-    //            uart_send_bytes(accelx, 4);
-    //            uart_send_bytes(accely, 4);
-    //            uart_send_bytes(accelz, 4);
     //
     //        }
     //        else

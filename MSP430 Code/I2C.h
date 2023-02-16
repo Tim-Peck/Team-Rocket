@@ -52,6 +52,7 @@ void accelInit();
 // input: array to store 6 acceleration bytes
 void getAccel(uint8_t *data_array);
 
+// O Additions
 // Convert 6 acceleration bytes into 3 floats of linear accelerations in m/s/s
 void parseAccelBytes(uint8_t *data_array, float *accelerations);
 
