@@ -71,8 +71,10 @@ int main(void)
 //    uart_init(); // Serial Monitor UART // FOR FR2433 SERIAL UART HAS TO OCCUPY SAME PINS SO COMMENT THIS OUT WHEN IN FLIGHT MODE MODE
     uart_GNSS_init(); // GNSS module UART // FOR FR2433 GNSS UART HAS TO OCCUPY SAME PINS SO COMMENT THIS OUT WHEN IN DATA ANALYSIS MODE
     i2c_init(); // IMU I2C
+    accelInit(); // Init the IMU
     spi_init(); // SD Card SPI
     camera_init(); // Init the camera
+
 
     timerB0_init(); // 1Hz timer
     timerB1_init(); // RGB LED PWM timer
