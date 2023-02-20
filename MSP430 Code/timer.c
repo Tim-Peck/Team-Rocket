@@ -5,36 +5,8 @@
 
 #define CCR0VALUE 20000
 
-// -- USER ENTRY -- //
-// enter valid launch time in NZDT
-static uint8_t launchHour = 20; // 0 to 23
-static uint8_t launchMinute = 25; // 0 to 60
-// -- USER ENTRY -- //
-
 void timerB0_init() // CHANGE FOR FR2355
 {
-    // set first stage as flight ready
-    currentStage = 0;
-
-    // change time to 1 minute before launch for comparing
-    if (launchMinute == 0)
-    {
-        if (launchHour == 0)
-        {
-            launchHour = 23;
-            launchMinute = 59;
-        }
-        else
-        {
-            launchHour -= 1;
-            launchMinute = 59;
-        }
-    }
-    else
-    {
-        launchMinute -= 1;
-    }
-
     // stop timer
     TA0CTL &= ~(MC0 | MC1);
 
@@ -58,64 +30,10 @@ void begin1HzTimer() // CHANGE FOR FR2355
     TA0CTL |= MC0;
 }
 
-// TA0CC0IFG: 1Hz timer for flight logic
+// CCIFG for TA0CCTLN0: 1Hz timer for flight logic
 #pragma vector=TIMER0_A0_VECTOR // CHANGE FOR FR2355
 __interrupt void TIMER0_A0_ISR(void)
 {
-    // ------- FLIGHT READY STAGE ------- //
-
-    // check if time is T-1 minute to launch time to go to recording stage
-    if (currentStage == 0)
-    {
-        // get current UTC time
-        parse_GGA_UTC(UTC);
-
-        // convert current UTC time to NZDT (NZDT is 13 hours ahead of UTC)
-        UTC[0] = (UTC[0] + 13) % 24;
-
-        // check if T-1 minute reached
-        if ((UTC[0] == launchHour) & (UTC[1] == launchMinute))
-        {
-            // set current stage to recording stage
-            currentStage = 1;
-        }
-    }
-
-    if (currentStage == 1)
-    {
-        // set LED to rainbow
-        rgbLED(255, 255, 0);
-        currentStage = 2;
-    }
-    //        // check fix acquired before parsing NMEA_sentence
-    //        __bis_SR_register(GIE);
-    //        if (fixAcquired())
-    //        {
-    //            // print altitude
-    //            float f = parse_GGA_alt();
-    //            uint8_t array[4];
-    //            float_to_uint8(f, array);
-    //            uart_send_bytes(array, 4);
-    //
-    //            // print UTC time
-    //            uint8_t UTC[3];
-    //            parse_GGA_UTC(UTC);
-    //            uart_send_bytes(UTC, 3);
-    //            uart_send_byte(100); // FOR TESTING - REMOVE
-    //
-    //            // print latitude/longitude
-    //            float GCS[2];
-    //            parse_GGA_GCS(GCS);
-    //            uint8_t latitude[4], longitude[4];
-    //            float_to_uint8(GCS[0], latitude);
-    //            float_to_uint8(GCS[1], longitude);
-    //            uart_send_bytes(latitude, 4);
-    //            uart_send_bytes(longitude, 4);
-    //        }
-    //        else
-    //        {
-    ////            uart_send_bytes("NO FIX\r", 7);
-    //        }
 }
 
 void timerB1_init() // CHANGE FOR FR2355
@@ -213,4 +131,23 @@ __interrupt void TIMER1_A1_ISR(void)
     default:
         break;
     }
+}
+
+uint32_t convert_uint8_array_to_uint32(uint8_t *arr)
+{
+    uint32_t num = 0;
+
+    // combine the four uint8_t bytes into a single uint32_t variable using bitwise operations
+    num |= ((uint32_t) arr[0]) << 24;
+    num |= ((uint32_t) arr[1]) << 16;
+    num |= ((uint32_t) arr[2]) << 8;
+    num |= (uint32_t) arr[3];
+
+    return num;
+}
+
+void convert_uint32_to_uint8_array(uint32_t num, uint8_t *arr)
+{
+    // note, this is little endian
+    memcpy(arr, &num, sizeof(uint32_t)); // note num is a copy but it doesn't matter as it still contains the same values
 }

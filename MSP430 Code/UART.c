@@ -48,10 +48,11 @@ void uart_send_byte(byte) {
 }
 
 void uart_send_bytes(uint8_t *bytes, uint8_t number_of_bytes) {
-//    uint8_t i;
-//    for (i = 0; i < number_of_bytes; i++) {
-//        uart_send_byte(bytes[i]);
-//    }
+    /*
+    uint8_t i;
+    for (i = 0; i < number_of_bytes; i++) {
+        uart_send_byte(bytes[i]);
+    }*/
 }
 
 void uart_send_hex8(uint8_t byte)

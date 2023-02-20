@@ -700,15 +700,14 @@ uint8_t SD_writeSingleBlock(uint32_t addr, uint8_t *writeBuf, uint8_t *token)
 }
 
 uint8_t checkFinishStatus() {
-    uint8_t R1, buf[512], token;
+    uint8_t buf[512], token;
+
+    // testing
+    SD_readSingleBlock(255, buf, &token);
 
     // read block 0
-    R1 = SD_readSingleBlock(0, buf, &token);
+    SD_readSingleBlock(0, buf, &token);
 
-    // check first byte
-    if (buf[0]) {
-        return 1; // flight finished
-    } else {
-        return 0; // flight not finished
-    }
+    // return status byte
+    return buf[0];
 }

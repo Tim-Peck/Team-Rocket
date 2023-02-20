@@ -3,11 +3,6 @@
 
 #include <inttypes.h>
 
-// data variables
-static volatile uint8_t UTC[3];
-// variable to determine which stage currently in each time timer ISR is entered
-static volatile uint8_t currentStage; // 0 = flight ready, 1 = recording stage A, 2 = recording stage B, 3 = in flight stage, 4 = landing stage
-
 // initialise timerA0 to have period of 1 second using TAIFG
 void timerB0_init();
 
@@ -21,5 +16,9 @@ void timerB1_init();
 // set RGB LED colour
 // input: 8 bit (0-255) RGB values for each colour
 void rgbLED(uint8_t redVal, uint8_t greenVal, uint8_t blueVal);
+
+uint32_t convert_uint8_array_to_uint32(uint8_t *arr);
+
+void convert_uint32_to_uint8_array(uint32_t num, uint8_t* arr);
 
 #endif

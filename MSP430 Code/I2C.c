@@ -195,7 +195,7 @@ uint8_t checkIMUConnection() {
     }
 }
 
-void accelInit()
+void IMUInit()
 {
     const uint8_t oprMode = 0x3D; // operating mode register to write to
     const uint8_t mode = 0b00001000; // IMU operating mode

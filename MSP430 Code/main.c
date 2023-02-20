@@ -9,14 +9,34 @@
 #include "GNSS.h"
 
 // -- USER ENTRY -- //
-// Set configuration mode
+// set function mode
 // mode 0 = flight mode, mode 1 = reset mode, mode 2 = data analysis mode
-//static uint8_t mode = 0;
+static uint8_t mode = 0;
+
+// set time to begin recording in NZDT
+static uint8_t recordHour = 19; // 0 to 23
+static uint8_t recordMinute = 59 ; // 0 to 60
 // -- USER ENTRY -- //
 
-// variable to determine which stage currently in each time timer ISR is entered
-extern volatile uint8_t currentStage = 0; // 0 = flight ready, 1 = recording stage A, 2 = recording stage B, 3 = in flight stage, 4 = landing stage
+// data variables
+static uint8_t accelXYZ[6];
+static float altitude_f;
+static uint8_t altitude[4];
+static uint8_t UTC[3];
+static float GCS_f[2];
+static uint8_t latitude[4], longitude[4];
+static uint8_t dataArray[25];
 
+// SD variables
+static uint8_t R1, metaData[512], buf[512], token;
+static uint32_t i;
+static uint32_t blockAddress;
+static uint8_t blockAddressArr[4];
+
+// operation variables
+static uint8_t currentStage; // stage currently in each time timer ISR is entered: 0 = flight ready, 1 = recording stage A, 2 = recording stage B, 3 = in flight stage, 4 = landing stage
+
+// FOR TESTING ONLY //
 const uint8_t redLEDPin = BIT1;
 const uint8_t greenLEDPin = BIT2;
 const uint8_t blueLEDPin = BIT3;
@@ -51,6 +71,7 @@ void blip()
     }
     __delay_cycles(150000);
 }
+// FOR TESTING ONLY //
 
 int main(void)
 {
@@ -75,13 +96,27 @@ int main(void)
     timerB0_init(); // 1Hz timer
     timerB1_init(); // RGB LED PWM timer
 
+    // Initialise variables
+    // set first stage as flight ready
+    currentStage = 0;
+
+    blockAddress = 1; // data begins in second SD block
+
+    // fill SD arrays with 0
+    for (i = 0; i < 512; i++)
+    {
+        metaData[i] = 0;
+        buf[i] = 0;
+    }
+
     // ----- FLIGHT LOGIC CODE ----- //
-    uint8_t mode = 0;
 
     // Initialise SD card
     if (!SD_init())
     {
         mode = 3;
+        // error initialising SD card, set LED to red
+        rgbLED(0, 0, 0);
     }
 
     // Mode list
@@ -95,22 +130,26 @@ int main(void)
         while (1)
         {
             // ------- INITIALISATION STAGE ------- //
+            uint8_t byte = checkFinishStatus();
 
-            // Check if flight/recording is complete
-            if (checkFinishStatus())
+            // Check if recording has begun to not override existing data
+            if (byte)
             {
                 // set LED to green
                 rgbLED(0, 255, 0);
                 break; // exit
             }
 
-            // Verify IMU connection
+            // Verify IMU connection // UNCOMMENT FOR IMU
 //            if (!checkIMUConnection()){
 //                // set LED to pink
 ////                rgbLED(255,0,255);
 //                rgbLED(255,0,0); //temporary for testing
 //                break; // exit
 //            }
+
+            // initialise IMU // UNCOMMENT FOR IMU
+//            IMUInit();
 
             // set LED to orange
 //            rgbLED(255,165,0);
@@ -130,8 +169,104 @@ int main(void)
 
             // begin 1Hz timer
             begin1HzTimer();
-            break;
-            // check timer.c ISR for continued code
+
+            while (1)
+            {
+                if (TA0CCTL0 & CCIFG)
+                {
+                    // ------- FLIGHT READY STAGE ------- //
+                    // check if time is T=0 minute to launch time to begin recording
+                    if (currentStage == 0)
+                    {
+                        // get current UTC time
+                        parse_GGA_UTC(UTC);
+
+                        // convert current UTC time to NZDT (NZDT is 13 hours ahead of UTC)
+                        UTC[0] = (UTC[0] + 13) % 24;
+
+                        // check if T=0 reached
+                        if ((UTC[0] == recordHour) & (UTC[1] == recordMinute))
+                        {
+                            // set current stage to recording stage
+                            currentStage = 1;
+                        }
+                    }
+
+                    // ------- SET CONDITIONS ------- //
+                    if (currentStage == 1)
+                    {
+                        // TO DO: set LED to rainbow
+                        rgbLED(255, 255, 0);
+
+                        // set SD recording status as recording
+                        metaData[0] = 1;
+                        SD_writeSingleBlock(0, metaData, &token);
+
+                        // TO DO: set buzzer
+
+
+                        currentStage = 2;
+                    }
+
+                    // ------- RECORD DATA ------- //
+                    if (currentStage == 2)
+                    {
+                        // retrieve 2 accelerometer bytes in each direction
+                        // raw register bytes - 2 bytes of acceleration in X, Y, Z each
+//                        getAccel(accelXYZ); // UNCOMMENT FOR IMU
+
+                        // retrieve MSL altitude time
+                        // float: 4 raw bytes
+                        altitude_f = parse_GGA_alt();
+                        float_to_uint8(altitude_f, altitude);
+
+                        // retrieve UTC
+                        // fixed point: 3 bytes of uint8_t of hh,mm,ss
+                        parse_GGA_UTC(UTC);
+
+                        // retrieve latitude and longitude
+                        // float: 4 raw bytes of latitude NORTH and longitude EAST each
+                        parse_GGA_GCS(GCS_f);
+                        float_to_uint8(GCS_f[0], latitude);
+                        float_to_uint8(GCS_f[1], longitude);
+
+                        // combine data together
+                        for (i = 0; i < 6; i++)
+                        {
+//                            buf[i] = accelXYZ[i]; // UNCOMMMENT FOR IMU
+                        }
+                        for (i = 6; i < 10; i++)
+                        {
+                            buf[i] = altitude[i - 6];
+                        }
+                        for (i = 10; i < 13; i++)
+                        {
+                            buf[i] = UTC[i - 10];
+                        }
+                        for (i = 13; i < 17; i++)
+                        {
+                            buf[i] = latitude[i - 13];
+                        }
+                        for (i = 17; i < 21; i++)
+                        {
+                            buf[i] = longitude[i - 17];
+                        }
+
+                        // write data to block
+                        SD_writeSingleBlock(blockAddress++, buf, &token);
+
+                        // record last written block address in metadata block as big-endian
+                        convert_uint32_to_uint8_array(blockAddress - 1,
+                                                      blockAddressArr);
+                        for (i = 0; i < 4; i++)
+                        {
+                            metaData[i + 1] = blockAddressArr[3-i];
+                        }
+                        SD_writeSingleBlock(0, metaData, &token);
+
+                    }
+                }
+            }
         }
 
     }
@@ -145,10 +280,7 @@ int main(void)
       // Therefore, 86400/2048 = 42.1875 seconds BEST CASE to reset 24 hours worth of data
 
         // MAX ADDRESS: 86399 (takes at least 90 minutes)
-        const uint32_t blocks = 1;
-
-        uint8_t R1, buf[512], token;
-        uint32_t i;
+        uint32_t blocks = 2;
 
         // set LED to off
         rgbLED(0, 0, 0);
@@ -178,8 +310,7 @@ int main(void)
 
     }
     else
-    { // error initialising SD card, set LED to red
-        rgbLED(0, 255, 0);
+    {
     }
 
     // ----- FLIGHT LOGIC CODE ----- //

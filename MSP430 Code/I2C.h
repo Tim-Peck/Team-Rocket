@@ -46,7 +46,7 @@ uint8_t i2c_receive(uint8_t slave_byte, uint8_t address_byte, int length);
 uint8_t checkIMUConnection();
 
 // initialise accelerometer to switch to IMU operating mode
-void accelInit();
+void IMUInit();
 
 // capture accelerometer values in all 3 directions
 // input: array to store 6 acceleration bytes

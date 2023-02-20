@@ -18,7 +18,7 @@ static volatile uint8_t received_bytesSPI[BUFFER_SIZE];
 static volatile int rwStatus; // bool value for ISR: 0 means read, 1 means write
 
 // initialise SPI for SD card
-// Using P2.5/2.6/3.1/2.4 for SPI with launchpad (2.5 is SOMI, 2.6 is SIMO, 3.1 is CS, 2.4 is CLK)
+// Using P2.5/2.6/3.1/2.4 for SPI with launchpad (2.5 is MISO, 2.6 is MOSI, 3.1 is CS, 2.4 is CLK)
 // eUSCI_A1
 void spi_init();
 
