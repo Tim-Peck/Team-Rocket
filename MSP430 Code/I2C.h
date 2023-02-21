@@ -28,7 +28,7 @@ void i2c_init();
 
 // -------- private read/write functions -------- //
 
-// write data to an address on I2C 
+// write data to an address on I2C
 // input: slave address, target register address, data (each in 1 byte)
 void i2c_write(uint8_t slave_byte, uint8_t address_byte, uint8_t data_byte);
 
@@ -51,6 +51,9 @@ void IMUInit();
 // capture accelerometer values in all 3 directions
 // input: array to store 6 acceleration bytes
 void getAccel(uint8_t *data_array);
+
+// Convert 6 acceleration bytes into 3 floats of linear accelerations in m/s/s
+void parseAccelBytes(uint8_t *data_array, float *accelerations);
 
 // initialise barometer
 void barInit();

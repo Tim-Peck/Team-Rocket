@@ -218,11 +218,23 @@ void getAccel(uint8_t *data_array)
 
     i2c_receive(IMUAddress, yAddress, 2);
     data_array[2] = received_bytes[0];
-	data_array[3] = received_bytes[1];
+    data_array[3] = received_bytes[1];
 
     i2c_receive(IMUAddress, zAddress, 2);
     data_array[4] = received_bytes[0];
- 	data_array[5] = received_bytes[1];
+    data_array[5] = received_bytes[1];
+}
+
+void parseAccelBytes(uint8_t *data_array, float *accelerations)
+{
+  uint16_t val16b = data_array[1] << 8 | data_array[0] ;
+  accelerations[0] = val16b/100.0;
+
+  val16b = data_array[3] << 8 | data_array[2] ;
+  accelerations[1] = val16b/100.0;
+
+  val16b = data_array[5] << 8 | data_array[4] ;
+  accelerations[2] = val16b/100.0;
 }
 
 void barInit()
