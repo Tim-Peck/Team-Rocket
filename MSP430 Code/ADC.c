@@ -28,17 +28,14 @@ void initADC() {
   // ADCCTL2 register, ADCSR bit, default = 0 (fast mode)
   ADCCTL2 |= ADCSR; // (slow mode)
 
-// TODO: Write correct port number
-  // Enable the analogue ADC portion of pin
+  // Enable the analogue ADC portion of port
   // SYSCFG2 register, ADCPCTLx
   SYSCFG2 |= ADCPCTL9; // (A9)
 
-// TODO: Write correct port and pin number
-  // Isolate the digital portion of the pin
+  // Isolate the digital portion of the port
   P5SEL0 |= BIT5;
   P5SEL1 |= BIT5;
 
-// TODO: Write correct port number
   // Select the read analogue read channel
   // ADCMCTL0 register, ADCINCHx 0-3 bits
   ADCMCTL0 |= ADCINCH0 | ADCINCH3 // (A9)
