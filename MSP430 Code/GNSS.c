@@ -21,7 +21,7 @@ void uart_GNSS_init()
 //    memcpy(NMEA_sentence, NMEA_sentence1, 53);
 
     // Configure pins
-    P1SEL0 |= BIT5 | BIT4; // P1.5=RXD, P1.4=TXD (is default high)
+    P1SEL0 |= BIT6 | BIT7; // P1.6=RXD, P1.7=TXD (is default high)
 
     // Configure UART
     UCA0CTLW0 |= UCSWRST;       // Put UART state machine in reset
@@ -39,7 +39,7 @@ void uart_GNSS_init()
     UCA0CTLW0 &= ~UCSWRST;      // Initialize GNSS state machine
 }
 
-void GNSS_send_byte( byte)
+void GNSS_send_byte(uint8_t byte)
 {
     byte_sent_GNSS = 0;
 
@@ -67,16 +67,16 @@ void GNSS_send_bytes(uint8_t *bytes, uint8_t number_of_bytes)
     }
 }
 
-void GNSS_cmd(int ID)
+void GNSS_cmd(int cmd_ID)
 {
     uint8_t cmd[8] = { '$', 'P', 'M', 'T', 'K' };
 
-    // convert each digit of ID to ASCII characters
+    // convert each digit of cmd_ID to ASCII characters
     uint8_t i;
     for (i = 0; i < 3; i++)
     {
-        cmd[5 + i] = (uint8_t) ((ID % 10) + 48); // note: must convert int to ASCII number
-        ID = ID / 10;
+        cmd[5 + i] = (uint8_t) ((cmd_ID % 10) + 48); // note: must convert int to ASCII number
+        cmd_ID = cmd_ID / 10;
     }
 
     // send command

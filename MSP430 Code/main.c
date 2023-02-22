@@ -25,7 +25,6 @@ static uint8_t altitude[4];
 static uint8_t UTC[3];
 static float GCS_f[2];
 static uint8_t latitude[4], longitude[4];
-static uint8_t dataArray[25];
 
 // SD variables
 static uint8_t R1, metaData[512], buf[512], token;
@@ -56,21 +55,6 @@ void digital_write(uint8_t pin, int value)
         P2OUT &= ~pin; // output low
     }
 }
-
-void blip()
-{
-    // toggle on and off for a second
-    P1OUT &= ~BIT0;
-    int i;
-    for (i = 0; i < 5; i++)
-    {
-        P1OUT ^= BIT0;
-        __delay_cycles(100000);
-        P1OUT ^= BIT0;
-        __delay_cycles(100000);
-    }
-    __delay_cycles(150000);
-}
 // FOR TESTING ONLY //
 
 int main(void)
@@ -84,24 +68,22 @@ int main(void)
 
     // ------------------------- DO NOT CHANGE ABOVE ---------------------------- //
 
-    P1DIR |= BIT0 | BIT1; // <- MOVE INSIDE APPROPRIATE FUNCTION
-
     // Initialising MSP430 pins and timers
 
-//    uart_init(); // Serial Monitor UART // FOR FR2433 SERIAL UART HAS TO OCCUPY SAME PINS SO COMMENT THIS OUT WHEN IN FLIGHT MODE MODE
-    uart_GNSS_init(); // GNSS module UART // FOR FR2433 GNSS UART HAS TO OCCUPY SAME PINS SO COMMENT THIS OUT WHEN IN DATA ANALYSIS MODE
+    uart_init(); // Serial Monitor UART
+    uart_GNSS_init(); // GNSS module UART
     i2c_init(); // IMU I2C
     spi_init(); // SD Card SPI
 
     timerB0_init(); // 1Hz timer
-    timerB1_init(); // RGB LED PWM timer
+    timerB3_init(); // RGB LED PWM timer
 
     // Initialise variables
     // set first stage as flight ready
     currentStage = 0;
 
     blockAddress = 1; // data begins in second SD block
-
+    /*
     // fill SD arrays with 0
     for (i = 0; i < 512; i++)
     {
@@ -141,15 +123,15 @@ int main(void)
             }
 
             // Verify IMU connection // UNCOMMENT FOR IMU
-//            if (!checkIMUConnection()){
-//                // set LED to pink
-////                rgbLED(255,0,255);
-//                rgbLED(255,0,0); //temporary for testing
-//                break; // exit
-//            }
+            if (!checkIMUConnection()){
+                // set LED to pink
+//                rgbLED(255,0,255);
+                rgbLED(255,0,0); //temporary for testing
+                break; // exit
+            }
 
             // initialise IMU // UNCOMMENT FOR IMU
-//            IMUInit();
+            IMUInit();
 
             // set LED to orange
 //            rgbLED(255,165,0);
@@ -172,7 +154,7 @@ int main(void)
 
             while (1)
             {
-                if (TA0CCTL0 & CCIFG)
+                if (TB0CCTL0 & CCIFG)
                 {
                     // ------- FLIGHT READY STAGE ------- //
                     // check if time is T=0 minute to launch time to begin recording
@@ -213,7 +195,7 @@ int main(void)
                     {
                         // retrieve 2 accelerometer bytes in each direction
                         // raw register bytes - 2 bytes of acceleration in X, Y, Z each
-//                        getAccel(accelXYZ); // UNCOMMENT FOR IMU
+                        getAccel(accelXYZ);
 
                         // retrieve MSL altitude time
                         // float: 4 raw bytes
@@ -233,7 +215,7 @@ int main(void)
                         // combine data together
                         for (i = 0; i < 6; i++)
                         {
-//                            buf[i] = accelXYZ[i]; // UNCOMMMENT FOR IMU
+                            buf[i] = accelXYZ[i];
                         }
                         for (i = 6; i < 10; i++)
                         {
@@ -272,15 +254,6 @@ int main(void)
     }
     else if (mode == 1)
     { // RESET MODE
-      // note: write speed limited by microcontroller and SD process
-      // at 1MHz, this is quite slow
-      // EVEN assuming writing a single block takes 512 cycles (more processes are involved)
-      // 1048576Hz / 512cycles per block = 2048 blocks per second
-      // 24 hours of data is required = 86400 blocks (at 1 block per second)
-      // Therefore, 86400/2048 = 42.1875 seconds BEST CASE to reset 24 hours worth of data
-
-        // MAX ADDRESS: 86399 (takes at least 90 minutes)
-        uint32_t blocks = 2;
 
         // set LED to off
         rgbLED(0, 0, 0);
@@ -288,18 +261,11 @@ int main(void)
         // fill buffer with 0x00
         for (i = 0; i < 512; i++)
         {
-            buf[i] = 0x00;
+            buf[i] = 0xAA;
         }
 
-        // reset first x blocks in SD card
-        // MAKE RESET MODE CHECK FOR FINAL ADDRESS WRITTEN TO SO DON'T HAVE TO RESET ALL 86400 BLOCKS
-        // actual time required for 1000 blocks is 1 minute and 2 seconds.
-        // time required for 5000 blocks is 5 minute and 13 seconds
-        // Therefore, about 1 minute and 2.75 seconds per 1000 blocks
-        for (i = 0; i < blocks; i++)
-        {
-            SD_writeSingleBlock(i, buf, &token);
-        }
+        // reset metadata block
+        SD_writeSingleBlock(0, buf, &token);
 
         // set LED to white
         rgbLED(255, 255, 255);
@@ -326,79 +292,81 @@ int main(void)
     }
 
     // ----- FLIGHT LOGIC CODE ----- //
+*/
+
+    // ---------- TESTING ---------- //
+    // Timer testing // Launchpad VERIFIED
 
 //    begin1HzTimer();
 
-//    rgbLED(1, 255, 0);
+//    rgbLED(255, 255, 0);
 
-    // GNSS testing
+    // Serial UART testing // Launchpad not verified fully working
 
+//    // MCLK/SMCLK output
+//    P3SEL0 |= BIT0 | BIT4;
+//    P3DIR |= BIT0 | BIT4;
+
+//    uart_send_bytes("hello world", 11); // could not verify fully working, only works on flash
+
+    // GNSS testing // Launchpad VERIFIED
+
+//    rgbLED(255, 255, 0);
+//
 //    GNSS_receive();
+//
+//    while (!fixAcquired())
+//        ;
+//
+//// set LED to yellow
+//    rgbLED(0, 0, 0);
 
-//    uart_send_byte('X');
 
-    /*
-     // SD card testing
-
-     uint8_t R1, buf[512], token;
-     uint16_t i;
+     // SD card testing // Launchpad VERIFIED
 
      // initialize SD card
      if (SD_init())
      {
-     uart_send_bytes("SD Initialization Success\r",
-     sizeof("SD Initialization Success\r"));
+        uart_send_bytes("SD Initialization Success\r",
+                        sizeof("SD Initialization Success\r"));
+        uart_send_bytes("------------------\r", sizeof("------------------\r"));
+        // fill buffer
+        for (i = 0; i < 512; i++)
+        {
+            buf[i] = 0x00;
+        }
+
+        // write a block to SD card to address 0x100 (256)
+        SD_writeSingleBlock(0, buf, &token);
+
+        // read block 0 from SD card
+        R1 = SD_readSingleBlock(0, buf, &token);
+
+        // print read SD block
+        print_SDBlock(R1, buf, &token);
+
+        // check if contents are correct
+        if (buf[0] == 0x00) {
+            rgbLED(0, 255, 0); // received correct: temporary for testing
+        } else {
+            rgbLED(255, 0, 0);
+        }
      }
      else
      {
-     uart_send_bytes("SD Initialization Failure\r",
-     sizeof("SD Initialization Failure\r"));
+        uart_send_bytes("SD Initialization Failure\r",
+                        sizeof("SD Initialization Failure\r"));
      }
 
-     uart_send_bytes("------------------\r", sizeof("------------------\r"));
+    // I2C testing // Launchpad VERIFIED
+//     if (checkIMUConnection()){
+//         rgbLED(0,255,0); // received correct: temporary for testing
+//     } else {
+//         rgbLED(255,0,0);
+//     }
 
-     // read a block from SD card
-     R1 = SD_readSingleBlock(0, buf, &token);
 
-     // print read SD block
-     print_SDBlock(R1, buf, &token);
-
-     // fill buffer
-     for (i = 0; i < 512; i++)
-     {
-     buf[i] = 0xAA;
-     }
-
-     //    // write a block to SD card to address 0x100 (256)
-     //    SD_writeSingleBlock(0, buf, &token);
-
-     // read a block from SD card
-     R1 = SD_readSingleBlock(0x00000101, buf, &token);
-
-     // print read SD block
-     print_SDBlock(R1, buf, &token);
-
-     // read a block from SD card
-     R1 = SD_readSingleBlock(0x00000100, buf, &token);
-
-     // print read SD block
-     print_SDBlock(R1, buf, &token);
-     */
-
-    /*
-     // ------------------------------ //
-     // ACTUAL MICROCONTROLLER TESTING //
-
-     // set direction of pins for led and buzzer
-     P2DIR |= (redLEDPin | greenLEDPin | blueLEDPin);
-     P5DIR |= BIT0;
-
-     // set colour
-     digital_write(redLEDPin, HIGH);
-     digital_write(greenLEDPin, HIGH);
-     digital_write(blueLEDPin, HIGH);
-
-     */
+    // ---------- TESTING ---------- //
 
     // keep MSP running
     while (1)

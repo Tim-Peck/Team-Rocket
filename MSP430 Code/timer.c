@@ -8,124 +8,140 @@
 void timerB0_init() // CHANGE FOR FR2355
 {
     // stop timer
-    TA0CTL &= ~(MC0 | MC1);
+    TB0CTL &= ~(MC0 | MC1);
 
-    // note: TASSEL1 is control bit for second TASSEL bit (so select SMCLK)
-    // note: TAR has max 2^16 - 1 = 65535 so to count to 1 second with 1MHz clock, we can divide by 32 (ID divide by 8, TAIDEX divide by 4) to get 32768Hz which we set as our CCR0 for 1Hz
-    TA0CCR0 = 33040;
-    TA0CTL |= TASSEL1 | ID1 | ID0;
-    TA0EX0 |= TAIDEX0 | TAIDEX1;
+    // note: TBSSEL1 is control bit for second TBSSEL bit (so select SMCLK)
+    // note: TAR has max 2^16 - 1 = 65535 so to count to 1 second with 1MHz clock, we can divide by 32 (ID divide by 8, TBIDEX divide by 4) to get 32768Hz which we set as our CCR0 for 1Hz
+    TB0CCR0 = 33040; // modified from 32768 to get 1Hz
+    TB0CTL |= TBSSEL1 | ID1 | ID0;
+    TB0EX0 |= TBIDEX0 | TBIDEX1;
     // enable CCR0 interrupt
-    TA0CCTL0 |= CCIE;
+    TB0CCTL0 |= CCIE;
 
     // clear timer
-    TA0CTL |= TACLR;
+    TB0CTL |= TBCLR;
     // clear flag
-    TA0CCTL0 &= ~CCIFG;
+    TB0CCTL0 &= ~CCIFG;
 }
 
 void begin1HzTimer() // CHANGE FOR FR2355
 {
     // start timer in up mode
-    TA0CTL |= MC0;
+    TB0CTL |= MC0;
+
+//    P1DIR |= BIT0; // TESTING
 }
 
-// CCIFG for TA0CCTLN0: 1Hz timer for flight logic
-#pragma vector=TIMER0_A0_VECTOR // CHANGE FOR FR2355
-__interrupt void TIMER0_A0_ISR(void)
+// IFG for CCR0: 1Hz timer for flight logic
+#pragma vector=TIMER0_B0_VECTOR // CHANGE FOR FR2355
+__interrupt void TIMER0_B0_ISR(void)
 {
+//    P1OUT ^= BIT0; // TESTING
 }
 
-void timerB1_init() // CHANGE FOR FR2355
+void timerB3_init()
 {
+    // set LED pins (LAUNCHPAD 2355)
+    P1DIR |= BIT0;
+    P6DIR |= BIT6;
+
+    // P2DIR |= BIT1; // red
+    // P2DIR |= BIT2; // green
+    // P2DIR |= BIT3; // blue
+
     // stop timer
-    TA1CTL &= ~(MC0 | MC1);
+    TB3CTL &= ~(MC0 | MC1);
 
-    // timer B1 clock at default clock speed of 1MHz
-    TA1CTL |= TASSEL1;
+    // timer B1 clock at default SMCLK clock speed of 1MHz
+    TB3CTL |= TBSSEL1;
 
     // enable CC interrupts
-    TA1CCTL0 |= CCIE; // counts to CCR0
+    TB3CCTL0 |= CCIE; // counts to CCR0
     // enable compare registers for duty cycle/width of pulse
-    TA1CCTL1 |= CCIE;
-    TA1CCTL2 |= CCIE;
-    // TA1CCTL3 |= CCIE; // uncomment for actual
+    TB3CCTL1 |= CCIE;
+    TB3CCTL2 |= CCIE;
+    // TB3CCTL3 |= CCIE; // uncomment for actual
 
     // set CCR0 compare value for cycle period
-    TA1CCR0 = CCR0VALUE;
+    TB3CCR0 = CCR0VALUE;
 
     // clear timer
-    TA1CTL |= TACLR;
+    TB3CTL |= TBCLR;
     // clear flags
-    TA1CCTL0 &= ~CCIFG;
-    TA1CCTL1 &= ~CCIFG;
-    TA1CCTL2 &= ~CCIFG;
+    TB3CCTL0 &= ~CCIFG;
+    TB3CCTL1 &= ~CCIFG;
+    TB3CCTL2 &= ~CCIFG;
     //TB1CCTL3 &= ~CCIFG;
 }
 
 void rgbLED(uint8_t redVal, uint8_t greenVal, uint8_t blueVal)
 {
     // stop timer
-    TA1CTL &= ~(MC0 | MC1);
+    TB3CTL &= ~(MC0 | MC1);
 
     // check values for edge cases 0 or 255 to disable respective interrupts
     if (redVal == 255)
     {
-        TA1CCTL1 &= ~CCIE;
+        TB3CCTL1 &= ~CCIE;
     }
     else
     {
-        TA1CCTL1 |= CCIE;
+        TB3CCTL1 |= CCIE;
     }
     if (greenVal == 255)
     {
-        TA1CCTL2 &= ~CCIE;
+        TB3CCTL2 &= ~CCIE;
     }
     else
     {
-        TA1CCTL2 |= CCIE;
+        TB3CCTL2 |= CCIE;
     }
 //    if (blueVal == 255)
 //    {
-//        TA1CCTL3 &= ~CCIE;
+//        TB3CCTL3 &= ~CCIE;
 //    }
 //    else
 //    {
-//        TA1CCTL3 |= CCIE;
+//        TB3CCTL3 |= CCIE;
 //    }
 
     // set duty cycle of each LED
-    TA1CCR1 = (uint16_t) (CCR0VALUE * (float) redVal / 255);
-    TA1CCR2 = (uint16_t) (CCR0VALUE * (float) greenVal / 255);
+    TB3CCR1 = (uint16_t) (CCR0VALUE * (float) redVal / 255);
+    TB3CCR2 = (uint16_t) (CCR0VALUE * (float) greenVal / 255);
     // TB1CCR3 = (uint16_t)(1000 * (float)blueVal/255);
 
     // clear timer
-    TA1CTL |= TACLR;
+    TB3CTL |= TBCLR;
 
     // start timer in up mode
-    TA1CTL |= MC0;
+    TB3CTL |= MC0;
 }
 
-// TA1CC0IFG: set all LED
-#pragma vector=TIMER1_A0_VECTOR // CHANGE FOR FR2355
-__interrupt void TIMER1_A0_ISR(void)
+// CCR0: set all LED
+#pragma vector=TIMER3_B0_VECTOR
+__interrupt void TIMER3_B0_ISR(void)
 {
-    P1OUT |= BIT0 | BIT1;
+    P1OUT |= BIT0;
+    P6OUT |= BIT6;
+
+    // P2OUT|= BIT1 | BIT2 | BIT3; // actual RGB pins
 }
 
-// CCR1/2/3 IFG: reset respective LED
-#pragma vector=TIMER1_A1_VECTOR // CHANGE FOR FR2355
-__interrupt void TIMER1_A1_ISR(void)
+// CCR1/2/3 IFG: reset respective LED (sets duty cycle)
+#pragma vector=TIMER3_B1_VECTOR
+__interrupt void TIMER3_B1_ISR(void)
 {
-    switch (TA1IV)
+    switch (TB3IV)
     {
-    case TA1IV_TACCR1:
+    case TBIV__TBCCR1:
         P1OUT &= ~BIT0;
+//        P2OUT &= ~BIT1;
         break;
-    case TA1IV_TACCR2:
-        P1OUT &= ~BIT1;
+    case TBIV__TBCCR2:
+        P6OUT &= ~BIT6;
+//        P2OUT &= ~BIT2;
         break;
-        //case TB1IV_TBCCR3:
+        //case TBIV__TBCCR3:
         //P2OUT &= ~BIT3
         //break;
     default:

@@ -21,8 +21,8 @@ static volatile int rwStatus; // bool value for ISR: 0 means read, 1 means write
 const static uint8_t IMUAddress = 0x28; // BNO055
 
 // initialising I2C once
-// Using P1.2/1.3 for I2C with launchpad (1.3 is SCL, 1.2 is SDA)
-// eUSCI_B0
+// Using P4.6/4.7 for I2C with launchpad (4.6 is SDA, 4.7 is SCL)
+// eUSCI_B1
 void i2c_init();
 
 
@@ -52,7 +52,9 @@ void IMUInit();
 // input: array to store 6 acceleration bytes
 void getAccel(uint8_t *data_array);
 
-// Convert 6 acceleration bytes into 3 floats of linear accelerations in m/s/s
+// currently for BNO055 conversion
+// convert raw register bytes for acceleration in each direction into 3 floats of linear accelerations in m/s/s
+// input: 6 byte array with 3x2 bytes in xyz directions, 3 float array to store float value of each direction
 void parseAccelBytes(uint8_t *data_array, float *accelerations);
 
 // initialise barometer

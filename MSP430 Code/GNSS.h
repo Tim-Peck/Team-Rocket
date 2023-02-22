@@ -17,11 +17,11 @@ static volatile uint8_t NMEA_sentence[BUFFER_SIZE];
 const static uint8_t NMEA_ID[] = "GGA"; // NMEA ID to store
 static volatile uint8_t check_idx;
 
-void uart_GNSS_init();
+void uart_GNSS_init(); // (1.6 is RX, 1.7 is TX)
 
 // send one byte
 // NOTE: Does nothing if the buffer is full
-void GNSS_send_byte(byte);
+void GNSS_send_byte(uint8_t byte);
 
 // NOTE: Only sends as many bytes as there is free space in the buffer
 // must pass in size of array as cannot use sizeof for pointer passed in
@@ -29,7 +29,7 @@ void GNSS_send_bytes(uint8_t *bytes, uint8_t number_of_bytes);
 
 // send an NMEA command to the GNSS module
 // input: 3 digit ID
-void GNSS_cmd(int ID);
+void GNSS_cmd(int cmd_ID);
 
 // begin storing GNSS data to NMEA_sentence array(currently GGA sentence)
 void GNSS_receive();

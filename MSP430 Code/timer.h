@@ -3,7 +3,7 @@
 
 #include <inttypes.h>
 
-// initialise timerA0 to have period of 1 second using TAIFG
+// initialise timerB0 to have period of 1 second using CCR0IFG
 void timerB0_init();
 
 // begin timerB0 and functions in TBIFG
@@ -11,7 +11,7 @@ void timerB0_init();
 void begin1HzTimer();
 
 // initialise timerB0 for RGB LED
-void timerB1_init();
+void timerB3_init();
 
 // set RGB LED colour
 // input: 8 bit (0-255) RGB values for each colour

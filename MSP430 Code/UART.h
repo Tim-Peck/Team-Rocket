@@ -14,7 +14,7 @@ void uart_init();
 
 // send one byte
 // NOTE: Does nothing if the buffer is full
-void uart_send_byte(byte);
+void uart_send_byte(uint8_t byte);
 
 // NOTE: Only sends as many bytes as there is free space in the buffer
 // must pass in size of array as cannot use sizeof for pointer passed in
