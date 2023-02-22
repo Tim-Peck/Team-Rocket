@@ -154,6 +154,28 @@ void SD_readRes7(uint8_t *res)
     spi_transfer(0xFF);
 }
 
+void SD_readRes2(uint8_t *res)
+{
+  // read response 1 in R2
+  res[0] = SD_readRes1(); // note: reusing code
+
+  // TODO: what why idk
+  if (res[0] > 1)
+  {
+      return;
+  }
+
+  // store next 16 bytes
+  uint8_t i;
+  for (i = 1; i < 17; i++)
+  {
+      res[i] = spi_transfer(0xFF);
+  }
+
+  // send extra 0xFF after response for to clear line
+  spi_transfer(0xFF);
+}
+
 void SD_printR1(uint8_t res)
 {
     if (res & 0b10000000)
