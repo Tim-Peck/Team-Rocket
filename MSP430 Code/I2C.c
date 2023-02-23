@@ -11,9 +11,9 @@ void i2c_init()
     // setting P4.6 and P4.7 for I2C (2355)
     P4SEL0 |= (BIT6 | BIT7); // primary module function
 
-    // I2C line is pulled high (LAUNCHPAD ONLY)
-    P4REN |= BIT6 | BIT7; // Enable internal resistors
-    P4OUT |= BIT6 | BIT7; // Switch resistors to pull-up
+//    // I2C line is pulled high (LAUNCHPAD ONLY)
+//    P4REN |= BIT6 | BIT7; // Enable internal resistors
+//    P4OUT |= BIT6 | BIT7; // Switch resistors to pull-up
 
     // configure I2C
     // see 24.3.1 for initialization and reset
@@ -181,7 +181,7 @@ __interrupt void USCI_B1_ISR(void)
 }
 
 uint8_t checkIMUConnection() {
-    const uint8_t chipIDRegister = 0;
+    const uint8_t chipIDRegister = 0; // ICM
 
     if (!i2c_receive(IMUAddress, chipIDRegister, 1)) {
         return 0; // if NACK

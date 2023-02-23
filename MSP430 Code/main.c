@@ -36,9 +36,9 @@ static uint8_t blockAddressArr[4];
 static uint8_t currentStage; // stage currently in each time timer ISR is entered: 0 = flight ready, 1 = recording stage A, 2 = recording stage B, 3 = in flight stage, 4 = landing stage
 
 // FOR TESTING ONLY //
-const uint8_t redLEDPin = BIT1;
+const uint8_t blueLEDPin = BIT1;
 const uint8_t greenLEDPin = BIT2;
-const uint8_t blueLEDPin = BIT3;
+const uint8_t redLEDPin = BIT3;
 const int HIGH = 1;
 const int LOW = 0;
 
@@ -295,75 +295,96 @@ int main(void)
 */
 
     // ---------- TESTING ---------- //
-    // Timer testing // Launchpad VERIFIED
+    // LED testing
 
+//    digital_write(redLEDPin, HIGH);
+//    digital_write(greenLEDPin, HIGH);
+//    digital_write(blueLEDPin, HIGH);
+
+    // Timer testing // Launchpad VERIFIED, PCB VERIFIED
+
+    //Main 1Hz timer
 //    begin1HzTimer();
 
-//    rgbLED(255, 255, 0);
+    //PWM
+//    rgbLED(255, 0, 255);
 
-    // Serial UART testing // Launchpad not verified fully working
+    // Serial UART testing // Launchpad not verified fully working, PCB NOT WORKING
 
 //    // MCLK/SMCLK output
 //    P3SEL0 |= BIT0 | BIT4;
 //    P3DIR |= BIT0 | BIT4;
 
+//    uart_send_byte('X');
 //    uart_send_bytes("hello world", 11); // could not verify fully working, only works on flash
 
     // GNSS testing // Launchpad VERIFIED
 
-//    rgbLED(255, 255, 0);
-//
-//    GNSS_receive();
-//
-//    while (!fixAcquired())
-//        ;
-//
-//// set LED to yellow
-//    rgbLED(0, 0, 0);
+    rgbLED(255, 0, 0);
+
+    GNSS_receive();
+
+    while (!fixAcquired())
+        ;
+
+// set LED to green
+    rgbLED(0, 255, 0);
 
 
      // SD card testing // Launchpad VERIFIED
 
-     // initialize SD card
-     if (SD_init())
-     {
-        uart_send_bytes("SD Initialization Success\r",
-                        sizeof("SD Initialization Success\r"));
-        uart_send_bytes("------------------\r", sizeof("------------------\r"));
-        // fill buffer
-        for (i = 0; i < 512; i++)
-        {
-            buf[i] = 0x00;
-        }
-
-        // write a block to SD card to address 0x100 (256)
-        SD_writeSingleBlock(0, buf, &token);
-
-        // read block 0 from SD card
-        R1 = SD_readSingleBlock(0, buf, &token);
-
-        // print read SD block
-        print_SDBlock(R1, buf, &token);
-
-        // check if contents are correct
-        if (buf[0] == 0x00) {
-            rgbLED(0, 255, 0); // received correct: temporary for testing
-        } else {
-            rgbLED(255, 0, 0);
-        }
-     }
-     else
-     {
-        uart_send_bytes("SD Initialization Failure\r",
-                        sizeof("SD Initialization Failure\r"));
-     }
-
-    // I2C testing // Launchpad VERIFIED
-//     if (checkIMUConnection()){
-//         rgbLED(0,255,0); // received correct: temporary for testing
-//     } else {
-//         rgbLED(255,0,0);
+//     // initialize SD card
+//     if (SD_init())
+//     {
+//        uart_send_bytes("SD Initialization Success\r",
+//                        sizeof("SD Initialization Success\r"));
+//        uart_send_bytes("------------------\r", sizeof("------------------\r"));
+//        // fill buffer
+//        for (i = 0; i < 512; i++)
+//        {
+//            buf[i] = 0x00;
+//        }
+//
+//        // write a block to SD card to address 0x100 (256)
+//        SD_writeSingleBlock(0, buf, &token);
+//
+//        // read block 0 from SD card
+//        R1 = SD_readSingleBlock(0, buf, &token);
+//
+//        // print read SD block
+//        print_SDBlock(R1, buf, &token);
+//
+//        // check if contents are correct
+//        if (buf[0] == 0x00) {
+//            rgbLED(0, 255, 0); // received correct: temporary for testing
+//        } else {
+//            rgbLED(255, 0, 0);
+//        }
 //     }
+//     else
+//     {
+//        uart_send_bytes("SD Initialization Failure\r",
+//                        sizeof("SD Initialization Failure\r"));
+//     }
+
+//     I2C testing // Launchpad VERIFIED, PCB NOT WORKING
+//    // Trigger pin
+//    P5DIR |= BIT0;
+//    P5OUT &= ~BIT0;
+//
+//    // P4.6/7 test // 6 is SDA 7 IS CLK // IMU was causing SDA to go to 2.12V
+//    P4DIR |= BIT6 | BIT7;
+//    P4OUT |= BIT6 | BIT7;
+//    P4OUT &= ~BIT6;
+//    P4OUT &= ~BIT7;
+
+//     if (checkIMUConnection()){
+//        digital_write(greenLEDPin, LOW); // received correct: temporary for testing
+//     } else {
+//        digital_write(redLEDPin, LOW);
+//    }
+
+//     P5OUT |= BIT0;
 
 
     // ---------- TESTING ---------- //

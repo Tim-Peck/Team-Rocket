@@ -29,25 +29,26 @@ void begin1HzTimer() // CHANGE FOR FR2355
     // start timer in up mode
     TB0CTL |= MC0;
 
-//    P1DIR |= BIT0; // TESTING
+    P2DIR |= BIT3; // TESTING
 }
 
 // IFG for CCR0: 1Hz timer for flight logic
 #pragma vector=TIMER0_B0_VECTOR // CHANGE FOR FR2355
 __interrupt void TIMER0_B0_ISR(void)
 {
-//    P1OUT ^= BIT0; // TESTING
+    P2OUT ^= BIT3; // TESTING
 }
 
 void timerB3_init()
 {
     // set LED pins (LAUNCHPAD 2355)
-    P1DIR |= BIT0;
-    P6DIR |= BIT6;
+//    P1DIR |= BIT0;
+//    P6DIR |= BIT6;
 
-    // P2DIR |= BIT1; // red
-    // P2DIR |= BIT2; // green
-    // P2DIR |= BIT3; // blue
+    // PCB 2355
+    P2DIR |= BIT3; // red
+    P2DIR |= BIT2; // green
+    P2DIR |= BIT1; // blue
 
     // stop timer
     TB3CTL &= ~(MC0 | MC1);
@@ -71,7 +72,7 @@ void timerB3_init()
     TB3CCTL0 &= ~CCIFG;
     TB3CCTL1 &= ~CCIFG;
     TB3CCTL2 &= ~CCIFG;
-    //TB1CCTL3 &= ~CCIFG;
+    TB3CCTL3 &= ~CCIFG;
 }
 
 void rgbLED(uint8_t redVal, uint8_t greenVal, uint8_t blueVal)
@@ -96,19 +97,19 @@ void rgbLED(uint8_t redVal, uint8_t greenVal, uint8_t blueVal)
     {
         TB3CCTL2 |= CCIE;
     }
-//    if (blueVal == 255)
-//    {
-//        TB3CCTL3 &= ~CCIE;
-//    }
-//    else
-//    {
-//        TB3CCTL3 |= CCIE;
-//    }
+    if (blueVal == 255)
+    {
+        TB3CCTL3 &= ~CCIE;
+    }
+    else
+    {
+        TB3CCTL3 |= CCIE;
+    }
 
     // set duty cycle of each LED
     TB3CCR1 = (uint16_t) (CCR0VALUE * (float) redVal / 255);
     TB3CCR2 = (uint16_t) (CCR0VALUE * (float) greenVal / 255);
-    // TB1CCR3 = (uint16_t)(1000 * (float)blueVal/255);
+    TB3CCR3 = (uint16_t) (CCR0VALUE * (float) blueVal / 255);
 
     // clear timer
     TB3CTL |= TBCLR;
@@ -117,33 +118,34 @@ void rgbLED(uint8_t redVal, uint8_t greenVal, uint8_t blueVal)
     TB3CTL |= MC0;
 }
 
-// CCR0: set all LED
+// CCR0: pull all LED low to turn on
 #pragma vector=TIMER3_B0_VECTOR
 __interrupt void TIMER3_B0_ISR(void)
 {
-    P1OUT |= BIT0;
-    P6OUT |= BIT6;
+    // Launchpad 2355
+//    P1OUT |= BIT0;
+//    P6OUT |= BIT6;
 
-    // P2OUT|= BIT1 | BIT2 | BIT3; // actual RGB pins
+    P2OUT &= ~(BIT1 | BIT2 | BIT3); // actual RGB pins
 }
 
-// CCR1/2/3 IFG: reset respective LED (sets duty cycle)
+// CCR1/2/3 IFG: set respective LED to turn off (sets duty cycle)
 #pragma vector=TIMER3_B1_VECTOR
 __interrupt void TIMER3_B1_ISR(void)
 {
     switch (TB3IV)
     {
-    case TBIV__TBCCR1:
-        P1OUT &= ~BIT0;
-//        P2OUT &= ~BIT1;
+    case TBIV__TBCCR1: // red
+//        P1OUT &= ~BIT0;
+        P2OUT |= BIT3;
         break;
-    case TBIV__TBCCR2:
-        P6OUT &= ~BIT6;
-//        P2OUT &= ~BIT2;
+    case TBIV__TBCCR2: // green
+//        P6OUT &= ~BIT6;
+        P2OUT |= BIT2;
         break;
-        //case TBIV__TBCCR3:
-        //P2OUT &= ~BIT3
-        //break;
+    case TBIV__TBCCR3: // blue
+        P2OUT |= BIT1;
+        break;
     default:
         break;
     }

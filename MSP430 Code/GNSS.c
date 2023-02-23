@@ -21,22 +21,22 @@ void uart_GNSS_init()
 //    memcpy(NMEA_sentence, NMEA_sentence1, 53);
 
     // Configure pins
-    P1SEL0 |= BIT6 | BIT7; // P1.6=RXD, P1.7=TXD (is default high)
+    P4SEL0 |= BIT2 | BIT3; // P4.2=RXD, P4.3=TXD (is default high)
 
     // Configure UART
-    UCA0CTLW0 |= UCSWRST;       // Put UART state machine in reset
-    UCA0CTLW0 |= UCSSEL__SMCLK; // Choose SMCLK as clock source
+    UCA1CTLW0 |= UCSWRST;       // Put UART state machine in reset
+    UCA1CTLW0 |= UCSSEL__SMCLK; // Choose SMCLK as clock source
 
     // Baud Rate calculation - we want 9600 baud (below are fields of registers)
     // N = clock / baud = 1,048,576 Hz / 9600 = 109.227
     // N > 16 so UCOS16 = 1
-    // UCA0BR0 = int(N / 16) = int(109.227 / 16) = int(6.827) = 6
+    // UCA1BR0 = int(N / 16) = int(109.227 / 16) = int(6.827) = 6
     // UCBRSx  = 0x22 as per users guide table "UCBRSx settings"
     // UCBRFx  = int([(N / 16) - int(N / 16)] * 16) = int(13.227) = 8
-    UCA0BRW = 6;
-    UCA0MCTLW = (0x22 << 8) | UCBRF_13 | UCOS16;
+    UCA1BRW = 6;
+    UCA1MCTLW = (0x22 << 8) | UCBRF_13 | UCOS16;
 
-    UCA0CTLW0 &= ~UCSWRST;      // Initialize GNSS state machine
+    UCA1CTLW0 &= ~UCSWRST;      // Initialize GNSS state machine
 }
 
 void GNSS_send_byte(uint8_t byte)
@@ -51,7 +51,7 @@ void GNSS_send_byte(uint8_t byte)
 
     // enable transmit interrupt to start transmitting
     // if we are already transmitting this does nothing
-    UCA0IE |= UCTXIE;
+    UCA1IE |= UCTXIE;
 
     // poll until byte is sent
     while (!byte_sent_GNSS)
@@ -86,7 +86,7 @@ void GNSS_cmd(int cmd_ID)
 void GNSS_receive()
 {
     // enable receive interrupt to begin receiving ASCII characters
-    UCA0IE |= UCRXIE;
+    UCA1IE |= UCRXIE;
 }
 
 uint8_t fixAcquired()
@@ -291,20 +291,20 @@ uint8_t ASCII_to_uint8(uint8_t MSD, uint8_t LSD)
     return (MSD * 10) + LSD;
 }
 
-// ISR TO USCI_A0
+// ISR TO USCI_A1
 // stores GGA sentence to NMEA_sentence every second (independent of micro timer)
-#pragma vector=USCI_A0_VECTOR
-__interrupt void USCI_A0_ISR(void)
+#pragma vector=USCI_A1_VECTOR
+__interrupt void USCI_A1_ISR(void)
 {
     __bis_SR_register(GIE); // enable interrupt nesting
 
-    switch (UCA0IV)
+    switch (UCA1IV)
     {
     case USCI_NONE:
         break;
 
     case USCI_UART_UCRXIFG:
-        received_byte = UCA0RXBUF;
+        received_byte = UCA1RXBUF;
 
 //            uart_send_byte(received_byte); // print all GNSS bytes
 
@@ -337,13 +337,13 @@ __interrupt void USCI_A0_ISR(void)
     case USCI_UART_UCTXIFG:
         if (current_length_GNSS > 0)
         {
-            UCA0TXBUF = cmd_buffer[next_idx_to_send_GNSS++];
+            UCA1TXBUF = cmd_buffer[next_idx_to_send_GNSS++];
             current_length_GNSS--;
         }
         else
         {
-            UCA0IE &= ~UCTXIE;
-            UCA0IFG |= UCTXIFG;
+            UCA1IE &= ~UCTXIE;
+            UCA1IFG |= UCTXIFG;
 
             byte_sent_GNSS = 1;
         }

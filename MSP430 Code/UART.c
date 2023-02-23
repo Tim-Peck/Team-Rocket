@@ -9,23 +9,23 @@ void uart_init()
     current_length_UART = 0;
 
     // Configure pins
-    P4SEL0 |= BIT2 | BIT3; // P4.2=RXD, P4.3=TXD
+    P1SEL0 |= BIT6 | BIT7; // P1.6=RXD, P1.7=TXD (is default high)
 
     // Configure UART
-    UCA1CTLW0 |= UCSWRST;       // Put UART state machine in reset
-    UCA1CTLW0 |= UCSSEL__SMCLK; // Choose SMCLK as clock source
+    UCA0CTLW0 |= UCSWRST;       // Put UART state machine in reset
+    UCA0CTLW0 |= UCSSEL__SMCLK; // Choose SMCLK as clock source
 
     // Baud Rate calculation - we want 9600 baud
     // N = clock / baud = 1,048,576 Hz / 9600 = 109.227 (2355: 1054430.6854/9600 = 109.8365296)
     // N > 16 so UCOS16 = 1
-    // UCA1BRW = int(N / 16) = int(109.227 / 16) = int(6.827) = 6
+    // UCA0BRW = int(N / 16) = int(109.227 / 16) = int(6.827) = 6
     // UCBRFx  = int([(N / 16) - int(N / 16)] * 16) = int(13.227) = 13
     // UCBRSx  = 0x22 as per users guide table "UCBRSx settings" (2355: 0xBF with 0.8333 closest)
 
-    UCA1BRW = 6;
-    UCA1MCTLW = UCOS16 | UCBRF_13 | (0xBF << 8);
+    UCA0BRW = 6;
+    UCA0MCTLW = UCOS16 | UCBRF_13 | (0xBF << 8);
 
-    UCA1CTLW0 &= ~UCSWRST;      // Initialize UART state machine
+    UCA0CTLW0 &= ~UCSWRST;      // Initialize UART state machine
 }
 
 void uart_send_byte(uint8_t byte)
@@ -40,7 +40,7 @@ void uart_send_byte(uint8_t byte)
 
     // enable transmit interrupt to start transmitting
     // if we are already transmitting this does nothing
-    UCA1IE |= UCTXIE;
+    UCA0IE |= UCTXIE;
 
     // poll until byte is sent
     while (!byte_sent)
@@ -81,11 +81,11 @@ void uart_send_hex8(uint8_t byte)
     }
 }
 
-// ISR TO USCI_A1
-#pragma vector=USCI_A1_VECTOR
-__interrupt void USCI_A1_ISR(void)
+// ISR TO USCI_A0
+#pragma vector=USCI_A0_VECTOR
+__interrupt void USCI_A0_ISR(void)
 {
-    switch (UCA1IV)
+    switch (UCA0IV)
     {
     case USCI_NONE:
         break;
@@ -95,14 +95,14 @@ __interrupt void USCI_A1_ISR(void)
     case USCI_UART_UCTXIFG:
         if (current_length_UART > 0)
         {
-            UCA1TXBUF = msg_buffer[next_idx_to_send_UART++];
+            UCA0TXBUF = msg_buffer[next_idx_to_send_UART++];
             current_length_UART--;
         }
         else
         {
             // Entering the interrupt service routine (ISR), will clear
             // interrupt flags. i.e. we have just cleared UCTXIFG
-            // UCTXIFG is usually set when UCA1TXBUF is emptied. However we
+            // UCTXIFG is usually set when UCA0TXBUF is emptied. However we
             // didn't write anything to the buffer this time (when ISR reentered), so it's empty
             // and cannot be "emptied". i.e. UCTXIFG will not get set again
             // We can however set UCTXIFG manually to re-enter the ISR!
@@ -111,8 +111,8 @@ __interrupt void USCI_A1_ISR(void)
             // here and disable TX interrupts. When interrupts are enabled
             // again, UCTXIFG will still be set so we will immediately come
             // back here.
-            UCA1IE &= ~UCTXIE;
-            UCA1IFG |= UCTXIFG;
+            UCA0IE &= ~UCTXIE;
+            UCA0IFG |= UCTXIFG;
 
             byte_sent = 1;
         }
