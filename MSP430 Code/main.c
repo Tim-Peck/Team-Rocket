@@ -297,9 +297,9 @@ int main(void)
     // ---------- TESTING ---------- //
     // LED testing
 
-//    digital_write(redLEDPin, HIGH);
-//    digital_write(greenLEDPin, HIGH);
-//    digital_write(blueLEDPin, HIGH);
+    digital_write(redLEDPin, HIGH);
+    digital_write(greenLEDPin, HIGH);
+    digital_write(blueLEDPin, HIGH);
 
     // Timer testing // Launchpad VERIFIED, PCB VERIFIED
 
@@ -308,6 +308,9 @@ int main(void)
 
     //PWM
 //    rgbLED(255, 0, 255);
+
+    //Tone - buzzer
+    // TO-DO
 
     // Serial UART testing // Launchpad not verified fully working, PCB NOT WORKING
 
@@ -318,22 +321,22 @@ int main(void)
 //    uart_send_byte('X');
 //    uart_send_bytes("hello world", 11); // could not verify fully working, only works on flash
 
-    // GNSS testing // Launchpad VERIFIED
+    // GNSS testing // Launchpad VERIFIED, PCB VERIFIED
 
-    rgbLED(255, 0, 0);
+//    rgbLED(255, 0, 0);
+//
+//    GNSS_receive();
+//
+//    while (!fixAcquired())
+//        ;
+//
+//// set LED to green
+//    rgbLED(0, 255, 0);
 
-    GNSS_receive();
 
-    while (!fixAcquired())
-        ;
+     // SD card testing // Launchpad VERIFIED, PCB VERIFIED
 
-// set LED to green
-    rgbLED(0, 255, 0);
-
-
-     // SD card testing // Launchpad VERIFIED
-
-//     // initialize SD card
+     // initialize SD card
 //     if (SD_init())
 //     {
 //        uart_send_bytes("SD Initialization Success\r",
@@ -346,7 +349,7 @@ int main(void)
 //        }
 //
 //        // write a block to SD card to address 0x100 (256)
-//        SD_writeSingleBlock(0, buf, &token);
+////        SD_writeSingleBlock(0, buf, &token);
 //
 //        // read block 0 from SD card
 //        R1 = SD_readSingleBlock(0, buf, &token);
@@ -355,28 +358,20 @@ int main(void)
 //        print_SDBlock(R1, buf, &token);
 //
 //        // check if contents are correct
-//        if (buf[0] == 0x00) {
+//        if (buf[0] == 0xAA) {
 //            rgbLED(0, 255, 0); // received correct: temporary for testing
 //        } else {
-//            rgbLED(255, 0, 0);
+//            rgbLED(0, 0, 255);
 //        }
 //     }
 //     else
 //     {
 //        uart_send_bytes("SD Initialization Failure\r",
 //                        sizeof("SD Initialization Failure\r"));
+//        rgbLED(255, 0, 0);
 //     }
 
-//     I2C testing // Launchpad VERIFIED, PCB NOT WORKING
-//    // Trigger pin
-//    P5DIR |= BIT0;
-//    P5OUT &= ~BIT0;
-//
-//    // P4.6/7 test // 6 is SDA 7 IS CLK // IMU was causing SDA to go to 2.12V
-//    P4DIR |= BIT6 | BIT7;
-//    P4OUT |= BIT6 | BIT7;
-//    P4OUT &= ~BIT6;
-//    P4OUT &= ~BIT7;
+//     I2C testing // Launchpad VERIFIED, PCB VERIFIED
 
 //     if (checkIMUConnection()){
 //        digital_write(greenLEDPin, LOW); // received correct: temporary for testing
@@ -384,7 +379,7 @@ int main(void)
 //        digital_write(redLEDPin, LOW);
 //    }
 
-//     P5OUT |= BIT0;
+    // ADC testing
 
 
     // ---------- TESTING ---------- //

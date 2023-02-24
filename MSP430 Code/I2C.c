@@ -181,7 +181,7 @@ __interrupt void USCI_B1_ISR(void)
 }
 
 uint8_t checkIMUConnection() {
-    const uint8_t chipIDRegister = 0; // ICM
+    const uint8_t chipIDRegister = 0; // BNO055
 
     if (!i2c_receive(IMUAddress, chipIDRegister, 1)) {
         return 0; // if NACK

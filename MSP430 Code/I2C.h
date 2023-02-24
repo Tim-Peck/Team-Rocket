@@ -18,7 +18,7 @@ static volatile uint8_t received_bytes[BUFFER_SIZE]; // array where received byt
 static volatile int rwStatus; // bool value for ISR: 0 means read, 1 means write
 
 // slave address of sensors
-const static uint8_t IMUAddress = 0x28; // BNO055
+const static uint8_t IMUAddress = 0x29; // BNO055
 
 // initialising I2C once
 // Using P4.6/4.7 for I2C with launchpad (4.6 is SDA, 4.7 is SCL)
