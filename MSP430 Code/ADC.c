@@ -28,17 +28,16 @@ void initADC() {
   // ADCCTL2 register, ADCSR bit, default = 0 (fast mode)
   ADCCTL2 |= ADCSR; // (slow mode)
 
-  // Enable the analogue ADC portion of port
-  // SYSCFG2 register, ADCPCTLx
-  SYSCFG2 |= ADCPCTL9; // (A9)
-
-  // Isolate the digital portion of the port
+  // Configure the pins
   P5SEL0 |= BIT5;
   P5SEL1 |= BIT5;
 
   // Select the read analogue read channel
   // ADCMCTL0 register, ADCINCHx 0-3 bits
-  ADCMCTL0 |= ADCINCH0 | ADCINCH3 // (A9)
+  ADCMCTL0 |= ADCINCH0 | ADCINCH3; // (A9)
+
+  // Turn the ADC on
+  ADCCTL0 |= ADCON;
 
 }
 
@@ -49,13 +48,13 @@ double getBatVoltage() {
 
 double convertADCToVoltage(uint16_t adcVal) {
   // 1024 for 10 bit, 4096 for 12 bits
-  return adcVal /4096.0 * (ADC_VRMAX - ADC_VRMIN) + ADC_VRMIN;
+  return adcVal /4096.0 * 3.3;
 }
 
 uint16_t getADCRawVal() {
 
-  // Turn the ADC on
-  ADCCTL0 |= ADCON;
+// Enable Conversion
+  ADCCTL0 |= ADCENC;
 
   // start taking sample
   ADCCTL0 |= ADCSC;
@@ -64,7 +63,7 @@ uint16_t getADCRawVal() {
   while (!(ADCIFG & ADCIFG0)) {}
 
   // Reset the ADCSC value if not already low
-  ADCCTL0 &= ~ADCSC;
+//  ADCCTL0 &= ~ADCSC;
 
   // Read and return the conversion register
   return ADCMEM0;

@@ -3,9 +3,6 @@
 
 #include <inttypes.h>
 
-const double ADC_VRMAX 3.3;
-const double ADC_VRMIN 0.0;
-
 // User functions
 
 // Initalise the ADC registers and the battery voltage pin.
