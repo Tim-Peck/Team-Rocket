@@ -18,8 +18,8 @@ static volatile uint8_t received_bytesSPI[BUFFER_SIZE];
 static volatile int rwStatus; // bool value for ISR: 0 means read, 1 means write
 
 // initialise SPI for SD card
-// Using P2.5/2.6/3.1/2.4 for SPI with launchpad (2.5 is MISO, 2.6 is MOSI, 3.1 is CS, 2.4 is CLK)
-// eUSCI_A1
+// Using P1.1/1.2/1.3/2.1 for SPI with launchpad (1.1 is CLK, 1.2 is MOSI, 1.3 is MISO, 2.1 is CS)
+// eUSCI_B0
 void spi_init();
 
 // -------- private functions -------- //
@@ -97,6 +97,10 @@ uint8_t SD_sendAppCommand();
 // ACMD41
 // output: R1
 uint8_t SD_sendOCR();
+
+// Sends the command to return the CSD register
+// input: 17 byte array for the Response
+void SD_sendCSD_Command(uint8_t *res);
 
 // -------- complete initialization function -------- //
 

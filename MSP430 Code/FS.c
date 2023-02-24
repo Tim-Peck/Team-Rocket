@@ -21,13 +21,14 @@ DSTATUS disk_initialize (BYTE pdrv) {
 // Read the given sectors into the buffer
 DRESULT disk_read (BYTE pdrv, BYTE* buff, LBA_t sector, UINT count) {
 
-  if (disk_status()) { return RES_NOTRDY; }
+  if (disk_status(pdrv)) { return RES_NOTRDY; }
 
   // TODO: add checks for exceding SD card size
   if ((pdrv != 0)) { return RES_PARERR; }
 
   uint8_t token, res;
-  for (size_t reads = 0; reads < count; reads++) {
+  int reads;
+  for (reads = 0; reads < count; reads++) {
     res = SD_readSingleBlock(sector + reads, buff+512*reads ,&token);
 
     if (res || (TOKEN_ERROR(token))) {return RES_ERROR; }
@@ -39,13 +40,14 @@ DRESULT disk_read (BYTE pdrv, BYTE* buff, LBA_t sector, UINT count) {
 
 // Writes to the given sectors from the buffers. Note, will be slow as individual write calls are not recomended.
 DRESULT disk_write (BYTE pdrv, const BYTE* buff, LBA_t sector, UINT count) {
-  if (disk_status()) { return RES_NOTRDY; }
+  if (disk_status(pdrv)) { return RES_NOTRDY; }
 
   // TODO: add checks for exceding SD card size
   if ((pdrv != 0)) { return RES_PARERR; }
 
   uint8_t token, res;
-  for (size_t writes = 0; writes < count; writes++) {
+  int writes;
+  for (writes = 0; writes < count; writes++) {
     res = SD_writeSingleBlock(sector + writes, buff+512*writes, &token);
     if (res || (TOKEN_ERROR(token))) {return RES_ERROR; }
 
@@ -57,7 +59,7 @@ DRESULT disk_write (BYTE pdrv, const BYTE* buff, LBA_t sector, UINT count) {
 // Controls various device specific features
 DRESULT disk_ioctl (BYTE pdrv, BYTE cmd, void* buff) {
 
-  if (disk_status()) { return RES_NOTRDY; }
+  if (disk_status(pdrv)) { return RES_NOTRDY; }
 
   if ((pdrv != 0)) { return RES_PARERR; }
 
@@ -90,16 +92,12 @@ DRESULT disk_ioctl (BYTE pdrv, BYTE cmd, void* buff) {
     int c_size_multi = ((res[6] & (BIT0 | BIT1)) << 1) | (res[5] & BIT7);
     int multi = (int) pow(2,c_size_multi);
 
-    *buff = (c_size+1) * multi;
+    *(DWORD*)buff = (c_size+1) * multi;
     return RES_OK;
-    case GET_SECTOR_SIZE : *buff = 512; return RES_OK;
-    case GET_BLOCK_SIZE : buff = 1; return RES_OK;
+    case GET_SECTOR_SIZE : *(DWORD*)buff = 512; return RES_OK;
+    case GET_BLOCK_SIZE : *(DWORD*)buff = 1; return RES_OK;
     case CTRL_TRIM : return RES_OK;
     default : return RES_PARERR;
   }
 
   }
-
-
-
-}

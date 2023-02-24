@@ -43,9 +43,9 @@
 #define WRITE_ERROR(X)         X & 0b00000100
 #define WRITE_CRC_ERROR(X)     X & 0b00000010
 
-// chip select macros
-#define CS_ENABLE() P3OUT &= ~BIT1;
-#define CS_DISABLE() P3OUT |= BIT1;
+// chip select macros // CHANGE FOR PCB 2355
+#define CS_ENABLE() P2OUT &= ~BIT1;
+#define CS_DISABLE() P2OUT |= BIT1;
 
 void spi_init()
 {
@@ -54,18 +54,20 @@ void spi_init()
     current_lengthSPI = 0;
     receive_idxSPI = 0;
 
-    // setting pins for SPI
-    P2SEL0 |= (BIT4 | BIT5 | BIT6); // primary module function (SPI)
-    P3DIR |= BIT1; // Use GPIO for CS
+    // setting pins for SPI (2355)
+    P1SEL0 |= (BIT1 | BIT2 | BIT3); // primary module function (SPI)
+    P2DIR |= BIT1; // Use GPIO for CS
+    // P1DIR |= BIT0;
+
 
     // configure SPI
     // see 23.4 for SPI registers
-    // eUSCI_A1 so control register UCA"1"CTLW0
+    // eUSCI_B0 so control register UCB"0"CTLW0
     // 16 bit "word" register
-    UCA1CTLW0 |= UCSWRST; // control register set SPI to reset condition (must be in reset for configuration)
+    UCB0CTLW0 |= UCSWRST; // control register set SPI to reset condition (must be in reset for configuration)
 
-    // set USCI_A as SPI master mode
-    UCA1CTLW0 |= (UCCKPH | UCMODE_2 | UCMST | UCSYNC | UCSTEM | UCMSB);
+    // set USCI_B as SPI master mode
+    UCB0CTLW0 |= (UCCKPH | UCMODE_2 | UCMST | UCSYNC | UCSTEM | UCMSB);
     // for SD card
     // UCCKPL = 0, clock polarity idle low
     // UCCKPH sets data to be captured on first edge before changing
@@ -76,29 +78,29 @@ void spi_init()
     // UCMSB sets Most Significant Bit first
 
     // set clock source of USCI_A
-    UCA1CTLW0 |= UCSSEL__SMCLK; // control register UCSSELx field, set clock source to SMCLK (which is same as MCLK at ~1MHz)
+    UCB0CTLW0 |= UCSSEL__SMCLK; // control register UCSSELx field, set clock source to SMCLK (which is same as MCLK at ~1MHz)
     // configuring baud rate registers for 100kHz when sourcing from SMCLK where SMCLK = 1048576 Hz
     // acts as divisor for BRCLK
-    UCA1BRW |= 10;
+    UCB0BRW |= 10;
 
-    UCA1CTLW0 &= ~UCSWRST; // bring SPI out of reset (Testing note: This brings SIMO and CS low for some reason)
+    UCB0CTLW0 &= ~UCSWRST; // bring SPI out of reset (Testing note: This brings SIMO and CS low for some reason)
 }
 
 // note: in order to receive for SPI, transmit line must be active so this transmit acts as receiving as well
 uint8_t spi_transfer(uint8_t byte)
 {
     // load data into register
-    UCA1TXBUF = byte;
+    UCB0TXBUF = byte;
 
     // poll until byte received
-    while (!(UCA1IFG & UCRXIFG))
+    while (!(UCB0IFG & UCRXIFG))
         ;
 
     // return PREVIOUS byte received in receive register (i.e. not from this transferred byte)
     // T: |Y|
     // R: |X|Z|
     // (so byte X received with Y transferred with this function)
-    return UCA1RXBUF;
+    return UCB0RXBUF;
 }
 
 // see command format in notes
@@ -173,6 +175,20 @@ void SD_readRes2(uint8_t *res)
   }
 
   // send extra 0xFF after response for to clear line
+  spi_transfer(0xFF);
+}
+
+void SD_sendCSD_Command(uint8_t *res) {
+  spi_transfer(0xFF); // 0xFF send before and after CS for safety (see notes 29/12)
+  CS_ENABLE();
+  spi_transfer(0xFF);
+
+  SD_command(9, 0, 0);
+  SD_readRes2(&res);
+
+  // deassert chip select
+  spi_transfer(0xFF);
+  CS_DISABLE();
   spi_transfer(0xFF);
 }
 
@@ -723,9 +739,6 @@ uint8_t SD_writeSingleBlock(uint32_t addr, uint8_t *writeBuf, uint8_t *token)
 
 uint8_t checkFinishStatus() {
     uint8_t buf[512], token;
-
-    // testing
-    SD_readSingleBlock(255, buf, &token);
 
     // read block 0
     SD_readSingleBlock(0, buf, &token);
