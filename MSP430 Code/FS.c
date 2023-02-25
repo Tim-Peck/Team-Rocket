@@ -1,7 +1,7 @@
 #include <msp430.h>
 #include <inttypes.h>
-#include "ff.h"			/* Obtains integer types */
-#include "diskio.h"		/* Declarations of disk functions */
+#include "include/ff15/source/ff.h"			/* Obtains integer types */
+#include "include/ff15/source/diskio.h"		/* Declarations of disk functions */
 
 // Glue functions for the FatFS library
 

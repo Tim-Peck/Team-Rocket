@@ -1,25 +1,31 @@
 // Note: Maximum amount of time available for writing data is 24 hours
 
+
+// #define USE_DEV_BOARD
+
+ #define TEST_LED
+// #define TEST_TIMER
+// #define TEST_UART
+// #define TEST_GNSS
+// #define TEST_SD
+// #define TEST_IMU
+// #define TEST_ADC
+
 #include <msp430.h>
 #include <inttypes.h>
-#include "SPI.h"
+
+
+#include "I2C.h"
 #include "UART.h"
+#include "SPI.h"
+#include "timer.h"
+#include "GNSS.h"
+// #include "FS.c"
 
-#define rgbLED(X,Y,Z) blip()
 
-
-static uint8_t dataArray[25];
-
-// SD variables
-static uint8_t R1, metaData[512], buf[512], token;
-static uint32_t i;
-static uint32_t blockAddress;
-static uint8_t blockAddressArr[4];
-
-// FOR TESTING ONLY //
-const uint8_t redLEDPin = BIT1;
+const uint8_t blueLEDPin = BIT1;
 const uint8_t greenLEDPin = BIT2;
-const uint8_t blueLEDPin = BIT3;
+const uint8_t redLEDPin = BIT3;
 const int HIGH = 1;
 const int LOW = 0;
 
@@ -37,21 +43,6 @@ void digital_write(uint8_t pin, int value)
     }
 }
 
-void blip()
-{
-    // toggle on and off for a second
-    P1OUT &= ~BIT0;
-    int i;
-    for (i = 0; i < 5; i++)
-    {
-        P1OUT ^= BIT0;
-        __delay_cycles(100000);
-        P1OUT ^= BIT0;
-        __delay_cycles(100000);
-    }
-    __delay_cycles(150000);
-}
-// FOR TESTING ONLY //
 
 int main(void)
 {
@@ -64,59 +55,152 @@ int main(void)
 
     // ------------------------- DO NOT CHANGE ABOVE ---------------------------- //
 
-    P1DIR |= BIT0 | BIT1; // <- MOVE INSIDE APPROPRIATE FUNCTION
+// Initialising MSP430 pins and timers
+#ifdef TEST_LED
+  timerB3_init(); // RGB LED PWM timer
+#endif
 
-    // Initialising MSP430 pins and timers
+#ifdef TEST_TIMER
+  timerB0_init(); // 1Hz timer
+#endif
 
-    spi_init(); // SD Card SPI
+#ifdef TEST_UART
+  uart_init(); // Serial Monitor UART
+#endif
 
-    // SD card testing // Launchpad VERIFIED, PCB VERIFIED
+#ifdef TEST_GNSS
+  #ifndef TEST_UART
+  uart_init();
+  #endif
+  uart_GNSS_init(); // GNSS module UART
+#endif
 
-     // initialize SD card
-    if (SD_init())
+#ifdef TEST_SD
+  #ifndef TEST_UART
+  uart_init();
+  #endif
+  spi_init(); // SD Card SPI
+#endif
+
+#ifdef TEST_IMU
+  i2c_init(); // IMU I2C
+#endif
+
+#ifdef TEST_ADC
+  // adc_init();
+#endif
+
+
+// ---------- TESTING ---------- //
+
+#ifdef TEST_LED
+  // LED testing
+  digital_write(redLEDPin, HIGH);
+  digital_write(greenLEDPin, HIGH);
+  #ifndef USE_DEV_BOARD
+  digital_write(blueLEDPin, HIGH);
+  #endif
+  rgbLED(255, 0, 255);
+
+#endif
+
+#ifdef TEST_TIMER
+// Timer testing // Launchpad VERIFIED, PCB VERIFIED
+
+//Main 1Hz timer
+begin1HzTimer();
+
+//Tone - buzzer
+// TO-DO
+
+#endif
+
+#ifdef TEST_UART
+  // Serial UART testing // Launchpad not verified fully working, PCB NOT WORKING
+  // MCLK/SMCLK output
+  P3SEL0 |= BIT0 | BIT4;
+  P3DIR |= BIT0 | BIT4;
+
+  uart_send_byte('X');
+  uart_send_bytes("hello world", 11); // could not verify fully working, only works on flash
+#endif
+
+#ifdef TEST_GNSS
+  // GNSS testing // Launchpad VERIFIED, PCB VERIFIED
+
+  rgbLED(255, 0, 0);
+
+  GNSS_receive();
+
+  while (!fixAcquired());
+
+  rgbLED(0, 255, 0);
+
+#endif
+
+#ifdef TEST_SD
+  // SD card testing // Launchpad VERIFIED, PCB VERIFIED
+  int i = 0;
+  uint8_t buf[512];
+  uint8_t R1;
+  uint8_t token;
+
+
+  // initialize SD card
+  if (SD_init())
+  {
+    uart_send_bytes("SD Initialization Success\r",
+    sizeof("SD Initialization Success\r"));
+    uart_send_bytes("------------------\r", sizeof("------------------\r"));
+    // fill buffer
+    for (i = 0; i < 512; i++)
     {
-       // fill buffer
-       for (i = 0; i < 512; i++)
-       {
-           buf[i] = 0x00;
-       }
-
-       // write a block to SD card to address 0x100 (256)
-//        SD_writeSingleBlock(0, buf, &token);
-
-       // read block 0 from SD card
-       R1 = SD_readSingleBlock(0, buf, &token);
-
-       // print read SD block
-       print_SDBlock(R1, buf, &token);
-
-       // check if contents are correct
-       if (buf[0] == 0xAA) {
-           rgbLED(0, 255, 0); // received correct: temporary for testing
-       } else {
-           rgbLED(0, 0, 255);
-       }
-
-      uint8_t res[17];
-      SD_sendCSD_Command(&res);
-
-      int block_len = ( (res[1] & (BIT0 | BIT1)) | (res[0] & (BIT6 | BIT7)));
-      if (block_len == 9) {
-        rgbLED(200, 200, block_len); // received correct
-      }
-    }
-    else
-    {
-       uart_send_bytes("SD Initialization Failure\r",
-                       sizeof("SD Initialization Failure\r"));
-       rgbLED(255, 0, 0);
+      buf[i] = 0x00;
     }
 
+    // write a block to SD card to address 0x100 (256)
+    //        SD_writeSingleBlock(0, buf, &token);
 
-    // keep MSP running
-    while (1)
-    {
+    // read block 0 from SD card
+    R1 = SD_readSingleBlock(0, buf, &token);
+
+    // print read SD block
+    print_SDBlock(R1, buf, &token);
+
+    // check if contents are correct
+    if (buf[0] == 0xAA) {
+    rgbLED(0, 255, 0); // received correct: temporary for testing
+    } else {
+    rgbLED(0, 0, 255);
     }
+  }
+  else
+  {
+    uart_send_bytes("SD Initialization Failure\r",
+    sizeof("SD Initialization Failure\r"));
+    rgbLED(255, 0, 0);
+  }
+#endif
 
-    return 0;
+#ifdef TEST_IMU
+  // I2C testing // Launchpad VERIFIED, PCB VERIFIED
+
+  if (checkIMUConnection()){
+    digital_write(greenLEDPin, LOW); // received correct: temporary for testing
+  } else {
+    digital_write(redLEDPin, LOW);
+  }
+#endif
+
+#ifdef TEST_ADC
+#endif
+
+
+
+  // keep MSP running
+  while (1)
+  {
+  }
+
+  return 0;
 }
