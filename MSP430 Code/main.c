@@ -1,5 +1,3 @@
-// Note: Maximum amount of time available for writing data is 24 hours
-
 #include <msp430.h>
 #include <inttypes.h>
 #include "I2C.h"
@@ -7,6 +5,7 @@
 #include "SPI.h"
 #include "timer.h"
 #include "GNSS.h"
+#include "my_ADC.h"
 
 // -- USER ENTRY -- //
 // set function mode
@@ -14,8 +13,8 @@
 static uint8_t mode = 0;
 
 // set time to begin recording in NZDT
-static uint8_t recordHour = 19; // 0 to 23
-static uint8_t recordMinute = 59 ; // 0 to 60
+static uint8_t recordHour = 18; // 0 to 23
+static uint8_t recordMinute = 47; // 0 to 60
 // -- USER ENTRY -- //
 
 // data variables
@@ -78,19 +77,21 @@ int main(void)
     timerB0_init(); // 1Hz timer
     timerB3_init(); // RGB LED PWM timer
 
+    initADC();
+
     // Initialise variables
     // set first stage as flight ready
     currentStage = 0;
 
     blockAddress = 1; // data begins in second SD block
-    /*
+
     // fill SD arrays with 0
     for (i = 0; i < 512; i++)
     {
         metaData[i] = 0;
         buf[i] = 0;
     }
-
+/*
     // ----- FLIGHT LOGIC CODE ----- //
 
     // Initialise SD card
@@ -98,7 +99,7 @@ int main(void)
     {
         mode = 3;
         // error initialising SD card, set LED to red
-        rgbLED(0, 0, 0);
+        rgbLED(255, 0, 0);
     }
 
     // Mode list
@@ -125,8 +126,7 @@ int main(void)
             // Verify IMU connection // UNCOMMENT FOR IMU
             if (!checkIMUConnection()){
                 // set LED to pink
-//                rgbLED(255,0,255);
-                rgbLED(255,0,0); //temporary for testing
+                rgbLED(255,0,255);
                 break; // exit
             }
 
@@ -134,8 +134,7 @@ int main(void)
             IMUInit();
 
             // set LED to orange
-//            rgbLED(255,165,0);
-            rgbLED(255, 0, 0); //temporary for testing
+            rgbLED(255,165,0);
 
             // begin receiving GNSS signals
             GNSS_receive();
@@ -145,7 +144,7 @@ int main(void)
                 ;
 
             // set LED to yellow
-            rgbLED(0, 0, 0);
+            rgbLED(138, 43, 226);
 
             // ------- FLIGHT READY STAGE ------- //
 
@@ -178,7 +177,7 @@ int main(void)
                     if (currentStage == 1)
                     {
                         // TO DO: set LED to rainbow
-                        rgbLED(255, 255, 0);
+                        rgbLED(0, 0, 255);
 
                         // set SD recording status as recording
                         metaData[0] = 1;
@@ -261,7 +260,7 @@ int main(void)
         // fill buffer with 0x00
         for (i = 0; i < 512; i++)
         {
-            buf[i] = 0xAA;
+            buf[i] = 0x00;
         }
 
         // reset metadata block
@@ -307,9 +306,14 @@ int main(void)
 //    begin1HzTimer();
 
     //PWM
-//    rgbLED(255, 0, 255);
+//    rgbLED(255,110,0); // orange
+//    rgbLED(255, 255, 0); // yellow
+//    rgbLED(191, 64, 191); // purple
 
     //Tone - buzzer
+    // buzzerOn(500);
+
+    //RGB LED
     // TO-DO
 
     // Serial UART testing // Launchpad not verified fully working, PCB NOT WORKING
@@ -317,6 +321,11 @@ int main(void)
 //    // MCLK/SMCLK output
 //    P3SEL0 |= BIT0 | BIT4;
 //    P3DIR |= BIT0 | BIT4;
+
+//    P1DIR |= BIT6 | BIT7;
+//
+//     P1OUT &= ~BIT6;
+//     P1OUT &= ~BIT7;
 
 //    uart_send_byte('X');
 //    uart_send_bytes("hello world", 11); // could not verify fully working, only works on flash
@@ -336,7 +345,7 @@ int main(void)
 
      // SD card testing // Launchpad VERIFIED, PCB VERIFIED
 
-     // initialize SD card
+//      initialize SD card
 //     if (SD_init())
 //     {
 //        uart_send_bytes("SD Initialization Success\r",
@@ -348,8 +357,8 @@ int main(void)
 //            buf[i] = 0x00;
 //        }
 //
-//        // write a block to SD card to address 0x100 (256)
-////        SD_writeSingleBlock(0, buf, &token);
+////         write a block to SD card to address 0
+//        SD_writeSingleBlock(0, buf, &token);
 //
 //        // read block 0 from SD card
 //        R1 = SD_readSingleBlock(0, buf, &token);
@@ -358,7 +367,7 @@ int main(void)
 //        print_SDBlock(R1, buf, &token);
 //
 //        // check if contents are correct
-//        if (buf[0] == 0xAA) {
+//        if (buf[0] == 0x00) {
 //            rgbLED(0, 255, 0); // received correct: temporary for testing
 //        } else {
 //            rgbLED(0, 0, 255);
@@ -373,14 +382,16 @@ int main(void)
 
 //     I2C testing // Launchpad VERIFIED, PCB VERIFIED
 
-//     if (checkIMUConnection()){
-//        digital_write(greenLEDPin, LOW); // received correct: temporary for testing
-//     } else {
-//        digital_write(redLEDPin, LOW);
-//    }
+     if (checkIMUConnection()){
+         rgbLED(0, 255, 0); // received correct: temporary for testing
+     } else {
+         rgbLED(255, 0, 0);
+    }
 
     // ADC testing
+//    double batVal = getBatVoltage();
 
+//    int x = 2;
 
     // ---------- TESTING ---------- //
 

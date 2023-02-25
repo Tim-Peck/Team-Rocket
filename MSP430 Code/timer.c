@@ -5,8 +5,11 @@
 
 #define CCR0VALUE 20000
 
-void timerB0_init() // CHANGE FOR FR2355
+void timerB0_init()
 {
+    // TIMER TESTING
+//    P2DIR |= BIT3; // red
+
     // stop timer
     TB0CTL &= ~(MC0 | MC1);
 
@@ -24,19 +27,57 @@ void timerB0_init() // CHANGE FOR FR2355
     TB0CCTL0 &= ~CCIFG;
 }
 
-void begin1HzTimer() // CHANGE FOR FR2355
+void begin1HzTimer()
 {
     // start timer in up mode
     TB0CTL |= MC0;
-
-    P2DIR |= BIT3; // TESTING
 }
 
 // IFG for CCR0: 1Hz timer for flight logic
 #pragma vector=TIMER0_B0_VECTOR // CHANGE FOR FR2355
 __interrupt void TIMER0_B0_ISR(void)
 {
-    P2OUT ^= BIT3; // TESTING
+    // TIMER TESTING
+//    P2OUT ^= BIT3;
+}
+
+void timerB2_init()
+{
+    // set pin 5.0 to timer output mode
+    P5SEL0 |= BIT0;
+
+    // stop timer
+    TB2CTL &= ~(MC0 | MC1);
+
+    // timer B1 clock at default SMCLK clock speed of 1MHz (1054430Hz)
+    TB2CTL |= TBSSEL1;
+
+    // set output mode for CCR1 to Reset/Set mode
+    // (automatic timer output on pin)
+    TB2CCTL1 |= OUTMOD0 | OUTMOD1 | OUTMOD2;
+
+    // clear timer
+    TB2CTL |= TBCLR;
+}
+
+void buzzerOn(int frequency)
+{
+    // stop timer
+    TB3CTL &= ~(MC0 | MC1);
+
+    // calculate CCR0 value from frequency
+    // note: counts per second/counts per cycle = frequency
+    uint16_t CCR0 = 1054430.0/frequency;
+
+    // set CCR0 and CCR1 values
+    TB2CCR0 = CCR0;
+    TB2CCR1 = CCR0/2; // duty cycle of 50%
+
+    // clear timer
+    TB2CTL |= TBCLR;
+
+    // start timer in up mode
+    TB2CTL |= MC0;
 }
 
 void timerB3_init()
@@ -53,7 +94,7 @@ void timerB3_init()
     // stop timer
     TB3CTL &= ~(MC0 | MC1);
 
-    // timer B1 clock at default SMCLK clock speed of 1MHz
+    // timer B3 clock at default SMCLK clock speed of 1MHz
     TB3CTL |= TBSSEL1;
 
     // enable CC interrupts
@@ -136,11 +177,9 @@ __interrupt void TIMER3_B1_ISR(void)
     switch (TB3IV)
     {
     case TBIV__TBCCR1: // red
-//        P1OUT &= ~BIT0;
         P2OUT |= BIT3;
         break;
     case TBIV__TBCCR2: // green
-//        P6OUT &= ~BIT6;
         P2OUT |= BIT2;
         break;
     case TBIV__TBCCR3: // blue

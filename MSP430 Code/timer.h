@@ -10,6 +10,14 @@ void timerB0_init();
 // this will execute the main functions of reading the sensors and writing to the SD card every second
 void begin1HzTimer();
 
+// initialise timerB2 for buzzer
+void timerB2_init();
+
+// turn on buzzer at desired frequency
+// frequency range from AROUND 16.088Hz to 527165Hz. Note at high frequencies, resolution is very low
+// input: desired frequency within range
+void buzzerOn(int frequency);
+
 // initialise timerB0 for RGB LED
 void timerB3_init();
 
