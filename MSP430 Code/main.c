@@ -17,7 +17,7 @@ int main(void)
     initADC();
 
     double batVal = getBatVoltage();
-    
+
     // keep MSP running
     while (1)
     {
