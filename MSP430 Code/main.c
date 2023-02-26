@@ -5,7 +5,7 @@
 // #define TEST_UART
 // #define TEST_GNSS
 // #define TEST_SD
- #define TEST_IMU
+// #define TEST_IMU
 // #define TEST_ADC
 
 #include <msp430.h>
@@ -98,7 +98,7 @@ int main(void)
   #ifndef USE_DEV_BOARD
   digital_write(blueLEDPin, HIGH);
   #endif
-  rgbLED(255, 255, 0);
+  rgbLED(255, 0, 255);
 
   __delay_cycles(1000000);
 
@@ -106,11 +106,15 @@ int main(void)
 
    __delay_cycles(1000000);
 
-  rgbLED(255, 255, 0);
+  rgbLED(255, 0, 255);
+
+  __delay_cycles(1000000);
 
 #endif
 
 #ifdef TEST_TIMER
+  rgbLED(0, 0, 255);
+  __delay_cycles(1000000);
 // Timer testing // Launchpad VERIFIED, PCB VERIFIED
 
 //Main 1Hz timer
@@ -119,9 +123,13 @@ begin1HzTimer();
 //Tone - buzzer
 // TO-DO
 
+__delay_cycles(1000000);
+
 #endif
 
 #ifdef TEST_UART
+  rgbLED(0, 0, 255);
+  __delay_cycles(1000000);
   // Serial UART testing // Launchpad not verified fully working, PCB NOT WORKING
   // MCLK/SMCLK output
   P3SEL0 |= BIT0 | BIT4;
@@ -129,9 +137,13 @@ begin1HzTimer();
 
   uart_send_byte('X');
   uart_send_bytes("hello world", 11); // could not verify fully working, only works on flash
+
+  __delay_cycles(1000000);
 #endif
 
 #ifdef TEST_GNSS
+  rgbLED(0, 0, 255);
+  __delay_cycles(1000000);
   // GNSS testing // Launchpad VERIFIED, PCB VERIFIED
 
   rgbLED(255, 0, 0);
@@ -142,9 +154,13 @@ begin1HzTimer();
 
   rgbLED(0, 255, 0);
 
+  __delay_cycles(1000000);
+
 #endif
 
 #ifdef TEST_SD
+  rgbLED(0, 0, 255);
+  __delay_cycles(1000000);
   // SD card testing // Launchpad VERIFIED, PCB VERIFIED
   int i;
   uint8_t buf[512];
@@ -187,19 +203,27 @@ begin1HzTimer();
     sizeof("SD Initialization Failure\r"));
     rgbLED(255, 0, 0);
   }
+
+  __delay_cycles(1000000);
 #endif
 
 #ifdef TEST_IMU
+  rgbLED(0, 0, 255);
+  __delay_cycles(1000000);
   // I2C testing // Launchpad VERIFIED, PCB VERIFIED
 
   if (checkIMUConnection()){
-    digital_write(greenLEDPin, LOW); // received correct: temporary for testing
+      rgbLED(0, 255, 0);
   } else {
-    digital_write(redLEDPin, LOW);
+      rgbLED(255, 0, 0);
   }
+
+  __delay_cycles(1000000);
 #endif
 
 #ifdef TEST_ADC
+  rgbLED(0, 0, 255);
+  __delay_cycles(1000000);
 #endif
 
 
