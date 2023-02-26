@@ -702,9 +702,6 @@ uint8_t SD_writeSingleBlock(uint32_t addr, uint8_t *writeBuf, uint8_t *token)
 uint8_t checkFinishStatus() {
     uint8_t buf[512], token;
 
-    // testing
-    SD_readSingleBlock(255, buf, &token);
-
     // read block 0
     SD_readSingleBlock(0, buf, &token);
 

@@ -17,8 +17,12 @@ void timerB1_init();
 // input: 8 bit (0-255) RGB values for each colour
 void rgbLED(uint8_t redVal, uint8_t greenVal, uint8_t blueVal);
 
+// combine 4 individual bytes to one uint32
+// big-endian
 uint32_t convert_uint8_array_to_uint32(uint8_t *arr);
 
+// split uint32 to 4 individual bytes
+// big-endian
 void convert_uint32_to_uint8_array(uint32_t num, uint8_t* arr);
 
 #endif
