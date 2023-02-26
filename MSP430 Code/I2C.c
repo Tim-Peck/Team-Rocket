@@ -213,7 +213,7 @@ uint8_t readAccelCalib()
     }
 
     // retrieve accelerometer calibration value
-    uint8_t accelCalibLevel = received_bytes[0] >> 6;
+    uint8_t accelCalibLevel = (received_bytes[0] >> 2) & 0b00000011;
 
     return accelCalibLevel;
 }

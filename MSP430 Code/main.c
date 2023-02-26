@@ -75,6 +75,7 @@ int main(void)
     spi_init(); // SD Card SPI
 
     timerB0_init(); // 1Hz timer
+    timerB2_init(); // Buzzer timer
     timerB3_init(); // RGB LED PWM timer
 
     initADC();
@@ -311,10 +312,10 @@ int main(void)
 //    rgbLED(191, 64, 191); // purple
 
     //Tone - buzzer
-    // buzzerOn(500);
+//     buzzerOn(500);
 
-    //RGB LED
-    // TO-DO
+    //RGB LED - PCB not verified
+    rainbowEffect();
 
     // Serial UART testing // Launchpad not verified fully working, PCB NOT WORKING
 
@@ -380,20 +381,20 @@ int main(void)
 //        rgbLED(255, 0, 0);
 //     }
 
-//     I2C testing // Launchpad VERIFIED, PCB VERIFIED
+//     I2C testing // Launchpad VERIFIED, PCB VERIFIED, accel not verified yet
 
-     if (checkIMUConnection()){
-         uint8_t accelCalibLevel;
-         // wait for IMU to be calibrated
-         while((accelCalibLevel = readAccelCalib()) != 3) {
-             // set brightness of LED to reflect calibration level
-             rgbLED(0, 255*accelCalibLevel/4.0, 0);
-         }
-         // set LED to green
-         rgbLED(0, 255, 0);
-     } else {
-         rgbLED(255, 0, 0);
-    }
+//     if (checkIMUConnection()){
+//         uint8_t accelCalibLevel;
+//         // wait for IMU to be calibrated
+//         while((accelCalibLevel = readAccelCalib()) != 3) {
+//             // set brightness of LED to reflect calibration level
+//             rgbLED(0, 255*accelCalibLevel/4.0, 0);
+//         }
+//         // set LED to green
+//         rgbLED(0, 255, 0);
+//     } else {
+//         rgbLED(255, 0, 0);
+//    }
 
     // ADC testing
 //    double batVal = getBatVoltage();

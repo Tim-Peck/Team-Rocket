@@ -3,6 +3,9 @@
 
 #include <inttypes.h>
 
+static volatile uint8_t rainbowOn, rainbowPhase;
+static volatile uint8_t RGB[3];
+
 // initialise timerB0 to have period of 1 second using CCR0IFG
 void timerB0_init();
 
@@ -24,6 +27,10 @@ void timerB3_init();
 // set RGB LED colour
 // input: 8 bit (0-255) RGB values for each colour
 void rgbLED(uint8_t redVal, uint8_t greenVal, uint8_t blueVal);
+
+// set a rainbow effect for the RGB LED
+// starts from red to yellow, green, cyan, blue, magenta and then back to red
+void rainbowEffect();
 
 uint32_t convert_uint8_array_to_uint32(uint8_t *arr);
 
