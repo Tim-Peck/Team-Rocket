@@ -72,7 +72,7 @@ void i2c_write(uint8_t slave_byte, uint8_t address_byte, uint8_t data_byte)
 uint8_t i2c_receive(uint8_t slave_byte, uint8_t address_byte, int length)
 {
     rwStatus = 0; // set bool for ISR to read
-	receiveLength = length;
+    receiveLength = length;
     received = 0; // reset received bool
 
     if (current_length < BUFFER_SIZE)
@@ -96,9 +96,11 @@ uint8_t i2c_receive(uint8_t slave_byte, uint8_t address_byte, int length)
     UCB1IE |= UCTXIE0;
 
     // poll for data received before exiting function
-    while (!received) {
+    while (!received)
+    {
         // check if NACK
-        if (UCNACKIFG & UCB1IFG) {
+        if (UCNACKIFG & UCB1IFG)
+        {
             return 0;
         }
     }
@@ -106,7 +108,6 @@ uint8_t i2c_receive(uint8_t slave_byte, uint8_t address_byte, int length)
     __delay_cycles(2200); // I2C receive requires delay for some reason
     return 1;
 }
-
 
 // ISR for USCI_B1
 #pragma vector=USCI_B1_VECTOR
@@ -180,19 +181,41 @@ __interrupt void USCI_B1_ISR(void)
     }
 }
 
-uint8_t checkIMUConnection() {
+uint8_t checkIMUConnection()
+{
     const uint8_t chipIDRegister = 0; // BNO055
 
-    if (!i2c_receive(IMUAddress, chipIDRegister, 1)) {
+    // read chipID register
+    if (!i2c_receive(IMUAddress, chipIDRegister, 1))
+    {
         return 0; // if NACK
     }
 
     // BNO055 chip ID is 0xA0 as seen in register table
-    if (received_bytes[0] == 0xA0){
+    if (received_bytes[0] == 0xA0)
+    {
         return 1;
-    } else {
+    }
+    else
+    {
         return 0;
     }
+}
+
+uint8_t readAccelCalib()
+{
+    const uint8_t calibStatRegister = 0x35; // BNO055
+
+    // read IMU calibration register
+    if (!i2c_receive(IMUAddress, calibStatRegister, 1))
+    {
+        return 0; // if NACK
+    }
+
+    // retrieve accelerometer calibration value
+    uint8_t accelCalibLevel = received_bytes[0] >> 6;
+
+    return accelCalibLevel;
 }
 
 void IMUInit()
@@ -227,14 +250,14 @@ void getAccel(uint8_t *data_array)
 
 void parseAccelBytes(uint8_t *data_array, float *accelerations)
 {
-  uint16_t val16b = data_array[1] << 8 | data_array[0] ;
-  accelerations[0] = val16b/100.0;
+    uint16_t val16b = data_array[1] << 8 | data_array[0];
+    accelerations[0] = val16b / 100.0;
 
-  val16b = data_array[3] << 8 | data_array[2] ;
-  accelerations[1] = val16b/100.0;
+    val16b = data_array[3] << 8 | data_array[2];
+    accelerations[1] = val16b / 100.0;
 
-  val16b = data_array[5] << 8 | data_array[4] ;
-  accelerations[2] = val16b/100.0;
+    val16b = data_array[5] << 8 | data_array[4];
+    accelerations[2] = val16b / 100.0;
 }
 
 void barInit()
@@ -261,13 +284,15 @@ void getBar(uint8_t *data_array)
 
 }
 
-void getBytes(uint8_t slaveAddress, uint8_t registerAddress, uint8_t *storeByte, int numBytes)
+void getBytes(uint8_t slaveAddress, uint8_t registerAddress, uint8_t *storeByte,
+              int numBytes)
 {
-	i2c_receive(slaveAddress, registerAddress, numBytes);
+    i2c_receive(slaveAddress, registerAddress, numBytes);
 
-	// store each byte read
-	int i;
-	for (i = 0; i < numBytes; i++) {
-	    storeByte[i] = received_bytes[i];
-	}
+    // store each byte read
+    int i;
+    for (i = 0; i < numBytes; i++)
+    {
+        storeByte[i] = received_bytes[i];
+    }
 }

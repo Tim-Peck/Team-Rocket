@@ -383,7 +383,14 @@ int main(void)
 //     I2C testing // Launchpad VERIFIED, PCB VERIFIED
 
      if (checkIMUConnection()){
-         rgbLED(0, 255, 0); // received correct: temporary for testing
+         uint8_t accelCalibLevel;
+         // wait for IMU to be calibrated
+         while((accelCalibLevel = readAccelCalib()) != 3) {
+             // set brightness of LED to reflect calibration level
+             rgbLED(0, 255*accelCalibLevel/4.0, 0);
+         }
+         // set LED to green
+         rgbLED(0, 255, 0);
      } else {
          rgbLED(255, 0, 0);
     }

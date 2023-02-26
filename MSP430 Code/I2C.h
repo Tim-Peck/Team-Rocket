@@ -45,6 +45,10 @@ uint8_t i2c_receive(uint8_t slave_byte, uint8_t address_byte, int length);
 // output: 0 for fail, 1 for success
 uint8_t checkIMUConnection();
 
+// read calibration level of IMU accelerometer
+// returns four levels of calibration: 0, 1, 2, 3 with 0 being uncalibrated and 3 being fully calibrated
+uint8_t readAccelCalib();
+
 // initialise accelerometer to switch to IMU operating mode
 void IMUInit();
 
