@@ -1,9 +1,10 @@
 // Note: Maximum amount of time available for writing data is 24 hours
 
- #define TEST_LED
+#define TEST_LED
 // #define TEST_TIMER
 // #define TEST_UART
-// #define TEST_GNSS
+ #define TEST_GNSS
+// #define TEST_GNSS_FIX
 // #define TEST_SD
 // #define TEST_IMU
 // #define TEST_ADC
@@ -71,6 +72,15 @@ int main(void)
   uart_init();
   #endif
   uart_GNSS_init(); // GNSS module UART
+#endif
+
+#ifdef TEST_GNSS_FIX
+  #ifndef TEST_GNSS
+    #ifndef TEST_UART
+    uart_init();
+    #endif
+    uart_GNSS_init(); // GNSS module UART
+  #endif
 #endif
 
 #ifdef TEST_SD
@@ -146,6 +156,23 @@ __delay_cycles(1000000);
   __delay_cycles(1000000);
   // GNSS testing // Launchpad VERIFIED, PCB VERIFIED
 
+  GNSS_receive();
+
+  if(GNSSIsCommunicating()) {
+    rgbLED(0, 255, 0);
+  } else {
+    rgbLED(255, 0, 0);
+  }
+
+  __delay_cycles(1000000);
+
+#endif
+
+#ifdef TEST_GNSS_FIX
+  rgbLED(0, 0, 255);
+  __delay_cycles(1000000);
+  // GNSS testing // Launchpad VERIFIED, PCB VERIFIED
+
   rgbLED(255, 0, 0);
 
   GNSS_receive();
@@ -194,7 +221,7 @@ __delay_cycles(1000000);
     if (buf[4] = 0x02) {
     rgbLED(0, 255, 0); // received correct: temporary for testing
     } else {
-    rgbLED(0, 0, 255);
+    rgbLED(255, 255, 0);
     }
   }
   else
