@@ -155,39 +155,6 @@ uint8_t fixAcquired()
     }
 }
 
-uint8_t GNSSIsCommunicating()
-{
-  // Reset the NMEA_Sequence
-  int i;
-  for (i = 0; i < BUFFER_SIZE; i++) {
-    NMEA_sentence[i] = 0;
-  }
-  uint8_t idx = 0;
-  uint8_t commaCount = 0;
-
-  // check if NMEA sentence received first
-  // GGA sentence may have not been reached yet
-  if (!NMEA_sentence[0])
-  {
-      return 0;
-  }
-
-  // walk the sentence till a comma is found
-  while (commaCount < 1)
-  {
-      // note: idx will be incremented to after the target comma
-      if (NMEA_sentence[idx++] == ',')
-      {
-          commaCount++; // increment commaCount when comma delimiter encountered
-      }
-      if (idx >= BUFFER_SIZE) {
-        return 0;
-      }
-  }
-
-  return 1;
-}
-
 float parse_GGA_alt()
 {
     uint8_t idx = 0;

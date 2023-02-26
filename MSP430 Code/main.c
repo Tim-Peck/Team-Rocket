@@ -1,12 +1,10 @@
-// Note: Maximum amount of time available for writing data is 24 hours
 
 #define TEST_LED
-// #define TEST_TIMER
+#define TEST_TIMER
 // #define TEST_UART
- #define TEST_GNSS
-// #define TEST_GNSS_FIX
-// #define TEST_SD
-// #define TEST_IMU
+#define TEST_GNSS
+#define TEST_SD
+#define TEST_IMU
 // #define TEST_ADC
 
 #include <msp430.h>
@@ -18,6 +16,7 @@
 #include "SPI.h"
 #include "timer.h"
 #include "GNSS.h"
+#include "ADC.h"
 // #include "FS.c"
 
 
@@ -74,15 +73,6 @@ int main(void)
   uart_GNSS_init(); // GNSS module UART
 #endif
 
-#ifdef TEST_GNSS_FIX
-  #ifndef TEST_GNSS
-    #ifndef TEST_UART
-    uart_init();
-    #endif
-    uart_GNSS_init(); // GNSS module UART
-  #endif
-#endif
-
 #ifdef TEST_SD
   #ifndef TEST_UART
   uart_init();
@@ -95,7 +85,7 @@ int main(void)
 #endif
 
 #ifdef TEST_ADC
-  // adc_init();
+  adc_init();
 #endif
 
 
@@ -125,13 +115,13 @@ int main(void)
 #ifdef TEST_TIMER
   rgbLED(0, 0, 255);
   __delay_cycles(1000000);
-// Timer testing // Launchpad VERIFIED, PCB VERIFIED
+  // Timer testing // Launchpad VERIFIED, PCB VERIFIED
 
-//Main 1Hz timer
-begin1HzTimer();
+  //Main 1Hz timer
+  begin1HzTimer();
 
-//Tone - buzzer
-// TO-DO
+  //Tone - buzzer
+  // TO-DO
 
 __delay_cycles(1000000);
 
@@ -152,23 +142,6 @@ __delay_cycles(1000000);
 #endif
 
 #ifdef TEST_GNSS
-  rgbLED(0, 0, 255);
-  __delay_cycles(1000000);
-  // GNSS testing // Launchpad VERIFIED, PCB VERIFIED
-
-  GNSS_receive();
-
-  if(GNSSIsCommunicating()) {
-    rgbLED(0, 255, 0);
-  } else {
-    rgbLED(255, 0, 0);
-  }
-
-  __delay_cycles(1000000);
-
-#endif
-
-#ifdef TEST_GNSS_FIX
   rgbLED(0, 0, 255);
   __delay_cycles(1000000);
   // GNSS testing // Launchpad VERIFIED, PCB VERIFIED
@@ -251,7 +224,19 @@ __delay_cycles(1000000);
 #ifdef TEST_ADC
   rgbLED(0, 0, 255);
   __delay_cycles(1000000);
+
+  rgbLED(255, 0, 0);
+  double batVal = getBatVoltage();
+  if (batVal < 1) {
+    rgbLED(batVal*100 + 155, 0, 0);
+  } else if (batVal < 2) {
+    rgbLED(batVal*100 + 155, batVal*100 + 155, 0);
+  } else {
+    rgbLED(0, 0, batVal*100 + 155);
+  }
+
 #endif
+
 
 
 
