@@ -1,6 +1,7 @@
 #include <msp430.h>
 #include <inttypes.h>
 #include "UART.h"
+#include "Defines.h"
 
 
 void uart_init()

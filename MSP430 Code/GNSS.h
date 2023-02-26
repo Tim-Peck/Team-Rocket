@@ -1,8 +1,6 @@
 #ifndef GNSS_H
 #define GNSS_H
 
-
-
 #include <inttypes.h>
 
 #define BUFFER_SIZE 256

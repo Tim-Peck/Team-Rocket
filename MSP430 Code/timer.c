@@ -1,5 +1,6 @@
 #include <msp430.h>
 #include <inttypes.h>
+#include "Defines.h"
 #include "timer.h"
 #include "GNSS.h" // need to include .h in .c file if you want to use
 

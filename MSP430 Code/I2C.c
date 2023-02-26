@@ -1,5 +1,6 @@
 #include <msp430.h>
 #include "I2C.h"
+#include "Defines.h"
 
 void i2c_init()
 {

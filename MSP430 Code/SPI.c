@@ -1,5 +1,6 @@
 #include <msp430.h>
 #include "SPI.h"
+#include "Defines.h"
 
 // note for uint8_t: NON-ZERO NUMBERS ARE TRUE WHILE ZERO IS FALSE (so e.g. 0b10 & 0b11 is TRUE while 0b10 & 0b01 is FALSE)
 // these check if a bit is positive
@@ -43,9 +44,13 @@
 #define WRITE_ERROR(X)         X & 0b00000100
 #define WRITE_CRC_ERROR(X)     X & 0b00000010
 
-// chip select macros // CHANGE FOR PCB 2355
+#ifdef USE_DEV_BOARD
 #define CS_ENABLE() P2OUT &= ~BIT1;
 #define CS_DISABLE() P2OUT |= BIT1;
+#else
+#define CS_ENABLE() P1OUT &= ~BIT0;
+#define CS_DISABLE() P1OUT |= BIT0;
+#endif
 
 void spi_init()
 {
@@ -56,8 +61,12 @@ void spi_init()
 
     // setting pins for SPI (2355)
     P1SEL0 |= (BIT1 | BIT2 | BIT3); // primary module function (SPI)
+
+    #ifdef USE_DEV_BOARD
     P2DIR |= BIT1; // Use GPIO for CS
-    // P1DIR |= BIT0;
+    #else
+    P1DIR |= BIT0;
+    #endif
 
 
     // configure SPI

@@ -2,6 +2,7 @@
 #include <inttypes.h>
 #include <math.h>
 #include <string.h>
+#include "Defines.h"
 #include "GNSS.h"
 #include "UART.h"
 

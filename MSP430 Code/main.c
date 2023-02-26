@@ -1,20 +1,17 @@
 // Note: Maximum amount of time available for writing data is 24 hours
 
-
-// #define USE_DEV_BOARD
-
  #define TEST_LED
 // #define TEST_TIMER
 // #define TEST_UART
 // #define TEST_GNSS
 // #define TEST_SD
-// #define TEST_IMU
+ #define TEST_IMU
 // #define TEST_ADC
 
 #include <msp430.h>
 #include <inttypes.h>
 
-
+#include "Defines.h"
 #include "I2C.h"
 #include "UART.h"
 #include "SPI.h"
@@ -56,6 +53,7 @@ int main(void)
     // ------------------------- DO NOT CHANGE ABOVE ---------------------------- //
 
 // Initialising MSP430 pins and timers
+
 #ifdef TEST_LED
   timerB3_init(); // RGB LED PWM timer
 #endif
@@ -100,7 +98,15 @@ int main(void)
   #ifndef USE_DEV_BOARD
   digital_write(blueLEDPin, HIGH);
   #endif
-  rgbLED(255, 0, 255);
+  rgbLED(255, 255, 0);
+
+  __delay_cycles(1000000);
+
+  rgbLED(0, 255, 255);
+
+   __delay_cycles(1000000);
+
+  rgbLED(255, 255, 0);
 
 #endif
 
@@ -140,7 +146,7 @@ begin1HzTimer();
 
 #ifdef TEST_SD
   // SD card testing // Launchpad VERIFIED, PCB VERIFIED
-  int i = 0;
+  int i;
   uint8_t buf[512];
   uint8_t R1;
   uint8_t token;
@@ -157,18 +163,19 @@ begin1HzTimer();
     {
       buf[i] = 0x00;
     }
+    buf[4] = 0x02;
 
     // write a block to SD card to address 0x100 (256)
-    //        SD_writeSingleBlock(0, buf, &token);
+    SD_writeSingleBlock(0x100, buf, &token);
 
     // read block 0 from SD card
-    R1 = SD_readSingleBlock(0, buf, &token);
+    R1 = SD_readSingleBlock(0x100, buf, &token);
 
     // print read SD block
     print_SDBlock(R1, buf, &token);
 
     // check if contents are correct
-    if (buf[0] == 0xAA) {
+    if (buf[4] = 0x02) {
     rgbLED(0, 255, 0); // received correct: temporary for testing
     } else {
     rgbLED(0, 0, 255);

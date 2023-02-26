@@ -1,5 +1,6 @@
 #include <msp430.h>
 #include <inttypes.h>
+#include "Defines.h"
 #include "include/ff15/source/ff.h"			/* Obtains integer types */
 #include "include/ff15/source/diskio.h"		/* Declarations of disk functions */
 
