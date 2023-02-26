@@ -2,7 +2,7 @@
 
 #include "ADC.h"
 
-void initADC() {
+void adc_init() {
   // Key settings
   // Set the sample time in 4x + 4 ADC clock pulses
   // ADCCTL0 register, ADCSHTx 4 bits, default = 1 (8 ADCCK)
@@ -66,5 +66,7 @@ uint16_t getADCRawVal() {
 //  ADCCTL0 &= ~ADCSC;
 
   // Read and return the conversion register
-  return ADCMEM0;
+  uint16_t rawVal = ADCMEM0;
+
+  return rawVal;
 }

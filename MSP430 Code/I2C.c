@@ -199,6 +199,22 @@ uint8_t checkIMUConnection() {
     }
 }
 
+uint8_t readAccelCalib()
+{
+    const uint8_t calibStatRegister = 0x35; // BNO055
+
+    // read IMU calibration register
+    if (!i2c_receive(IMUAddress, calibStatRegister, 1))
+    {
+        return 0; // if NACK
+    }
+
+    // retrieve accelerometer calibration value
+    uint8_t accelCalibLevel = received_bytes[0] >> 6;
+
+    return accelCalibLevel;
+}
+
 void IMUInit()
 {
     const uint8_t oprMode = 0x3D; // operating mode register to write to

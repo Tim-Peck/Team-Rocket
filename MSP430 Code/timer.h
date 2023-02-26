@@ -10,8 +10,15 @@ void timerB0_init();
 // this will execute the main functions of reading the sensors and writing to the SD card every second
 void begin1HzTimer();
 
+void timerB2_init();
+
+// Buzzer function
+void buzzerOn(int frequency);
+
 // initialise timerB0 for RGB LED
 void timerB3_init();
+
+
 
 // set RGB LED colour
 // input: 8 bit (0-255) RGB values for each colour

@@ -50,6 +50,8 @@ uint8_t i2c_receive(uint8_t slave_byte, uint8_t address_byte, int length);
 // output: 0 for fail, 1 for success
 uint8_t checkIMUConnection();
 
+uint8_t readAccelCalib();
+
 // initialise accelerometer to switch to IMU operating mode
 void IMUInit();
 

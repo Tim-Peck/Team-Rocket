@@ -155,6 +155,27 @@ uint8_t fixAcquired()
     }
 }
 
+uint8_t GNSSIsResponding()
+{
+  int i;
+  for (i = 0; i < 10000; i++) {
+    uint8_t idx = 0;
+    uint8_t commaCount = 0;
+
+//    uart_send_bytes(NMEA_sentence, 40); // print NMEA_sentence for testing
+
+    // check if NMEA sentence received first
+    // GGA sentence may have not been reached yet
+    if (!NMEA_sentence[0])
+    {
+        continue;
+    }
+
+    return 1;
+  }
+  return 0;
+}
+
 float parse_GGA_alt()
 {
     uint8_t idx = 0;
