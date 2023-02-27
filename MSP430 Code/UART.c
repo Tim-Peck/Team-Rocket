@@ -2,6 +2,8 @@
 #include <inttypes.h>
 #include "UART.h"
 
+//#define TESTING // uncomment to read metadata and first data block
+
 void uart_init() {
     next_idx_to_send_UART = 0;
     next_idx_to_store_UART = 0;
@@ -29,8 +31,6 @@ void uart_init() {
 }
 
 void uart_send_byte(byte) {
-    // COMMENT OUT FOR 2433 WHEN OTHER UART IN USE
-    /*
     byte_sent = 0;
 
     if (current_length_UART < BUFFER_SIZE) {
@@ -44,15 +44,15 @@ void uart_send_byte(byte) {
 
     // poll until byte is sent
     while (!byte_sent);
-    */
 }
 
 void uart_send_bytes(uint8_t *bytes, uint8_t number_of_bytes) {
-    /*
+#ifdef TESTING
     uint8_t i;
     for (i = 0; i < number_of_bytes; i++) {
         uart_send_byte(bytes[i]);
-    }*/
+    }
+#endif
 }
 
 void uart_send_hex8(uint8_t byte)
@@ -74,7 +74,7 @@ void uart_send_hex8(uint8_t byte)
         }
 }
 
-/*// COMMENT OUT FOR 2433 WHEN OTHER UART IN USE
+
 // ISR TO USCI_A0
 #pragma vector=USCI_A0_VECTOR
 __interrupt void USCI_A0_ISR(void) {
@@ -111,4 +111,3 @@ __interrupt void USCI_A0_ISR(void) {
         default: break;
     }
 }
-*/

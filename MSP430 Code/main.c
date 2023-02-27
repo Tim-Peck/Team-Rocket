@@ -8,26 +8,6 @@
 #include "UART.h"
 #include "SPI.h"
 #include "timer.h"
-#include "GNSS.h"
-
-#define accelField 0
-#define altField 1
-#define UTCField 2
-#define latField 3
-#define longField 4
-
-// -- USER ENTRY -- //
-// set function mode
-// mode 0 = flight mode, mode 1 = reset mode, mode 2 = data analysis mode
-static uint8_t mode = 1;
-
-// set time to begin recording in NZDT
-static uint8_t recordHour = 19; // 0 to 23
-static uint8_t recordMinute = 59; // 0 to 60
-
-// set field to read from SD card
-static uint8_t fieldRead = UTCField;
-// -- USER ENTRY -- //
 
 // data variables
 static uint8_t accelXYZ[6];
@@ -43,7 +23,8 @@ static uint8_t R1, metaData[512], buf[512], token;
 static uint32_t i;
 static uint32_t blockAddress;
 static uint8_t blockAddressArr[4];
-const static uint8_t dataByteLengths[5] = {6, 4, 3, 4, 4}; // accel, alt, UTC, lat, long
+const static uint8_t dataByteLengths[5] = { 6, 4, 3, 4, 4 }; // accel, alt, UTC, lat, long
+const static uint8_t dataByteLocations[5] = { 0, 6, 10, 14, 18 };
 
 // operation variables
 static uint8_t currentStage; // stage currently in each time timer ISR is entered: 0 = flight ready, 1 = recording stage A, 2 = recording stage B, 3 = in flight stage, 4 = landing stage
@@ -100,8 +81,7 @@ int main(void)
 
     // Initialising MSP430 pins and timers
 
-//    uart_init(); // Serial Monitor UART // FOR FR2433 SERIAL UART HAS TO OCCUPY SAME PINS SO COMMENT THIS OUT WHEN IN FLIGHT MODE MODE
-    uart_GNSS_init(); // GNSS module UART // FOR FR2433 GNSS UART HAS TO OCCUPY SAME PINS SO COMMENT THIS OUT WHEN IN DATA ANALYSIS MODE
+    uart_init(); // Serial Monitor UART
     i2c_init(); // IMU I2C
     spi_init(); // SD Card SPI
 
@@ -121,194 +101,24 @@ int main(void)
         buf[i] = 0;
     }
 
-    // ----- FLIGHT LOGIC CODE ----- //
-
+    // ----- READ SD ----- //
     // Initialise SD card
     if (!SD_init())
     {
-        mode = 3;
         // error initialising SD card, set LED to red
-        rgbLED(0, 0, 0);
+        rgbLED(255, 0, 0);
 
         uart_send_bytes("SD Initialization Failure\r",
                         sizeof("SD Initialization Failure\r"));
     }
-
-    // Mode list
-    // 0 - FLIGHT MODE (Flight logic - see flow chart)
-    // 1 - RESET MODE (Erase all content by setting all bytes to 0)
-    // 2 - DATA ANALYSIS MODE (View complete flight data)
-
-    if (mode == 0)
-    { // FLIGHT MODE
-        /*
-         while (1)
-         {
-         // ------- INITIALISATION STAGE ------- //
-         uint8_t byte = checkFinishStatus();
-
-         // Check if recording has begun to not override existing data
-         if (byte)
-         {
-         // set LED to green
-         rgbLED(0, 255, 0);
-         break; // exit
-         }
-
-         // Verify IMU connection // UNCOMMENT FOR IMU
-         //            if (!checkIMUConnection()){
-         //                // set LED to pink
-         ////                rgbLED(255,0,255);
-         //                rgbLED(255,0,0); //temporary for testing
-         //                break; // exit
-         //            }
-
-         // initialise IMU // UNCOMMENT FOR IMU
-         //            IMUInit();
-
-         // set LED to orange
-         //            rgbLED(255,165,0);
-         rgbLED(255, 0, 0); //temporary for testing
-
-         // begin receiving GNSS signals
-         GNSS_receive();
-
-         // wait for fix acquired
-         while (!fixAcquired())
-         ;
-
-         // set LED to yellow
-         rgbLED(0, 0, 0);
-
-         // ------- FLIGHT READY STAGE ------- //
-
-         // begin 1Hz timer
-         begin1HzTimer();
-
-         while (1)
-         {
-         if (TA0CCTL0 & CCIFG)
-         {
-         // ------- FLIGHT READY STAGE ------- //
-         // check if time is T=0 minute to launch time to begin recording
-         if (currentStage == 0)
-         {
-         // get current UTC time
-         parse_GGA_UTC(UTC);
-
-         // convert current UTC time to NZDT (NZDT is 13 hours ahead of UTC)
-         UTC[0] = (UTC[0] + 13) % 24;
-
-         // check if T=0 reached
-         if ((UTC[0] == recordHour) & (UTC[1] == recordMinute))
-         {
-         // set current stage to recording stage
-         currentStage = 1;
-         }
-         }
-
-         // ------- SET CONDITIONS ------- //
-         if (currentStage == 1)
-         {
-         // TO DO: set LED to rainbow
-         rgbLED(255, 255, 0);
-
-         // set SD recording status as recording
-         metaData[0] = 1;
-         SD_writeSingleBlock(0, metaData, &token);
-
-         // TO DO: set buzzer
-
-
-         currentStage = 2;
-         }
-
-         // ------- RECORD DATA ------- //
-         if (currentStage == 2)
-         {
-         // retrieve 2 accelerometer bytes in each direction
-         // raw register bytes - 2 bytes of acceleration in X, Y, Z each
-         //                        getAccel(accelXYZ); // UNCOMMENT FOR IMU
-
-         // retrieve MSL altitude time
-         // float: 4 raw bytes
-         altitude_f = parse_GGA_alt();
-         float_to_uint8(altitude_f, altitude);
-
-         // retrieve UTC
-         // fixed point: 3 bytes of uint8_t of hh,mm,ss
-         parse_GGA_UTC(UTC);
-
-         // retrieve latitude and longitude
-         // float: 4 raw bytes of latitude NORTH and longitude EAST each
-         parse_GGA_GCS(GCS_f);
-         float_to_uint8(GCS_f[0], latitude);
-         float_to_uint8(GCS_f[1], longitude);
-
-         // combine data together
-         for (i = 0; i < 6; i++)
-         {
-         buf[i] = accelXYZ[i];
-         }
-         for (i = 6; i < 10; i++)
-         {
-         buf[i] = altitude[i - 6];
-         }
-         for (i = 10; i < 13; i++)
-         {
-         buf[i] = UTC[i - 10];
-         }
-         for (i = 13; i < 17; i++)
-         {
-         buf[i] = latitude[i - 13];
-         }
-         for (i = 17; i < 21; i++)
-         {
-         buf[i] = longitude[i - 17];
-         }
-
-         // write data to block
-         SD_writeSingleBlock(blockAddress++, buf, &token);
-
-         // record last written block address in metadata block as big-endian
-         convert_uint32_to_uint8_array(blockAddress - 1,
-         blockAddressArr);
-         for (i = 0; i < 4; i++)
-         {
-         metaData[i + 1] = blockAddressArr[3-i];
-         }
-         SD_writeSingleBlock(0, metaData, &token);
-
-         }
-         }
-         }
-         }
-         */
-    }
-    else if (mode == 1)
-    { // RESET MODE
-
-        // set LED to off
-        rgbLED(0, 0, 0);
-
-        // fill buffer with 0x00
-        for (i = 0; i < 512; i++)
-        {
-            buf[i] = 0x00;
-        }
-
-        // reset metadata block
-        SD_writeSingleBlock(i, buf, &token);
-
-        // set LED to white
-        rgbLED(255, 255, 255);
-
-    }
-    else if (mode == 2)
-    { // DATA ANALYSIS MODE
+    else
+    {
+// DATA ANALYSIS MODE
+        rgbLED(0, 255, 0);
         uart_send_bytes("SD Initialization Success\r",
                         sizeof("SD Initialization Success\r"));
-#define TESTING
+//#define TESTING // uncomment to read metadata and first data block
+        // also uncomment in UART and SPI
 #ifdef TESTING
         // read metadata block
         R1 = SD_readSingleBlock(0, buf, &token);
@@ -319,35 +129,38 @@ int main(void)
         R1 = SD_readSingleBlock(1, buf, &token);
         // print 1st data block
         print_SDBlock(R1, buf, &token);
-#elif
+#else
         // read metadata information
         // determine if data has been written
-        while (1) {
-        if (!checkFinishStatus()) {
+        while (1)
+        {
+            SD_readSingleBlock(0, buf, &token);
+            if (!buf[0])
+            {
+                break;
+            }
+            // then determine number of blocks written to
+            for (i = 0; i < 4; i++)
+            {
+                blockAddressArr[i] = buf[i + 1]; // block number is big endian
+            }
+            blockAddress = convert_uint8_array_to_uint32(blockAddressArr);
+
+            // OPTIONAL TO-DO (requires converting uint32 to ASCII)
+            // print block address
+
+            uint8_t j;
+            for (i = 1; i <= blockAddress; i++)
+            {
+                SD_readSingleBlock(i, buf, &token);
+                // print out all blocks, 21 bytes wide
+                for (j = 0; j < 21; j++)
+                {
+                    uart_send_hex8(buf[j]);
+                }
+            }
             break;
         }
-        // then determine number of blocks written to
-        for (i = 0; i < 4; i++) {
-            blockAddressArr[i] = buf[i+1]; // block number is big endian
-        }
-        blockAddress = convert_uint8_array_to_uint32(blockAddressArr);
-
-        // OPTIONAL TO-DO (requires converting uint32 to ASCII)
-        // print block address
-
-        uint8_t j;
-        // print all values of chosen field to serial monitor
-        // note: floats need float4 and accel/UTC needs uint8 in realTerm
-        for (i = 1; i < blockAddress; i++) {
-            // read data block
-            R1 = SD_readSingleBlock(i, buf, &token);
-            for (j = 0; j < dataByteLengths[fieldRead]) {
-                uart_send_byte(buf[j+fieldRead]);
-            }
-        }
-
-        }
-
         // print each value
 
         // // print IMU acceleration
@@ -364,11 +177,8 @@ int main(void)
         // uart_send_bytes(accelz, 4);
 #endif
     }
-    else
-    {
-    }
 
-    // ----- FLIGHT LOGIC CODE ----- //
+    // ----- READ SD ----- //
 
 //    begin1HzTimer();
 
