@@ -8,7 +8,7 @@
 //#define TEST_SD
 // #define TEST_IMU
 //#define TEST_ADC
-#define TEST_BUZZER
+//#define TEST_BUZZER
 
 // Flight type list
 // FLIGHT MODE (Flight logic - see flow chart)
@@ -32,8 +32,8 @@
 #include "SPI.h"
 #include "timer.h"
 #include "GNSS.h"
-#include "ADC.h"
-// #include "FS.c"
+// #include "ADC.h"
+ // #include "FS.c"
 
 
 const uint8_t blueLEDPin = BIT1;
@@ -202,23 +202,23 @@ __delay_cycles(1000000);
   __delay_cycles(1000000);
 #endif
 
-#ifdef TEST_GNSS
-
-  rgbLED(0, 0, 255);
-  __delay_cycles(1000000);
-  // GNSS testing // Launchpad VERIFIED, PCB VERIFIED
-
-  GNSS_receive();
-
-  if (GNSSIsResponding()) {
-    rgbLED(0, 255, 0);
-  } else {
-    rgbLED(255, 0, 0);
-  }
-
-  __delay_cycles(1000000);
-
-#endif
+// #ifdef TEST_GNSS
+//
+//   rgbLED(0, 0, 255);
+//   __delay_cycles(1000000);
+//   // GNSS testing // Launchpad VERIFIED, PCB VERIFIED
+//
+//   GNSS_receive();
+//
+//   if (GNSSIsResponding()) {
+//     rgbLED(0, 255, 0);
+//   } else {
+//     rgbLED(255, 0, 0);
+//   }
+//
+//   __delay_cycles(1000000);
+//
+// #endif
 
 #ifdef TEST_GNSS_FIX
 
@@ -361,7 +361,6 @@ __delay_cycles(1000000);
   // __delay_cycles(1000000);
 
 #endif
-
 
 
 #ifdef FLIGHT_LOGIC

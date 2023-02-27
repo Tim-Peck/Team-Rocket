@@ -39,8 +39,6 @@ void GNSS_receive();
 // output: 1 for fix acquired, 0 for fix not acquired
 uint8_t fixAcquired();
 
-uint8_t GNSSIsResponding();
-
 // store altitude from latest GGA sentence
 // input: ASCII array for GGA sentence
 // output: float of altitude
