@@ -271,7 +271,7 @@ __delay_cycles(1000000);
     print_SDBlock(R1, buf, &token);
 
     // check if contents are correct
-    if (buf[4] = 0x02) {
+    if (buf[4] == 0x02) {
     rgbLED(0, 255, 0); // received correct: temporary for testing
     } else {
     rgbLED(255, 255, 0);
@@ -457,7 +457,7 @@ while (1) {
                   // convert current UTC time to NZDT (NZDT is 13 hours ahead of UTC)
                   UTC[0] = (UTC[0] + 13) % 24;
                   // check if T=0 reached
-                  if (((UTC[0] = FLIGHT_START_HOUR) && (UTC[1] >= FLIGHT_START_MIN)) || (UTC[0] > FLIGHT_START_HOUR))
+                  if (((UTC[0] == FLIGHT_START_HOUR) && (UTC[1] >= FLIGHT_START_MIN)) || (UTC[0] > FLIGHT_START_HOUR))
                   {
                       // set current stage to recording stage
                       currentStage = 1;
