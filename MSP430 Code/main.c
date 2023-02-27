@@ -1,24 +1,25 @@
 
 // Unit tests
 #define TEST_LED
-//#define TEST_TIMER
-//#define TEST_UART
-//#define TEST_GNSS
-//#define TEST_GNSS_FIX
-//#define TEST_SD
+// #define TEST_TIMER
+// #define TEST_UART
+// #define TEST_GNSS
+// #define TEST_GNSS_FIX
+// #define TEST_SD
 // #define TEST_IMU
-//#define TEST_ADC
-//#define TEST_BUZZER
+// #define TEST_ADC
+// #define TEST_BUZZER
+#define TEST_FS
 
 // Flight type list
 // FLIGHT MODE (Flight logic - see flow chart)
-// #define FLIGHT_MODE
+#define FLIGHT_MODE
 
 // RESET MODE (Erase all content by setting all bytes to 0)
-// #define RESET_MODE
+#define RESET_MODE
 
 // DATA ANALYSIS MODE (View complete flight data)
-// #define DATA_ANALYSIS_MODE
+#define DATA_ANALYSIS_MODE
 
 #define FLIGHT_START_MIN 13
 #define FLIGHT_START_HOUR 17
@@ -33,7 +34,8 @@
 #include "timer.h"
 #include "GNSS.h"
 // #include "ADC.h"
- // #include "FS.c"
+#include "ff.h"
+
 
 
 const uint8_t blueLEDPin = BIT1;
@@ -271,7 +273,7 @@ __delay_cycles(1000000);
     print_SDBlock(R1, buf, &token);
 
     // check if contents are correct
-    if (buf[4] = 0x02) {
+    if (buf[4] == 0x02) {
     rgbLED(0, 255, 0); // received correct: temporary for testing
     } else {
     rgbLED(255, 255, 0);
@@ -361,6 +363,46 @@ __delay_cycles(1000000);
   // __delay_cycles(1000000);
 
 #endif
+
+#ifdef TEST_FS
+rgbLED(0, 0, 255);
+__delay_cycles(1000000);
+
+UINT token2;
+FRESULT fr;
+FATFS fs;
+FIL file;
+uint8_t buf2[16];
+
+/* Open or create a log file and ready to append */
+f_mount(&fs, "", 0);
+fr = f_open(&file, "test.txt", FA_WRITE | FA_OPEN_ALWAYS);
+fr = setAppend(&file);
+if (fr == FR_OK) {
+  f_write(&file, "HELLO FILE WORLD!", 16, token2);
+} else {
+  rgbLED(255,0,0);
+}
+f_close(&file);
+
+fr = f_open(&file, "test.txt", FA_WRITE | FA_OPEN_ALWAYS);
+if (fr == FR_OK) {
+  f_read(&file, buf2, 16, token2);
+} else {
+  rgbLED(255,0,0);
+}
+f_close (&file);
+
+if ((buf2[0] == "H") || (buf2[15] == "!")) {
+  rgbLED(0,255,0);
+} else {
+  rgbLED(255,0,0);
+}
+#endif
+
+
+
+
 
 
 #ifdef FLIGHT_LOGIC
@@ -457,7 +499,7 @@ while (1) {
                   // convert current UTC time to NZDT (NZDT is 13 hours ahead of UTC)
                   UTC[0] = (UTC[0] + 13) % 24;
                   // check if T=0 reached
-                  if (((UTC[0] = FLIGHT_START_HOUR) && (UTC[1] >= FLIGHT_START_MIN)) || (UTC[0] > FLIGHT_START_HOUR))
+                  if (((UTC[0] == FLIGHT_START_HOUR) && (UTC[1] >= FLIGHT_START_MIN)) || (UTC[0] > FLIGHT_START_HOUR))
                   {
                       // set current stage to recording stage
                       currentStage = 1;
