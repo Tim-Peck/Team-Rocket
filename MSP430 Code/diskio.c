@@ -114,8 +114,9 @@ DWORD get_fattime (void) { return 0;}
 FRESULT setAppend (FIL* fp )
 {
     /* Seek to end of the file to append data */
+    FRESULT fr;
     fr = f_lseek(fp, f_size(fp));
-    if (fr != FR_OK)
+    if (fr != FR_OK) {
         f_close(fp);
     }
     return fr;

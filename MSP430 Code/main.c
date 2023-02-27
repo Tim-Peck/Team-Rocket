@@ -1,14 +1,14 @@
 
 // Unit tests
 #define TEST_LED
-// #define TEST_TIMER
-// #define TEST_UART
-// #define TEST_GNSS
-// #define TEST_GNSS_FIX
-// #define TEST_SD
-// #define TEST_IMU
-// #define TEST_ADC
-// #define TEST_BUZZER
+#define TEST_TIMER
+#define TEST_UART
+#define TEST_GNSS
+#define TEST_GNSS_FIX
+#define TEST_SD
+#define TEST_IMU
+#define TEST_ADC
+#define TEST_BUZZER
 #define TEST_FS
 
 // Flight type list

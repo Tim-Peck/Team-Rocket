@@ -35,6 +35,8 @@ void timerB2_init()
 {
     // set pin 5.0 to timer output mode
     P5SEL0 |= BIT0;
+    // set pin direction
+    P5DIR |= BIT0;
 
     // stop timer
     TB2CTL &= ~(MC0 | MC1);
