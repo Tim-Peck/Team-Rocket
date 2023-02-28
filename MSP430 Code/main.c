@@ -117,7 +117,7 @@ int main(void)
         rgbLED(0, 255, 0);
         uart_send_bytes("SD Initialization Success\r",
                         sizeof("SD Initialization Success\r"));
-//#define TESTING // uncomment to read metadata and first data block
+#define TESTING // uncomment to read metadata and first data block
         // also uncomment in UART and SPI
 #ifdef TESTING
         // read metadata block
@@ -150,31 +150,36 @@ int main(void)
             // print block address
 
             uint8_t j;
-            for (i = 1; i <= blockAddress; i++)
+            uint8_t ninetyNinesCount = 0;
+            uint32_t blockCount = 0;
+            while (blockCount < blockAddress)
             {
-                SD_readSingleBlock(i, buf, &token);
-                // print out all blocks, 21 bytes wide
-                for (j = 0; j < 21; j++)
+                // print out data by batch of ninety nine blocks (RealTerm 100 row limit)
+                for (i = 1 + ninetyNinesCount * 99;
+                        i <= 99 + ninetyNinesCount * 99; i++)
                 {
-                    uart_send_hex8(buf[j]);
+                    SD_readSingleBlock(i, buf, &token);
+                    // only print out block if less than last block address
+                    if (blockCount < blockAddress)
+                    {
+                        blockCount++;
+                        // print out data in current block, 21 bytes wide
+                        for (j = 0; j < 21; j++)
+                        {
+                            uart_send_hex8(buf[j]);
+                        }
+                    }
                 }
+                // print Xs to delineate
+                for (j = 0; j < 42; j++)
+                {
+                    uart_send_byte('X');
+                }
+                ninetyNinesCount++;
+                __delay_cycles(30000000); // wait 100 seconds before sending out next batch
             }
             break;
         }
-        // print each value
-
-        // // print IMU acceleration
-        // uint8_t rawAccels[6];
-        // float linearAccels[3];
-        // getAccel(rawAccels);
-        // parseAccelBytes(rawAccels,linearAccels);
-        // uint8_t accelx[4], accely[4], accelz[4];
-        // float_to_uint8(linearAccels[0], accelx);
-        // float_to_uint8(linearAccels[1], accely);
-        // float_to_uint8(linearAccels[1], accelz);
-        // uart_send_bytes(accelx, 4);
-        // uart_send_bytes(accely, 4);
-        // uart_send_bytes(accelz, 4);
 #endif
     }
 

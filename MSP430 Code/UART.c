@@ -2,7 +2,7 @@
 #include <inttypes.h>
 #include "UART.h"
 
-//#define TESTING // uncomment to read metadata and first data block
+#define TESTING // uncomment to read metadata and first data block
 
 void uart_init() {
     next_idx_to_send_UART = 0;

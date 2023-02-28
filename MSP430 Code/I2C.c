@@ -225,6 +225,7 @@ void getAccel(uint8_t *data_array)
     data_array[5] = received_bytes[1];
 }
 
+// Note: Do not need this function as conversion is done in Excel
 void parseAccelBytes(uint8_t *data_array, float *accelerations)
 {
   uint16_t val16b = data_array[1] << 8 | data_array[0] ;

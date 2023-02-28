@@ -1,7 +1,7 @@
 #include <msp430.h>
 #include "SPI.h"
 
-//#define TESTING // uncomment to read metadata and first data block
+#define TESTING // uncomment to read metadata and first data block
 
 // note for uint8_t: NON-ZERO NUMBERS ARE TRUE WHILE ZERO IS FALSE (so e.g. 0b10 & 0b11 is TRUE while 0b10 & 0b01 is FALSE)
 // these check if a bit is positive
