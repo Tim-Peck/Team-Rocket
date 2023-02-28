@@ -9,7 +9,7 @@
 //#define TEST_IMU
 // #define TEST_ADC
 // #define TEST_BUZZER
-// #define TEST_FS
+ #define TEST_FS
 
 // Flight type list
 // FLIGHT MODE (Flight logic - see flow chart)
@@ -150,6 +150,12 @@ int main(void)
   timerB2_init();
 #endif
 
+#ifdef TEST_FS
+  #ifndef TEST_UART
+  uart_init();
+  #endif
+  spi_init(); // SD Card SPI
+#endif
 
 // ---------- TESTING ---------- //
 
@@ -377,8 +383,8 @@ uint8_t buf2[16];
 
 /* Open or create a log file and ready to append */
 f_mount(&fs, "", 0);
-fr = f_open(&file, "test.txt", FA_WRITE | FA_OPEN_ALWAYS);
-fr = setAppend(&file);
+fr = f_open(&file, "test.txt", FA_WRITE);
+//fr = setAppend(&file);
 if (fr == FR_OK) {
   f_write(&file, "HELLO FILE WORLD!", 16, token2);
 } else {
@@ -386,7 +392,7 @@ if (fr == FR_OK) {
 }
 f_close(&file);
 
-fr = f_open(&file, "test.txt", FA_WRITE | FA_OPEN_ALWAYS);
+fr = f_open(&file, "test.txt", FA_READ);
 if (fr == FR_OK) {
   f_read(&file, buf2, 16, token2);
 } else {

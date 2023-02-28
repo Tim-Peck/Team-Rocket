@@ -13,13 +13,19 @@
 // Send the disk into idle state and check for correct response
 // TODO: unsure if this will screw with things if FatFS uses this function while doing other things?
 DSTATUS disk_status (BYTE pdrv) {
-  return (SD_goIdleState() == 0x01);
+  // uint8_t res[5];
+  // if (SD_goIdleState() != 0x01) {
+  //   return STA_NOINIT;
+  // }
+  return 0;
 }
 
 // Initalse the disk and return disk status if succesful
 DSTATUS disk_initialize (BYTE pdrv) {
-  SD_init();
-  return disk_status(pdrv);
+  if (SD_init() == 1) {
+    return 0;
+  }
+  return 1;
 }
 
 // Read the given sectors into the buffer
