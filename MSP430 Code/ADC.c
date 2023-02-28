@@ -32,23 +32,32 @@ void adc_init() {
   P5SEL0 |= BIT5;
   P5SEL1 |= BIT5;
 
-  // Select the read analogue read channel
-  // ADCMCTL0 register, ADCINCHx 0-3 bits
-  ADCMCTL0 |= ADCINCH0 | ADCINCH3; // (A9)
-
   // Turn the ADC on
   ADCCTL0 |= ADCON;
 
 }
 
 double getBatVoltage() {
-  uint16_t adcVal = getADCRawVal();
-  return convertADCToVoltage(adcVal);
+  // Disable conversion to change source
+  ADCCTL0 &= ~ADCENC;
+  // Select the read analogue read channel
+  // ADCMCTL0 register, ADCINCHx 0-3 bits
+  ADCMCTL0 |= ADCINCH0 | ADCINCH2 | ADCINCH3; // (A13)
+  uint16_t refADCVal = getADCRawVal();
+
+  // Disable conversion to change source
+  ADCCTL0 &= ~ADCENC;
+  // Select the read analogue read channel
+  // ADCMCTL0 register, ADCINCHx 0-3 bits
+  ADCMCTL0 |= ADCINCH0 | ADCINCH3; // (A9)
+  uint16_t batADCVal = getADCRawVal();
+
+  return convertADCToVoltage(refADCVal,batADCVal);
 }
 
-double convertADCToVoltage(uint16_t adcVal) {
-  // 1024 for 10 bit, 4096 for 12 bits
-  return adcVal /4096.0 * 3.3 * 2;
+double convertADCToVoltage(uint16_t refVal,uint16_t batVal) {
+  // 1024 for 10 bit
+  return 1.5/(refVal/1024.0)*(batVal/1024.0)  * 2;
 }
 
 uint16_t getADCRawVal() {

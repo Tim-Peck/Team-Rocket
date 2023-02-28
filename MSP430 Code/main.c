@@ -1,25 +1,25 @@
 
 // Unit tests
 #define TEST_LED
-#define TEST_TIMER
-#define TEST_UART
-#define TEST_GNSS
-#define TEST_GNSS_FIX
-#define TEST_SD
-#define TEST_IMU
-#define TEST_ADC
+//#define TEST_TIMER
+//#define TEST_UART
+//#define TEST_GNSS
+// #define TEST_GNSS_FIX
+// #define TEST_SD
+// #define TEST_IMU
+//#define TEST_ADC
 #define TEST_BUZZER
-#define TEST_FS
+//#define TEST_FS
 
 // Flight type list
 // FLIGHT MODE (Flight logic - see flow chart)
-#define FLIGHT_MODE
+// #define FLIGHT_MODE
 
 // RESET MODE (Erase all content by setting all bytes to 0)
-#define RESET_MODE
+// #define RESET_MODE
 
 // DATA ANALYSIS MODE (View complete flight data)
-#define DATA_ANALYSIS_MODE
+// #define DATA_ANALYSIS_MODE
 
 #define FLIGHT_START_MIN 13
 #define FLIGHT_START_HOUR 17
@@ -33,7 +33,7 @@
 #include "SPI.h"
 #include "timer.h"
 #include "GNSS.h"
-// #include "ADC.h"
+#include "ADC.h"
 #include "ff.h"
 
 
@@ -140,7 +140,7 @@ int main(void)
 
 #ifdef TEST_IMU
   i2c_init(); // IMU I2C
-  IMUInit();
+//  IMUInit();
 #endif
 
 #ifdef TEST_ADC
@@ -228,7 +228,7 @@ __delay_cycles(1000000);
   __delay_cycles(1000000);
   // GNSS testing // Launchpad VERIFIED, PCB VERIFIED
 
-  rgbLED(255, 0, 0);
+  rgbLED(255, 255, 255);
 
   GNSS_receive();
 
@@ -331,6 +331,8 @@ __delay_cycles(1000000);
     rgbLED(0, 0, 255);
   }
 
+  __delay_cycles(1000000);
+
 
 #endif
 
@@ -338,29 +340,29 @@ __delay_cycles(1000000);
   rgbLED(0, 0, 255);
   __delay_cycles(1000000);
 
-  // rgbLED(0, 255, 0);
-  buzzerOn(500);
-  // __delay_cycles(1000000);
-  // buzzerOn(262);
-  // __delay_cycles(1000000);
-  //
-  // buzzerOn(330);
-  // __delay_cycles(1000000);
-  //
-  // buzzerOn(392);
-  // __delay_cycles(1000000);
-  //
-  // buzzerOn(523);
-  // __delay_cycles(1000000);
-  //
-  // buzzerOn(392);
-  // __delay_cycles(1000000);
-  //
-  // buzzerOn(330);
-  // __delay_cycles(1000000);
-  //
-  // buzzerOn(262);
-  // __delay_cycles(1000000);
+  rgbLED(0, 255, 0);
+  // buzzerOn(500);
+  __delay_cycles(1000000);
+  buzzerOn(262);
+  __delay_cycles(1000000);
+
+  buzzerOn(330);
+  __delay_cycles(1000000);
+
+  buzzerOn(392);
+  __delay_cycles(1000000);
+
+  buzzerOn(523);
+  __delay_cycles(1000000);
+
+  buzzerOn(392);
+  __delay_cycles(1000000);
+
+  buzzerOn(330);
+  __delay_cycles(1000000);
+
+  buzzerOn(262);
+  __delay_cycles(1000000);
 
 #endif
 
