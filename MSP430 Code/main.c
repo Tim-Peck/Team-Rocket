@@ -1,15 +1,15 @@
 
 // Unit tests
-#define TEST_LED
+ #define TEST_LED
 //#define TEST_TIMER
 //#define TEST_UART
 //#define TEST_GNSS
 // #define TEST_GNSS_FIX
 // #define TEST_SD
-// #define TEST_IMU
-//#define TEST_ADC
-#define TEST_BUZZER
-//#define TEST_FS
+//#define TEST_IMU
+// #define TEST_ADC
+// #define TEST_BUZZER
+// #define TEST_FS
 
 // Flight type list
 // FLIGHT MODE (Flight logic - see flow chart)
@@ -102,7 +102,6 @@ int main(void)
     // ------------------------- DO NOT CHANGE ABOVE ---------------------------- //
 
 // Initialising MSP430 pins and timers
-
 #ifdef TEST_LED
   timerB3_init(); // RGB LED PWM timer
 #endif
@@ -140,7 +139,7 @@ int main(void)
 
 #ifdef TEST_IMU
   i2c_init(); // IMU I2C
-//  IMUInit();
+  IMUInit();
 #endif
 
 #ifdef TEST_ADC
@@ -318,17 +317,17 @@ __delay_cycles(1000000);
 
   double batVal = getBatVoltage();
   if (batVal < 3) {
-    rgbLED(255, 255, 255);
+    rgbLED(255, 255, 255); // white
   } else if (batVal < 3.5) {
-    rgbLED(255, 0, 0);
+    rgbLED(255, 0, 0); // red
   } else if (batVal < 3.7) {
-    rgbLED(255, 255, 0);
+    rgbLED(255, 255, 0); // yellow
   } else if (batVal < 3.8){
-    rgbLED(0, 255, 0);
+    rgbLED(0, 255, 0); // green
   } else if (batVal < 3.9){
-    rgbLED(0, 255, 255);
+    rgbLED(0, 255, 255); // cyan
   } else {
-    rgbLED(0, 0, 255);
+    rgbLED(255, 255, 255); // white
   }
 
   __delay_cycles(1000000);
