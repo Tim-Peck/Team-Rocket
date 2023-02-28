@@ -8,7 +8,7 @@
 //#define TEST_SD
 // #define TEST_IMU
 //#define TEST_ADC
-//#define TEST_BUZZER
+#define TEST_BUZZER
 
 // Flight type list
 // FLIGHT MODE (Flight logic - see flow chart)
@@ -336,29 +336,28 @@ __delay_cycles(1000000);
   rgbLED(0, 0, 255);
   __delay_cycles(1000000);
 
-  // rgbLED(0, 255, 0);
-  buzzerOn(500);
-  // __delay_cycles(1000000);
-  // buzzerOn(262);
-  // __delay_cycles(1000000);
-  //
-  // buzzerOn(330);
-  // __delay_cycles(1000000);
-  //
-  // buzzerOn(392);
-  // __delay_cycles(1000000);
-  //
-  // buzzerOn(523);
-  // __delay_cycles(1000000);
-  //
-  // buzzerOn(392);
-  // __delay_cycles(1000000);
-  //
-  // buzzerOn(330);
-  // __delay_cycles(1000000);
-  //
-  // buzzerOn(262);
-  // __delay_cycles(1000000);
+  rgbLED(0, 255, 0);
+
+  buzzerOn(262);
+  __delay_cycles(1000000);
+
+  buzzerOn(330);
+  __delay_cycles(1000000);
+
+  buzzerOn(392);
+  __delay_cycles(1000000);
+
+  buzzerOn(523);
+  __delay_cycles(1000000);
+
+  buzzerOn(392);
+  __delay_cycles(1000000);
+
+  buzzerOn(330);
+  __delay_cycles(1000000);
+
+  buzzerOn(262);
+  __delay_cycles(1000000);
 
 #endif
 
