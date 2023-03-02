@@ -3,6 +3,9 @@
 
 #include <inttypes.h>
 
+static volatile uint8_t rainbowOn, rainbowPhase;
+static volatile uint8_t RGB[3];
+
 // initialise timerB0 to have period of 1 second using CCR0IFG
 void timerB0_init();
 

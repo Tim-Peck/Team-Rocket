@@ -44,9 +44,11 @@ uint8_t SD_readRes1();
 // input: 5 byte uin8_t array to store response R7
 void SD_readRes7(uint8_t *res);
 
+/* TO REMOVE
 // receive response R2
 // input: 17 byte uin8_t array to store response R2
 void SD_readRes2(uint8_t *res);
+*/
 
 // -------- print functions -------- //
 
@@ -98,9 +100,11 @@ uint8_t SD_sendAppCommand();
 // output: R1
 uint8_t SD_sendOCR();
 
+/* TO REMOVE
 // Sends the command to return the CSD register
 // input: 17 byte array for the Response
 void SD_sendCSD_Command(uint8_t *res);
+*/
 
 // -------- complete initialization function -------- //
 

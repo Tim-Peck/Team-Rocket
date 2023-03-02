@@ -165,6 +165,7 @@ void SD_readRes7(uint8_t *res)
     spi_transfer(0xFF);
 }
 
+/* TO REMOVE
 void SD_readRes2(uint8_t *res)
 {
   // read response 1 in R2
@@ -187,6 +188,7 @@ void SD_readRes2(uint8_t *res)
   spi_transfer(0xFF);
 }
 
+
 void SD_sendCSD_Command(uint8_t *res) {
   spi_transfer(0xFF); // 0xFF send before and after CS for safety (see notes 29/12)
   CS_ENABLE();
@@ -199,7 +201,7 @@ void SD_sendCSD_Command(uint8_t *res) {
   spi_transfer(0xFF);
   CS_DISABLE();
   spi_transfer(0xFF);
-}
+}*/
 
 void SD_printR1(uint8_t res)
 {
