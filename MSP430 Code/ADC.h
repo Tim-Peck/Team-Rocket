@@ -15,7 +15,7 @@ double getBatVoltage();
 // Helper Functions
 
 // Covert the uint16_t value from the ADC into a ratio of the reference voltages
-double convertADCToVoltage(uint16_t adcVal);
+double convertADCToVoltage(uint16_t refVal, uint16_t batVal);
 
 // Read and return the currently set ADC pin
 uint16_t getADCRawVal();

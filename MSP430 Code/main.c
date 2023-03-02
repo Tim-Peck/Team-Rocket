@@ -35,8 +35,10 @@
 #include "SPI.h"
 #include "timer.h"
 #include "GNSS.h"
-// #include "ADC.h"
-// #include "FS.c"
+#include "ADC.h"
+// #include "ff.h" // File System not working
+
+
 
 const uint8_t blueLEDPin = BIT1;
 const uint8_t greenLEDPin = BIT2;
@@ -113,7 +115,6 @@ int main(void)
     // ------------------------- DO NOT CHANGE ABOVE ---------------------------- //
 
 // Initialising MSP430 pins and timers
-
 #ifdef TEST_LED
     timerB3_init(); // RGB LED PWM timer
 #endif
@@ -165,6 +166,15 @@ int main(void)
 
 #ifdef TEST_RAINBOW
     timerB3_init();
+#endif
+
+#ifdef TEST_FS
+  #ifndef TEST_SD
+    #ifndef TEST_UART
+      uart_init();
+    #endif
+    spi_init();
+  #endif
 #endif
 
 // ---------- TESTING ---------- //
@@ -231,7 +241,7 @@ int main(void)
 #ifdef TEST_GNSS_FIX
   test_start_sequence();
 
-  rgbLED(255, 0, 0);
+  rgbLED(255, 255, 255);
 
   GNSS_receive();
 
@@ -346,18 +356,20 @@ int main(void)
 
   double batVal = getBatVoltage();
   if (batVal < 3) {
-    rgbLED(255, 255, 255);
+    rgbLED(255, 255, 255); // white
   } else if (batVal < 3.5) {
-    rgbLED(255, 0, 0);
+    rgbLED(255, 0, 0); // red
   } else if (batVal < 3.7) {
-    rgbLED(255, 255, 0);
+    rgbLED(255, 255, 0); // yellow
   } else if (batVal < 3.8){
-    rgbLED(0, 255, 0);
+    rgbLED(0, 255, 0); // green
   } else if (batVal < 3.9){
-    rgbLED(0, 255, 255);
+    rgbLED(0, 255, 255); // cyan
   } else {
-    rgbLED(0, 0, 255);
+    rgbLED(255, 255, 255); // white
   }
+
+  __delay_cycles(1000000);
 
 
 #endif
@@ -389,6 +401,7 @@ int main(void)
   buzzerOn(262);
   __delay_cycles(1000000);
 
+
 #endif
 
 // Test if rainbow effect for LED working
@@ -397,6 +410,48 @@ int main(void)
 
     rainbowEffect();
 #endif
+
+// Test if the file system is working
+ // File System not working
+#ifdef TEST_FS
+rgbLED(0, 0, 255);
+__delay_cycles(1000000);
+
+UINT token2;
+FRESULT fr;
+FATFS fs;
+FIL file;
+uint8_t buf2[16];
+
+/* Open or create a log file and ready to append */
+fr = f_mount(&fs, "", 1);
+if (fr != FR_OK) { rgbLED(255,0,0);}
+fr = f_open(&file, "test.txt", FA_WRITE | FA_OPEN_APPEND);
+if (fr != FR_OK) { rgbLED(255,0,0);}
+// fr = f_write(&file, "HELLO FILE WORLD!", 16, &token2);
+token2 = f_printf(&file, "HELLO WORLD");
+if (token2 != 11) { rgbLED(255,0,0);} else {rgbLED(0,255,0); }
+f_close(&file);
+
+// fr = f_open(&file, "test.txt", FA_READ | FA_OPEN_EXISTING);
+// if (fr != FR_OK) {
+//   rgbLED(255,0,0);
+// } else {
+//   f_read(&file, buf2, 16, &token2);
+// }
+// f_close (&file);
+//
+// if (((char)buf2[0] == 'H') || ((char)buf2[15] == '!')) {
+//   rgbLED(0,255,0);
+// } else {
+//   rgbLED(255,0,0);
+// }
+#endif
+
+
+
+
+
 
 #ifdef FLIGHT_LOGIC
 
