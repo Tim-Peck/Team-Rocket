@@ -151,11 +151,14 @@ int main(void)
 #endif
 
 #ifdef TEST_FS
-  #ifndef TEST_UART
-  uart_init();
+  #ifndef TEST_SD
+    #ifndef TEST_UART
+      uart_init();
+    #endif
+    spi_init();
   #endif
-  spi_init(); // SD Card SPI
 #endif
+
 
 // ---------- TESTING ---------- //
 
@@ -368,7 +371,6 @@ __delay_cycles(1000000);
 
   buzzerOn(262);
   __delay_cycles(1000000);
-
 #endif
 
 #ifdef TEST_FS
@@ -382,29 +384,28 @@ FIL file;
 uint8_t buf2[16];
 
 /* Open or create a log file and ready to append */
-f_mount(&fs, "", 0);
-fr = f_open(&file, "test.txt", FA_WRITE);
-//fr = setAppend(&file);
-if (fr == FR_OK) {
-  f_write(&file, "HELLO FILE WORLD!", 16, token2);
-} else {
-  rgbLED(255,0,0);
-}
+fr = f_mount(&fs, "", 1);
+if (fr != FR_OK) { rgbLED(255,0,0);}
+fr = f_open(&file, "test.txt", FA_WRITE | FA_OPEN_APPEND);
+if (fr != FR_OK) { rgbLED(255,0,0);}
+// fr = f_write(&file, "HELLO FILE WORLD!", 16, &token2);
+token2 = f_printf(&file, "HELLO WORLD");
+if (token2 != 11) { rgbLED(255,0,0);} else {rgbLED(0,255,0); }
 f_close(&file);
 
-fr = f_open(&file, "test.txt", FA_READ);
-if (fr == FR_OK) {
-  f_read(&file, buf2, 16, token2);
-} else {
-  rgbLED(255,0,0);
-}
-f_close (&file);
-
-if ((buf2[0] == "H") || (buf2[15] == "!")) {
-  rgbLED(0,255,0);
-} else {
-  rgbLED(255,0,0);
-}
+// fr = f_open(&file, "test.txt", FA_READ | FA_OPEN_EXISTING);
+// if (fr != FR_OK) {
+//   rgbLED(255,0,0);
+// } else {
+//   f_read(&file, buf2, 16, &token2);
+// }
+// f_close (&file);
+//
+// if (((char)buf2[0] == 'H') || ((char)buf2[15] == '!')) {
+//   rgbLED(0,255,0);
+// } else {
+//   rgbLED(255,0,0);
+// }
 #endif
 
 

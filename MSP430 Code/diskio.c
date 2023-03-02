@@ -7,6 +7,7 @@
 #include "ff.h"			/* Obtains integer types */
 #include "diskio.h"
 
+uint8_t sd_already_initalised = 0;
 
 // Glue functions for the FatFS library
 
@@ -17,15 +18,21 @@ DSTATUS disk_status (BYTE pdrv) {
   // if (SD_goIdleState() != 0x01) {
   //   return STA_NOINIT;
   // }
-  return 0;
+  return !sd_already_initalised;
 }
 
-// Initalse the disk and return disk status if succesful
+// Initalise the disk and return disk status if succesful
 DSTATUS disk_initialize (BYTE pdrv) {
-  if (SD_init() == 1) {
-    return 0;
+  if (sd_already_initalised == 0) {
+      uint8_t res = SD_init();
+      if (res == 1) {
+        sd_already_initalised = 1;
+        return !res;
+      }
+      return 1;
   }
-  return 1;
+  return 0;
+
 }
 
 // Read the given sectors into the buffer
@@ -115,15 +122,3 @@ DRESULT disk_ioctl (BYTE pdrv, BYTE cmd, void* buff) {
 
 
 DWORD get_fattime (void) { return 0;}
-
- /* fp [OUT] File object to move to the end of */
-FRESULT setAppend (FIL* fp )
-{
-    /* Seek to end of the file to append data */
-    FRESULT fr;
-    fr = f_lseek(fp, f_size(fp));
-    if (fr != FR_OK) {
-        f_close(fp);
-    }
-    return fr;
-}
