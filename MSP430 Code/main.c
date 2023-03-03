@@ -6,13 +6,13 @@
 //#define TEST_GNSS_FIX
 //#define TEST_SD
 //#define TEST_IMU // DOES NOT WORK WITH CURRENT I2C CODE
-//#define TEST_ADC
+// #define TEST_ADC
 //#define TEST_BUZZER
 //#define TEST_RAINBOW
 
 // Operation type list
 // FLIGHT MODE (Flight logic - see flow chart)
- #define FLIGHT_MODE
+#define FLIGHT_MODE
 
 // RESET MODE (Erase all content by setting all bytes to 0)
 // #define RESET_MODE
@@ -451,8 +451,6 @@ int main(void)
         }
     }
 
-    // Set the camera pin direction and value
-    P2DIR &= ~BIT5;
 #endif
 
 #ifdef FLIGHT_MODE
@@ -531,9 +529,6 @@ int main(void)
                     // TO DO: set buzzer
                     buzzerOn(440);
 
-                    // Set the Camera Pin high
-                    P2DIR |= BIT5;
-
                     currentStage = 2;
                 }
                 // ------- RECORD DATA ------- //
@@ -604,17 +599,14 @@ int main(void)
                   uint8_t addressNum[4];
                   int i;
                   for (i = 0; i < 4; i++) {
-                    addressNum[i] = buf[i+1];
+                    addressNum[i] = metaData[i+1];
                   }
-                  blockAddress = convert_uint8_array_to_uint32(&addressNum);
+                  blockAddress = convert_uint8_array_to_uint32(addressNum);
 
                   // TO DO: recording time reached, set LED to rainbow
                   rainbowEffect();
                   // TO DO: set buzzer
                   buzzerOn(600);
-
-                  // Set the Camera Pin high
-                  P2DIR |= BIT5;
 
                   currentStage = 2;
                 }

@@ -65,7 +65,7 @@ double getBatVoltage() {
 
 double convertADCToVoltage(uint16_t refVal,uint16_t batVal) {
   // 1024 for 10 bit
-  return (0.115-(1.5/(refVal/1024.0)*(batVal/1024.0) * 2  - 2.875))/0.115*0.5+3.6;
+  return (1.5/(refVal/1024.0)*(batVal/1024.0)) * 2;
 }
 
 uint16_t getADCRawVal() {
