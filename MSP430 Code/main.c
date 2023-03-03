@@ -602,7 +602,11 @@ int main(void)
                   // set SD recording status as recording
                   SD_readSingleBlock(0, buf, &token);
                   uint8_t addressNum[4];
-                  blockAddress = convert_uint8_array_to_uint32(&addressNum)
+                  int i;
+                  for (i = 0; i < 4; i++) {
+                    addressNum[i] = buf[i+1];
+                  }
+                  blockAddress = convert_uint8_array_to_uint32(&addressNum);
 
                   // TO DO: recording time reached, set LED to rainbow
                   rainbowEffect();

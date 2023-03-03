@@ -183,14 +183,6 @@ float parse_GGA_alt()
 
 void parse_GGA_UTC(uint8_t *UTC)
 {
-    // check if fix acquired first
-    if (!fixAcquired())
-    {
-        UTC[0] = 0;
-        UTC[1] = 0;
-        UTC[2] = 0;
-        return ;
-    }
 
     // extract ASCII values for UTC
     uint8_t h1 = NMEA_sentence[1];
