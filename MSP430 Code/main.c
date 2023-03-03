@@ -12,7 +12,7 @@
 
 // Operation type list
 // FLIGHT MODE (Flight logic - see flow chart)
-#define FLIGHT_MODE
+ #define FLIGHT_MODE
 
 // RESET MODE (Erase all content by setting all bytes to 0)
 // #define RESET_MODE
@@ -22,8 +22,8 @@
 
 // USER ENTRY //
 // SET START TIME IN NZDT (CANNOT SET TIME IN THE NEXT DAY)
-#define FLIGHT_START_HOUR 20
-#define FLIGHT_START_MIN 56
+#define FLIGHT_START_HOUR 18
+#define FLIGHT_START_MIN 35
 // USER ENTRY //
 
 #include <msp430.h>
@@ -529,7 +529,7 @@ int main(void)
                     // TO DO: recording time reached, set LED to rainbow
                     rainbowEffect();
                     // TO DO: set buzzer
-                    buzzerOn(500);
+                    buzzerOn(440);
 
                     // Set the Camera Pin high
                     P2DIR |= BIT5;
@@ -600,7 +600,7 @@ int main(void)
                 if (currentStage == 3)
                 {
                   // set SD recording status as recording
-                  SD_readSingleBlock(0, buf, &token);
+                  SD_readSingleBlock(0, metaData, &token);
                   uint8_t addressNum[4];
                   int i;
                   for (i = 0; i < 4; i++) {

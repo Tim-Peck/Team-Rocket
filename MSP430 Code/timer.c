@@ -59,7 +59,7 @@ void buzzerOn(int frequency)
 
     // calculate CCR0 value from frequency
     // note: counts per second/counts per cycle = frequency
-    uint16_t CCR0 = 1054430.0 / frequency;
+    uint16_t CCR0 = 1054300.0 / frequency;
 
     // set CCR0 and CCR1 values
     TB2CCR0 = CCR0;
