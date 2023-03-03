@@ -113,13 +113,17 @@ int main(void)
     }
     else
     {
+
+//#define TESTING
+//#define METADATA // comment for reading metadata and first data block
+        // also uncomment in UART and SPI
+
+#ifndef TESTING
 // DATA ANALYSIS MODE
         rgbLED(0, 255, 0);
         uart_send_bytes("SD Initialization Success\r",
                         sizeof("SD Initialization Success\r"));
-#define TESTING // uncomment to read metadata and first data block
-        // also uncomment in UART and SPI
-#ifdef TESTING
+#ifdef METADATA
         // read metadata block
         R1 = SD_readSingleBlock(0, buf, &token);
         // print metadata block
@@ -149,37 +153,21 @@ int main(void)
             // OPTIONAL TO-DO (requires converting uint32 to ASCII)
             // print block address
 
+            uint8_t currentBlock = 1;
             uint8_t j;
-            uint8_t ninetyNinesCount = 0;
-            uint32_t blockCount = 0;
-            while (blockCount < blockAddress)
+            while (currentBlock <= blockAddress)
             {
-                // print out data by batch of ninety nine blocks (RealTerm 100 row limit)
-                for (i = 1 + ninetyNinesCount * 99;
-                        i <= 99 + ninetyNinesCount * 99; i++)
+                SD_readSingleBlock(currentBlock++, buf, &token);
+                // print out data in current block, 25 bytes wide
+                for (j = 0; j < 25; j++)
                 {
-                    SD_readSingleBlock(i, buf, &token);
-                    // only print out block if less than last block address
-                    if (blockCount < blockAddress)
-                    {
-                        blockCount++;
-                        // print out data in current block, 21 bytes wide
-                        for (j = 0; j < 21; j++)
-                        {
-                            uart_send_hex8(buf[j]);
-                        }
-                    }
+                    uart_send_hex8(buf[j]);
                 }
-                // print Xs to delineate
-                for (j = 0; j < 42; j++)
-                {
-                    uart_send_byte('X');
-                }
-                ninetyNinesCount++;
-                __delay_cycles(30000000); // wait 100 seconds before sending out next batch
+                uart_send_byte('\n');
             }
             break;
         }
+#endif
 #endif
     }
 
@@ -195,53 +183,53 @@ int main(void)
 
 //    uart_send_byte('X');
 
-    /*
-     // SD card testing
+#ifdef TESTING
+    // SD card testing
 
-     uint8_t R1, buf[512], token;
-     uint16_t i;
+    uint8_t R1, buf[512], token;
+    uint16_t i;
 
-     // initialize SD card
-     if (SD_init())
-     {
-     uart_send_bytes("SD Initialization Success\r",
-     sizeof("SD Initialization Success\r"));
-     }
-     else
-     {
-     uart_send_bytes("SD Initialization Failure\r",
-     sizeof("SD Initialization Failure\r"));
-     }
+    // initialize SD card
+    if (SD_init())
+    {
+        uart_send_bytes("SD Initialization Success\r",
+                        sizeof("SD Initialization Success\r"));
 
-     uart_send_bytes("------------------\r", sizeof("------------------\r"));
+        uart_send_bytes("------------------\r", sizeof("------------------\r"));
 
-     // read a block from SD card
-     R1 = SD_readSingleBlock(0, buf, &token);
+        // read a block from SD card
+        R1 = SD_readSingleBlock(0, buf, &token);
 
-     // print read SD block
-     print_SDBlock(R1, buf, &token);
+        // print read SD block
+        print_SDBlock(R1, buf, &token);
 
-     // fill buffer
-     for (i = 0; i < 512; i++)
-     {
-     buf[i] = 0xAA;
-     }
+        // fill buffer
+        for (i = 0; i < 512; i++)
+        {
+            buf[i] = 0xAA;
+        }
 
-     //    // write a block to SD card to address 0x100 (256)
-     //    SD_writeSingleBlock(0, buf, &token);
+        // write a block to SD card to address 0 (256)
+        SD_writeSingleBlock(0, buf, &token);
 
-     // read a block from SD card
-     R1 = SD_readSingleBlock(0x00000101, buf, &token);
+        // read a block from SD card
+        R1 = SD_readSingleBlock(0, buf, &token);
 
-     // print read SD block
-     print_SDBlock(R1, buf, &token);
+        // print read SD block
+        print_SDBlock(R1, buf, &token);
 
-     // read a block from SD card
-     R1 = SD_readSingleBlock(0x00000100, buf, &token);
+        // read a block from SD card
+        R1 = SD_readSingleBlock(0xFFFFFFFF, buf, &token);
 
-     // print read SD block
-     print_SDBlock(R1, buf, &token);
-     */
+        // print read SD block
+        print_SDBlock(R1, buf, &token);
+    }
+    else
+    {
+        uart_send_bytes("SD Initialization Failure\r",
+                        sizeof("SD Initialization Failure\r"));
+    }
+#endif
 
     /*
      // ------------------------------ //

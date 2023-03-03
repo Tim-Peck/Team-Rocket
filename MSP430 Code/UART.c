@@ -2,7 +2,7 @@
 #include <inttypes.h>
 #include "UART.h"
 
-#define TESTING // uncomment to read metadata and first data block
+//#define METADATA // uncomment to read metadata and first data block
 
 void uart_init() {
     next_idx_to_send_UART = 0;
@@ -47,7 +47,7 @@ void uart_send_byte(byte) {
 }
 
 void uart_send_bytes(uint8_t *bytes, uint8_t number_of_bytes) {
-#ifdef TESTING
+#ifdef METADATA
     uint8_t i;
     for (i = 0; i < number_of_bytes; i++) {
         uart_send_byte(bytes[i]);

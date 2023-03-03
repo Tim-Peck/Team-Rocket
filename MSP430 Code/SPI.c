@@ -1,7 +1,7 @@
 #include <msp430.h>
 #include "SPI.h"
 
-#define TESTING // uncomment to read metadata and first data block
+//#define METADATA // uncomment to read metadata and first data block
 
 // note for uint8_t: NON-ZERO NUMBERS ARE TRUE WHILE ZERO IS FALSE (so e.g. 0b10 & 0b11 is TRUE while 0b10 & 0b01 is FALSE)
 // these check if a bit is positive
@@ -196,7 +196,7 @@ void SD_printR7(uint8_t *res)
         return;
 
     uart_send_bytes("\tCommand Version: ", sizeof("\tCommand Version: ") - 1);
-#ifdef TESTING
+#ifdef METADATA
     uart_send_hex8(CMD_VER(res[1]));
 #endif
     uart_send_bytes("\r", sizeof("\r") - 1);
@@ -214,7 +214,7 @@ void SD_printR7(uint8_t *res)
         uart_send_bytes("NOT DEFINED\r", sizeof("NOT DEFINED\r") - 1);
 
     uart_send_bytes("\tEcho: ", sizeof("\tEcho: ") - 1);
-#ifdef TESTING
+#ifdef METADATA
     uart_send_hex8(res[4]);
 #endif
     uart_send_bytes("\r", sizeof("\r") - 1);
@@ -304,7 +304,7 @@ void print_SDBlock(uint8_t R1, uint8_t *buf, uint8_t *token)
 
     uint16_t i;
 
-#ifdef TESTING
+#ifdef METADATA
     for (i = 0; i < 512; i++)
     {
         uart_send_hex8(buf[i]);
