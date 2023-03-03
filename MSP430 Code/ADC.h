@@ -11,6 +11,9 @@ void adc_init();
 // Get the battery voltage as a double
 double getBatVoltage();
 
+uint8_t getRawRef();
+
+uint8_t getRawBat();
 
 // Helper Functions
 

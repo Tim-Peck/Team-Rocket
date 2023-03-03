@@ -22,8 +22,8 @@
 
 // USER ENTRY //
 // SET START TIME IN NZDT (CANNOT SET TIME IN THE NEXT DAY)
-#define FLIGHT_START_HOUR 16
-#define FLIGHT_START_MIN 26
+#define FLIGHT_START_HOUR 20
+#define FLIGHT_START_MIN 56
 // USER ENTRY //
 
 #include <msp430.h>
@@ -90,6 +90,7 @@ static uint8_t altitude[4];
 static uint8_t UTC[3];
 static float GCS_f[2];
 static uint8_t latitude[4], longitude[4];
+static uint8_t batteryVal[4];
 #endif
 
 #ifdef FLIGHT_LOGIC
@@ -166,15 +167,6 @@ int main(void)
 
 #ifdef TEST_RAINBOW
     timerB3_init();
-#endif
-
-#ifdef TEST_FS
-  #ifndef TEST_SD
-    #ifndef TEST_UART
-      uart_init();
-    #endif
-    spi_init();
-  #endif
 #endif
 
 // ---------- TESTING ---------- //
@@ -411,44 +403,6 @@ int main(void)
     rainbowEffect();
 #endif
 
-// Test if the file system is working
- // File System not working
-#ifdef TEST_FS
-rgbLED(0, 0, 255);
-__delay_cycles(1000000);
-
-UINT token2;
-FRESULT fr;
-FATFS fs;
-FIL file;
-uint8_t buf2[16];
-
-/* Open or create a log file and ready to append */
-fr = f_mount(&fs, "", 1);
-if (fr != FR_OK) { rgbLED(255,0,0);}
-fr = f_open(&file, "test.txt", FA_WRITE | FA_OPEN_APPEND);
-if (fr != FR_OK) { rgbLED(255,0,0);}
-// fr = f_write(&file, "HELLO FILE WORLD!", 16, &token2);
-token2 = f_printf(&file, "HELLO WORLD");
-if (token2 != 11) { rgbLED(255,0,0);} else {rgbLED(0,255,0); }
-f_close(&file);
-
-// fr = f_open(&file, "test.txt", FA_READ | FA_OPEN_EXISTING);
-// if (fr != FR_OK) {
-//   rgbLED(255,0,0);
-// } else {
-//   f_read(&file, buf2, 16, &token2);
-// }
-// f_close (&file);
-//
-// if (((char)buf2[0] == 'H') || ((char)buf2[15] == '!')) {
-//   rgbLED(0,255,0);
-// } else {
-//   rgbLED(255,0,0);
-// }
-#endif
-
-
 
 
 
@@ -461,9 +415,10 @@ f_close(&file);
     uart_GNSS_init(); // GNSS module UART
     i2c_init(); // IMU I2C
     spi_init(); // SD Card SPI
-// adc_init();
+    adc_init();
 
     timerB0_init(); // 1Hz timer
+    timerB2_init(); // Buzzer PWM timer
     timerB3_init(); // RGB LED PWM timer
 
     rgbLED(255, 255, 255); // set a first light to be white
@@ -495,6 +450,9 @@ f_close(&file);
             break;
         }
     }
+
+    // Set the camera pin direction and value
+    P2DIR &= ~BIT5;
 #endif
 
 #ifdef FLIGHT_MODE
@@ -507,15 +465,17 @@ f_close(&file);
         {
             // SD card has data, set LED to green
             rgbLED(0, 255, 0);
-            break; // exit
+            currentStage = 3;
         }
 
         // Verify IMU connection
         if (!checkIMUConnection())
         {
+          if (currentStage != 3) {
             // IMU initialisation failure, set LED to pink
             rgbLED(255, 0, 255);
             break; // exit
+          }
         }
         // initialise IMU
         IMUInit();
@@ -525,8 +485,10 @@ f_close(&file);
         // begin receiving GNSS signals
         GNSS_receive();
         // wait for fix acquired
-        while (!fixAcquired())
-            ;
+        if (currentStage != 3) {
+          while (!fixAcquired())
+              ;
+        }
         // fix acquired, set LED to yellow
         rgbLED(255, 255, 0);
 
@@ -569,6 +531,9 @@ f_close(&file);
                     // TO DO: set buzzer
                     buzzerOn(500);
 
+                    // Set the Camera Pin high
+                    P2DIR |= BIT5;
+
                     currentStage = 2;
                 }
                 // ------- RECORD DATA ------- //
@@ -592,6 +557,7 @@ f_close(&file);
                     parse_GGA_GCS(GCS_f);
                     float_to_uint8(GCS_f[0], latitude);
                     float_to_uint8(GCS_f[1], longitude);
+                    float_to_uint8(getBatVoltage(), batteryVal);
 
                     // combine data together
                     for (i = 0; i < 6; i++)
@@ -614,6 +580,10 @@ f_close(&file);
                     {
                         buf[i] = longitude[i - 17];
                     }
+                    for (i = 21; i < 25; i++)
+                    {
+                        buf[i] = batteryVal[i - 21];
+                    }
 
                     // write data to block
                     SD_writeSingleBlock(blockAddress++, buf, &token);
@@ -625,6 +595,24 @@ f_close(&file);
                         metaData[i + 1] = blockAddressArr[3 - i];
                     }
                     SD_writeSingleBlock(0, metaData, &token);
+                }
+                // ------- SET CONDITIONS ON FAST RESTART ------- //
+                if (currentStage == 3)
+                {
+                  // set SD recording status as recording
+                  SD_readSingleBlock(0, buf, &token);
+                  uint8_t addressNum[4];
+                  blockAddress = convert_uint8_array_to_uint32(&addressNum)
+
+                  // TO DO: recording time reached, set LED to rainbow
+                  rainbowEffect();
+                  // TO DO: set buzzer
+                  buzzerOn(600);
+
+                  // Set the Camera Pin high
+                  P2DIR |= BIT5;
+
+                  currentStage = 2;
                 }
             }
         }

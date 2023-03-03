@@ -164,7 +164,7 @@ float parse_GGA_alt()
     // check if fix acquired first
     if (!fixAcquired())
     {
-        return;
+        return 0;
     }
 
     // walk the GGA sentence till altitude field reached
@@ -186,7 +186,10 @@ void parse_GGA_UTC(uint8_t *UTC)
     // check if fix acquired first
     if (!fixAcquired())
     {
-        return;
+        UTC[0] = 0;
+        UTC[1] = 0;
+        UTC[2] = 0;
+        return ;
     }
 
     // extract ASCII values for UTC
@@ -213,6 +216,9 @@ void parse_GGA_GCS(float *GCS)
     // check if fix acquired first
     if (!fixAcquired())
     {
+        GCS[0] = 0;
+        GCS[1] = 0;
+        GCS[2] = 0;
         return;
     }
 

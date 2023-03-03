@@ -37,7 +37,7 @@ void adc_init() {
 
 }
 
-double getBatVoltage() {
+uint8_t getRawRef() {
   // Disable conversion to change source
   ADCCTL0 &= ~ADCON;
   ADCCTL0 &= ~ADCENC;
@@ -45,8 +45,10 @@ double getBatVoltage() {
   // ADCMCTL0 register, ADCINCHx 0-3 bits
   ADCMCTL0 |= ADCINCH0 | ADCINCH2 | ADCINCH3; // (A13)
   ADCCTL0 |= ADCON;
-  uint16_t refADCVal = getADCRawVal();
+  return getADCRawVal();
+}
 
+uint8_t getRawBat() {
   // Disable conversion to change source
   ADCCTL0 &= ~ADCON;
   ADCCTL0 &= ~ADCENC;
@@ -54,9 +56,11 @@ double getBatVoltage() {
   // ADCMCTL0 register, ADCINCHx 0-3 bits
   ADCMCTL0 |= ADCINCH0 | ADCINCH3; // (A9)
   ADCCTL0 |= ADCON;
-  uint16_t batADCVal = getADCRawVal();
+  return getADCRawVal();
+}
 
-  return convertADCToVoltage(refADCVal,batADCVal);
+double getBatVoltage() {
+  return convertADCToVoltage(getRawRef(),getRawBat());
 }
 
 double convertADCToVoltage(uint16_t refVal,uint16_t batVal) {
