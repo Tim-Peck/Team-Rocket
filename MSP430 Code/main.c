@@ -1,5 +1,5 @@
 // Unit tests
-//#define TEST_LED
+// #define TEST_LED
 //#define TEST_TIMER // Must uncomment LED testing in TIMER B3 ISR
 //#define TEST_UART // Serial Comm has not been tested to work on PCB or 2355 Launchpad
 //#define TEST_GNSS // Function not made to test GNSS UART communication only
@@ -10,21 +10,22 @@
 //#define TEST_BUZZER
 //#define TEST_RAINBOW
 
+
 // Operation type list
 // FLIGHT MODE (Flight logic - see flow chart)
-#define FLIGHT_MODE
+  #define FLIGHT_MODE
 
 // RESET MODE (Erase all content by setting all bytes to 0)
-// #define RESET_MODE
+//#define RESET_MODE
 
 // DATA ANALYSIS MODE (View complete flight data)
 // #define DATA_ANALYSIS_MODE
 
-// USER ENTRY //
-// SET START TIME IN NZDT (CANNOT SET TIME IN THE NEXT DAY)
-#define FLIGHT_START_HOUR 18
-#define FLIGHT_START_MIN 35
-// USER ENTRY //
+// Play some tunes
+ // #define PLAY_MUSIC
+
+#define FLIGHT_START_HOUR 13
+#define FLIGHT_START_MIN 50
 
 #include <msp430.h>
 #include <inttypes.h>
@@ -36,8 +37,7 @@
 #include "timer.h"
 #include "GNSS.h"
 #include "ADC.h"
-// #include "ff.h" // File System not working
-
+#include "tunes.h"
 
 
 const uint8_t blueLEDPin = BIT1;
@@ -196,7 +196,7 @@ int main(void)
 
 // Test 1Hz Timer
 #ifdef TEST_TIMER
-  test_start_sequence();
+//  test_start_sequence();
 
   //Main 1Hz timer
   begin1HzTimer();
@@ -212,24 +212,6 @@ int main(void)
   __delay_cycles(1000000);
 #endif
 
-// #ifdef TEST_GNSS
-//
-//   test_start_sequence();
-//   // GNSS testing // Launchpad VERIFIED, PCB VERIFIED
-//
-//   GNSS_receive();
-//
-//   if (GNSSIsResponding()) {
-//     rgbLED(0, 255, 0);
-//   } else {
-//     rgbLED(255, 0, 0);
-//   }
-//
-//   __delay_cycles(1000000);
-//
-// #endif
-
-// Test if communication is good and fix received from GNSS on UART line
 #ifdef TEST_GNSS_FIX
   test_start_sequence();
 
@@ -363,7 +345,6 @@ int main(void)
 
   __delay_cycles(1000000);
 
-
 #endif
 
 // Test if buzzer working
@@ -418,6 +399,7 @@ int main(void)
     adc_init();
 
     timerB0_init(); // 1Hz timer
+    timerB1_init(); // Tunes timer
     timerB2_init(); // Buzzer PWM timer
     timerB3_init(); // RGB LED PWM timer
 
@@ -456,6 +438,8 @@ int main(void)
 #ifdef FLIGHT_MODE
     while (1)
     {
+
+
         // ------- INITIALISATION STAGE ------- //
         uint8_t byte = checkFinishStatus();
         // Check if recording has begun to not override existing data
@@ -479,6 +463,9 @@ int main(void)
         IMUInit();
         // IMU initialisation complete, set LED to cyan
         rgbLED(0, 255, 255);
+
+        tunes_songSelect = 1;
+        tunes_PlaySong();
 
         // begin receiving GNSS signals
         GNSS_receive();
@@ -527,9 +514,13 @@ int main(void)
                     // TO DO: recording time reached, set LED to rainbow
                     rainbowEffect();
                     // TO DO: set buzzer
-                    buzzerOn(440);
+                    // buzzerOn(440);
+                    tunes_songSelect = 2;
+                    tunes_PlaySong();
 
                     currentStage = 2;
+
+
                 }
                 // ------- RECORD DATA ------- //
                 if (currentStage == 2)
@@ -606,7 +597,9 @@ int main(void)
                   // TO DO: recording time reached, set LED to rainbow
                   rainbowEffect();
                   // TO DO: set buzzer
-                  buzzerOn(600);
+                  // buzzerOn(600);
+                  timerB1_init();
+                  tunes_PlaySong();
 
                   currentStage = 2;
                 }
@@ -645,10 +638,18 @@ int main(void)
   // uart_send_bytes(accelz, 4);
 #endif
 
-    // keep MSP running
-    while (1)
-    {
-    }
+#ifdef PLAY_MUSIC
+  timerB2_init();
+  timerB1_init();
+  tunes_songSelect = 1;
+  tunes_PlaySong();
+#endif
+
+
+  // keep MSP running
+  while (1)
+  {
+  }
 
     return 0;
 }

@@ -23,6 +23,8 @@ void timerB0_init()
     TB0CTL |= TBCLR;
     // clear flag
     TB0CCTL0 &= ~CCIFG;
+
+    P2DIR |= BIT3;
 }
 
 void begin1HzTimer()
@@ -31,11 +33,22 @@ void begin1HzTimer()
     TB0CTL |= MC0;
 }
 
+// IFG for CCR0: 1Hz timer for flight logic
+#pragma vector=TIMER0_B0_VECTOR
+__interrupt void TIMER0_B0_ISR(void)
+{
+  #ifdef USE_DEV_BOARD
+    P1OUT ^= BIT0; // TESTING
+  #else
+    P2OUT ^= BIT3; // TESTING
+  #endif
+}
+
 void timerB2_init()
 {
     // set pin 5.0 to timer output mode
     P5SEL0 |= BIT0;
-    // set pin direction
+    // Set the direction of pin 5.0 to out
     P5DIR |= BIT0;
 
     // stop timer
@@ -70,6 +83,12 @@ void buzzerOn(int frequency)
 
     // start timer in up mode
     TB2CTL |= MC0;
+}
+
+void buzzerOff()
+{
+    // stop timer
+    TB2CTL &= ~(MC0 | MC1);
 }
 
 void timerB3_init()
@@ -185,19 +204,6 @@ void rainbowEffect()
     RGB[2] = 0;
 
     rgbLED(RGB[0], RGB[1], RGB[2]); // begin from red to yellow and then the other colours
-}
-
-// IFG for CCR0: 1Hz timer for flight logic
-#pragma vector=TIMER0_B0_VECTOR
-__interrupt void TIMER0_B0_ISR(void)
-{
-#ifdef USE_DEV_BOARD
-//    P1DIR |= BIT0 // Uncomment for 1Hz timer testing
-//    P1OUT ^= BIT0; // Uncomment for 1Hz timer testing
-  #else
-//    P2DIR |= BIT3; // Uncomment for 1Hz timer testing
-//    P2OUT ^= BIT3; // Uncomment for 1Hz timer testing
-#endif
 }
 
 // CCR0: pull all LED low to turn on
